@@ -1,4 +1,6 @@
-﻿using Objectiks.Engine;
+﻿using Objectiks.Caching;
+using Objectiks.Engine;
+using Objectiks.Parsers;
 using Objectiks.Services;
 using System;
 using System.Collections.Generic;
@@ -8,14 +10,34 @@ namespace Objectiks
 {
     public class DocumentOptions
     {
-        public Type Cache { get; private set; }
-        public Type Engine { get; private set; }
-        public List<Type> ParserOf { get; private set; }
-        public IDocumentConnection Connection { get; private set; }
+        internal Type Cache { get; private set; }
+        internal Type Engine { get; private set; }
+        internal List<Type> ParserOf { get; private set; }
+        internal IDocumentConnection Connection { get; private set; }
 
         public DocumentOptions()
         {
+            RegisterDefaultTypeOrParser(string.Empty);
+        }
+
+        public DocumentOptions(string baseDirectory)
+        {
+            RegisterDefaultTypeOrParser(baseDirectory);
+        }
+
+        private void RegisterDefaultTypeOrParser(string baseDirectory)
+        {
             ParserOf = new List<Type>();
+            Connection = new DocumentConnection(baseDirectory);
+
+            UseCacheTypeOf<DocumentInMemory>();
+            UseEngineTypeOf<DocumentEngine>();
+
+            AddParserTypeOf<DocumentDefaultParser>();
+            AddParserTypeOf<DocumentOneToOneParser>();
+            AddParserTypeOf<DocumentManyToManyParser>();
+            AddParserTypeOf<DocumentOneToManyParser>();
+            AddParserTypeOf<DocumentOneToOneFileParser>();
         }
 
         public void UseEngineTypeOf<T>() where T : DocumentEngine
@@ -37,5 +59,11 @@ namespace Objectiks
         {
             Connection = connection;
         }
+
+        public void ClearParserOf()
+        {
+            ParserOf?.Clear();
+        }
+
     }
 }

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
 
-namespace Objectiks.Json.Parser
+namespace Objectiks.Parsers
 {
     public class DocumentOneToManyParser : IDocumentRefParser
     {

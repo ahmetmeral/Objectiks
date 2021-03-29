@@ -1,11 +1,11 @@
-﻿using Objectiks.Json.Parser;
+﻿using Objectiks.Parsers;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Objectiks.Json
+namespace Objectiks.Extentions
 {
-    public static class JsonExtentions
+    public static class OptionExtentions
     {
         public static void AddDefaultParsers(this DocumentOptions options)
         {

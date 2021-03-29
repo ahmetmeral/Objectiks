@@ -12,6 +12,16 @@ namespace Objectiks
     {
         public DocumentEngine Engine { get; private set; }
 
+        public ObjectiksOf()
+        {
+            Engine = Core.Initialize(new DocumentOptions());
+        }
+
+        public ObjectiksOf(string baseDirectory)
+        {
+            Engine = Core.Initialize(new DocumentOptions(baseDirectory));
+        }
+
         public ObjectiksOf(DocumentOptions options)
         {
             Engine = Core.Initialize(options);

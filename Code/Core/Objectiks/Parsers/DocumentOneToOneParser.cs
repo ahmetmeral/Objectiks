@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Objectiks.Json.Parser
+namespace Objectiks.Parsers
 {
     public class DocumentOneToOneParser : IDocumentRefParser
     {

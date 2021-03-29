@@ -12,5 +12,6 @@ namespace Objectiks.Services
         string BaseDirectory { get; set; }
         string Username { get; set; }
         string Password { get; set; }
+        string Hash { get; set; }
     }
 }

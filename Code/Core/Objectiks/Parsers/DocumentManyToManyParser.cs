@@ -10,7 +10,7 @@ using Objectiks.Services;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 
-namespace Objectiks.Json.Parser
+namespace Objectiks.Parsers
 {
     public class DocumentManyToManyParser : IDocumentRefParser
     {

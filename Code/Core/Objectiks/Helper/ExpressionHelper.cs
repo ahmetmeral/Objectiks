@@ -122,10 +122,6 @@ namespace Objectiks.Helper
             return constExprType.GetField(expr.Member.Name).GetValue(constExpr.Value);
         }
 
-
-
-
-
         public static MemberExpression GetMemberExpression(Expression expression)
         {
             switch (expression)

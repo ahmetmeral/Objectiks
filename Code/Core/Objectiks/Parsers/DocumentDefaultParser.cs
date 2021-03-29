@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Objectiks.Json.Parser
+namespace Objectiks.Parsers
 {
     public class DocumentDefaultParser : IDocumentParser
     {

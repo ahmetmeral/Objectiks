@@ -18,7 +18,7 @@ using System.Text;
 
 namespace Objectiks.Extentions
 {
-    public static class DocumentExtention
+    public static class DocumentExtentions
     {
         public static bool AsBool(this DocumentVars obj, string key)
         {

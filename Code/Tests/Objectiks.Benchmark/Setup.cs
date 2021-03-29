@@ -2,9 +2,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 using Objectiks.Benchmark.Models;
-using Objectiks.InMemory;
-using Objectiks.Json;
-using Objectiks.Json.Parser;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,16 +18,7 @@ namespace Objectiks.Benchmark
         {
             get
             {
-                var options = new DocumentOptions();
-                options.UseCacheTypeOf<DocumentInMemory>();
-                options.UseEngineTypeOf<JsonEngine>();
-                options.UseConnection(new DocumentConnection());
-                options.AddParserTypeOf<DocumentDefaultParser>();
-                options.AddParserTypeOf<DocumentManyToManyParser>();
-                options.AddParserTypeOf<DocumentOneToManyParser>();
-                options.AddParserTypeOf<DocumentOneToOneFileParser>();
-
-                return options;
+                return new DocumentOptions();
             }
         }
 

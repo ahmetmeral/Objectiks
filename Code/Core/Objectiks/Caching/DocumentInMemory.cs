@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace Objectiks.InMemory
+namespace Objectiks.Caching
 {
     public class DocumentInMemory : DocumentCache
     {

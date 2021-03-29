@@ -4,8 +4,8 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 
 ### Tasks
 
-- [ ] Nuget Package
 - [ ] File watcher
+- [ ] Nuget Package
 - [ ] Sample Project
 - [ ] Refs Sample
 - [ ] Benchmark
@@ -17,6 +17,8 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 
 
 ##### Folder structure
+
+> Default Directory ``` .\<Current Directory>\Objectiks```
 
 - **Objectiks** [**Root**]
   - **Documents**
@@ -142,29 +144,12 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 
 ### How to use Objectiks
 
-##### Document Options 
-
-```csharp
-
-var baseDirectory = Path.Combine(
-    Directory.GetCurrentDirectory(),
-    DocumentDefaults.Root
-);
-
-var options = new DocumentOptions();
-options.AddDefaultParsers();
-options.UseCacheTypeOf<DocumentInMemory>();
-options.UseEngineTypeOf<JsonEngine>();
-options.UseConnection(new DocumentConnection
-{
-    BaseDirectory = baseDirectory
-});
-```               
 
 ##### Document Reader
 
 ```csharp
-var repos = new ObjectiksOf(options);
+//default directory .\<Current Directory>\Objectiks
+var repos = new ObjectiksOf();
 ```
 
 ```csharp
@@ -194,12 +179,15 @@ var categories = repos
 
 ```csharp
 
-var repos = new ObjectiksOf(options);
+var repos = new ObjectiksOf();
 
 //writer
 var pages = TestSetup.GeneratePages(10000);
 using (var writer = repos.WriterOf<Pages>())
 {
+    //creates a new file for every thousand records
+    //manifest.json can also be used for all types through two parameters.
+    //StoragePartial=true and StoragePartialLimit=1000
     writer.UsePartialStore(1000);
     writer.UseFormatting();
     writer.Add(pages);
@@ -207,24 +195,25 @@ using (var writer = repos.WriterOf<Pages>())
 }
 
 //merge
-var mergePage = repos
+var merge = repos
     .TypeOf<Pages>()
     .PrimaryOf(1)
     .First();
 
-mergePage.Title = "Merge";
+merge.Title = "Merge";
 
 using (var writer = repos.WriterOf<Pages>())
 {
-    writer.Add(mergePage);
+    writer.Add(merge);
     writer.SubmitChanges();
 }
 
-//delete
 
+//delete
+var deleted= repos.First<Pages>(2);
 using (var writer = repos.WriterOf<Pages>())
 {
-    writer.Delete(mergePage);
+    writer.Delete(deleted);
     writer.SubmitChanges();
 }
 
@@ -233,7 +222,7 @@ using (var writer = repos.WriterOf<Pages>())
 ##### Document Meta
 
 ```csharp
-var repos = new ObjectiksOf(options);
+var repos = new ObjectiksOf();
 var meta = repos.GetTypeMeta("pages");
 
 var typeOf = meta.TypeOf;

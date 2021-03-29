@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Objectiks.Helper;
 using Objectiks.Models;
 using Objectiks.Services;
 using System;
@@ -6,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Objectiks.Json.Parser
+namespace Objectiks.Parsers
 {
     public class DocumentOneToOneFileParser : IDocumentRefParser
     {
@@ -43,7 +44,7 @@ namespace Objectiks.Json.Parser
                 var path = Path.Combine(engine.Connection.BaseDirectory, DocumentDefaults.Documents,
                     typeOf, DocumentDefaults.Contents, fileName);
 
-                source[docRef.MapOf.Target] = FileReader.Get(path, engine.Manifest.BufferSize);
+                source[docRef.MapOf.Target] = FileHelper.Get(path, engine.Manifest.BufferSize);
             }
 
             document.Data = source;

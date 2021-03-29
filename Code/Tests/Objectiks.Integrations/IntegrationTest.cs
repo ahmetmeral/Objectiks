@@ -1,8 +1,6 @@
 ﻿using NUnit.Framework;
 using Objectiks.Engine.Query;
-using Objectiks.InMemory;
 using Objectiks.Integrations.Models;
-using Objectiks.Json;
 using System;
 using System.IO;
 
@@ -31,13 +29,11 @@ namespace Objectiks.Integrations
         [Test(Description = "Document Reader Test")]
         public void DocumentReaderTest()
         {
-            var repos = new ObjectiksOf(TestSetup.Options);
-
+            var repos = new ObjectiksOf();
             var page = repos
              .TypeOf<Pages>()
              .PrimaryOf(1)
              .First();
-
         }
 
         [Order(2)]

@@ -3,12 +3,10 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Objectiks.Services;
-using Objectiks.InMemory;
-using Objectiks.Json;
-using Objectiks.Json.Parser;
 using Objectiks.Integrations.Models;
 using System.IO;
+using Objectiks.Caching;
+using Objectiks.Engine;
 
 namespace Objectiks.Integrations
 {
@@ -21,20 +19,7 @@ namespace Objectiks.Integrations
         {
             get
             {
-                var baseDirectory = Path.Combine(Directory.GetCurrentDirectory(),
-                    DocumentDefaults.Root);
-
-                var options = new DocumentOptions();
-                options.UseCacheTypeOf<DocumentInMemory>();
-                options.UseEngineTypeOf<JsonEngine>();
-                options.AddDefaultParsers();
-                options.UseConnection(new DocumentConnection
-                {
-                    BaseDirectory = baseDirectory
-                });
-               
-
-                return options;
+                return new DocumentOptions();
             }
         }
 

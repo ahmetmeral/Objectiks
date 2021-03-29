@@ -28,6 +28,8 @@ namespace Objectiks.Engine
         public abstract void Set(Document document, int expire);
         public abstract void Set(DocumentMeta meta, int expire);
 
+
+
         public virtual string CacheOf(Document doc)
         {
             return CacheOfDocument(doc.TypeOf, doc.Primary);
@@ -35,7 +37,7 @@ namespace Objectiks.Engine
 
         public virtual string CacheOfDocument(string typeOf, object primaryOf)
         {
-            return $"objectiks:{DocumentDefaults.Documents}:{typeOf}:{primaryOf}".ToLowerInvariant();
+            return $"objectiks:{Connection.Hash}:{DocumentDefaults.Documents}:{typeOf}:{primaryOf}".ToLowerInvariant();
         }
 
         public virtual string CacheOf(DocumentMeta meta)
@@ -45,7 +47,7 @@ namespace Objectiks.Engine
 
         public virtual string CacheOfMeta(string typeOf)
         {
-            return $"objectiks:{DocumentDefaults.Meta}:{typeOf}".ToLowerInvariant();
+            return $"objectiks:{Connection.Hash}:{DocumentDefaults.Meta}:{typeOf}".ToLowerInvariant();
         }
 
         protected virtual T CreateNotExistEntity<T>() where T : class

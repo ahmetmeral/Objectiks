@@ -1,13 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Objectiks.Json.Models;
 using Objectiks.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Objectiks.Json
+namespace Objectiks.Helper
 {
     public class JSONSerializer
     {
@@ -53,19 +52,6 @@ namespace Objectiks.Json
                     var contents = sr.ReadToEnd();
                     return Deserialize<T>(contents);
                 }
-            }
-        }
-
-        public DocumentText GetDocumentText(string path)
-        {
-            var info = new FileInfo(path);
-
-            using (var stream = info.Open(FileMode.Open))
-            using (var sr = new StreamReader(stream, Encoding.UTF8, false, BufferSize))
-            {
-                var contents = sr.ReadToEnd();
-
-                return new DocumentText(contents);
             }
         }
 

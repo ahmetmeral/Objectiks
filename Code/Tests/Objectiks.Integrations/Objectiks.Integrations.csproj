@@ -13,8 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Objectiks.InMemory\Objectiks.InMemory.csproj" />
-    <ProjectReference Include="..\..\Core\Objectiks.Json\Objectiks.Json.csproj" />
     <ProjectReference Include="..\..\Core\Objectiks\Objectiks.csproj" />
   </ItemGroup>
 
