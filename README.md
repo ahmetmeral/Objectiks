@@ -1,15 +1,14 @@
-# Objectiks .NET is a NoDb document store 
+# Objectiks .NET is a NoDb json document store 
 
-Objectiks is an open-source NoDb document store, that can run over a single or multiple **json** files.
+Objectiks is an open-source NoDb json document store, that can run over a single or multiple **json** files.
 
 ### Tasks
 
+- [ ] File watcher
 - [ ] Sample Project
 - [ ] Refs Sample
 - [ ] Benchmark
-- [ ] File watcher
 - [ ] Redis Cache
-
 
 
 ## Get Started
