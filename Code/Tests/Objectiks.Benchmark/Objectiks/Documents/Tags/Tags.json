@@ -1,0 +1,32 @@
+﻿[
+  {
+    "Id": 1,
+    "Name": "Life",
+    "Language": "en"
+  },
+  {
+    "Id": 2,
+    "Name": "Media",
+    "Language": "tr"
+  },
+  {
+    "Id": 3,
+    "Name": "Photos",
+    "Language": "en"
+  },
+  {
+    "Id": 4,
+    "Name": "Sports",
+    "Language": "en"
+  },
+  {
+    "Id": 5,
+    "Name": "Spor",
+    "Language": "tr"
+  },
+  {
+    "Id": 6,
+    "Name": "Fotoğraf",
+    "Language": "tr"
+  }
+]

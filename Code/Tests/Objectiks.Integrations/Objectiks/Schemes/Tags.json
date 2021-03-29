@@ -1,0 +1,6 @@
+{
+  "TypeOf": "Tags",
+  "ParseOf": "Document",
+  "Primary": "Id",
+  "KeyOf": [ "Language" ]
+}

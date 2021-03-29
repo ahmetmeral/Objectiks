@@ -1,0 +1,23 @@
+﻿{
+  "Name": "Objectiks",
+  "Version": "0.0.4",
+  "Author": "Ahmet Meral",
+  "Primary": "Id",
+  "KeyOf": [],
+  "TypeOf": [ "Pages", "Categories", "Tags" ],
+  "BufferSize": 512,
+  "Extention": {
+    "Documents": "*.json"
+  },
+  "Cache": {
+    "Expire": 1000
+  },
+  "Documents": {
+    "PropertyOverride": true,
+    "StoragePartial": false,
+    "StoragePartialLimit": 2
+  },
+  "Vars": {
+    "AnyVariables": true
+  }
+}

@@ -1,0 +1,49 @@
+﻿{
+  "TypeOf": "Pages",
+  "ParseOf": "Document",
+  "Primary": "Id",
+  "KeyOf": [ "Name", "Language", "CategoryRef" ],
+  "Refs": [
+    {
+      "ParseOf": "M:M",
+      "TypeOf": "Tags",
+      "KeyOf": {
+        "Source": [ "TagRefs" ],
+        "Target": [ "Id" ],
+        "Any": false
+      },
+      "MapOf": {
+        "Source": "Tags"
+      }
+    },
+    {
+      "ParseOf": "1:1",
+      "TypeOf": "Categories",
+      "KeyOf": {
+        "Source": [ "CategoryRef" ],
+        "Target": [ "Id" ]
+      },
+      "MapOf": {
+        "Source": "Category"
+      }
+    },
+    {
+      "ParseOf": "1:M",
+      "TypeOf": "Categories",
+      "MapOf": {
+        "Source": "Categories"
+      }
+    },
+    {
+      "ParseOf": "1:1F",
+      "TypeOf": "Copy",
+      "MapOf": {
+        "Source": "File",
+        "Target": "Contents"
+      }
+    }
+  ],
+  "Cache": {
+    "Expire": 100000
+  }
+}

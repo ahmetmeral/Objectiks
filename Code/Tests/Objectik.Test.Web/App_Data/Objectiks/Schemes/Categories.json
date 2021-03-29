@@ -1,0 +1,6 @@
+﻿{
+  "TypeOf": "Categories",
+  "ParseOf": "Default",
+  "Primary": "Id",
+  "KeyOf": [ "Name", "Language" ]
+}
