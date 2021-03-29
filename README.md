@@ -130,7 +130,6 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 }
 ```
 
-
 ###### tags.json schema  (sample)
 
 ```json 
@@ -143,6 +142,55 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 ```
 
 ### How to use Objectiks
+
+##### Models (samples)
+
+```csharp
+[TypeOf, Serializable]
+public class Pages
+{
+    [Primary]
+    public int Id { get; set; }
+    public int CategoryRef { get; set; }
+    public int[] TagRefs { get; set; }
+    public string Name { get; set; }
+    public string Language { get; set; }
+    [Requried]
+    public string Title { get; set; }
+    public string File { get; set; }
+    [Ignore]
+    public string Contents { get; set; }
+    [Ignore]
+    public Categories Category { get; set; }
+    [Ignore]
+    public Tags[] Tags { get; set; }
+    [Ignore]
+    public Categories[] Categories { get; set; }
+}
+
+[TypeOf, Serializable]
+public class Categories
+{
+    [Primary]
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Language { get; set; }
+    public string Title { get; set; }
+    public string Description { get; set; }
+}
+
+[TypeOf, Serializable]
+public class Tags
+{
+    [Primary]
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Language { get; set; }
+}
+
+```
+
+> **Primary,Requried or Ignore  etc.. attributes are used for writing to a file.**
 
 
 ##### Document Reader
