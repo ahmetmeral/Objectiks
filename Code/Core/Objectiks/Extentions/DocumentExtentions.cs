@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
-using Newtonsoft.Json.Schema.Generation;
 using Objectiks.Attributes;
 using Objectiks.Engine;
 using Objectiks.Engine.Query;
@@ -104,16 +103,6 @@ namespace Objectiks.Extentions
         public static bool IsNull(this object obj)
         {
             return obj == null;
-        }
-
-        public static bool CanBeConverted<T>(this object value) where T : class
-        {
-            var jsonData = JsonConvert.SerializeObject(value);
-            var generator = new JSchemaGenerator();
-            var parsedSchema = generator.Generate(typeof(T));
-            var jObject = JObject.Parse(jsonData);
-
-            return jObject.IsValid(parsedSchema);
         }
 
         public static T ConvertToType<T>(this object value) where T : class, new()
