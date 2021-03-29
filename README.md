@@ -4,6 +4,7 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 
 ### Tasks
 
+- [ ] Nuget Package
 - [ ] File watcher
 - [ ] Sample Project
 - [ ] Refs Sample
@@ -61,7 +62,7 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 }
 ```
 
-###### pages.json schema 
+###### pages.json schema (sample)
 
 ```json 
 {
@@ -116,7 +117,7 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 
 ```
 
-###### categories.json schema 
+###### categories.json schema  (sample)
 
 ```json 
 {
@@ -128,7 +129,7 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 ```
 
 
-###### tags.json schema 
+###### tags.json schema  (sample)
 
 ```json 
 {
