@@ -20,9 +20,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{B24CF3E5-3
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Github", ".Github", "{1893AEAA-7E70-4102-A15E-B88AB66E81A2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Github", ".Github", "{CE99B25A-983D-469A-AEB4-2960241B7007}"
 	ProjectSection(SolutionItems) = preProject
-		.Github\nuget.yml = .Github\nuget.yml
+		..\.github\workflows\nuget.yml = ..\.github\workflows\nuget.yml
 	EndProjectSection
 EndProject
 Global
