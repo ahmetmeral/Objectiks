@@ -63,8 +63,8 @@ namespace Objectiks
                 string ticks = DateTime.Now.Ticks.ToString();
                 string operationStr = operation.ToString();
 
-                Tempory = Path.Combine(document.DirectoryName, "Temp", $"{name}.{operationStr}.{ticks}.json");
-                Backup = Path.Combine(document.DirectoryName, "Backup", $"{name}.{operationStr}.{ticks}.json");
+                Tempory = Path.Combine(document.DirectoryName, "Temp", $"Temp.{name}.{operationStr}.{ticks}.json");
+                Backup = Path.Combine(document.DirectoryName, "Backup", $"Backup.{name}.{operationStr}.{ticks}.json");
 
                 CheckDirectories();
 

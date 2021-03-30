@@ -4,8 +4,8 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 
 ### Tasks
 
-- [ ] File watcher
-- [ ] Nuget Package
+- [x] File watcher
+- [x] Nuget Package
 - [ ] Sample Project
 - [ ] Refs Sample
 - [ ] Benchmark
@@ -36,7 +36,7 @@ Objectiks is an open-source NoDb json document store, that can run over a single
   - Objectik.json [**manifest**]
 
 
-###### manifest.json
+###### manifest.json (sample)
 
 ```json
 {
@@ -46,17 +46,20 @@ Objectiks is an open-source NoDb json document store, that can run over a single
   "Primary": "Id",
   "KeyOf": [],
   "TypeOf": [ "Pages", "Categories", "Tags" ],
-  "BufferSize": 512,
-  "Extention": {
-    "Documents": "*.json"
-  },
-  "Cache": {
-    "Expire": 1000
-  },
   "Documents": {
-    "PropertyOverride": true,
-    "StoragePartial": false,
-    "StoragePartialLimit": 2
+    "Extention": "*.json",
+    "BufferSize": 512,
+    "Watcher": true,
+    "Storage": {
+      "Parital": true,
+      "Limit": 1000
+    },
+    "Parser": {
+      "PropertyOverride": true
+    },
+    "Cache": {
+      "Expire": 1000
+    }
   },
   "Vars": {
     "AnyVariables": true
@@ -223,6 +226,7 @@ var categories = repos
     .ToList();
 
 ```
+
 ##### Document Writer
 
 ```csharp

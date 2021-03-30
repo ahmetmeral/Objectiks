@@ -20,6 +20,7 @@ namespace Objectiks
         public DocumentManifest Manifest { get; private set; }
         public IDocumentConnection Connection { get; private set; }
         public IDocumentCache Cache { get; private set; }
+        public DocumentWatcher Watcher { get; private set; }
 
 
         public DocumentEngine(DocumentManifest manifest, IDocumentConnection connections, IDocumentCache cache)
@@ -27,20 +28,124 @@ namespace Objectiks
             Manifest = manifest;
             Connection = connections;
             Cache = cache;
+
+            if (Manifest.Documents.Watcher)
+            {
+                Watcher = new DocumentWatcher(this);
+            }
         }
 
         internal virtual List<string> LoadAllDocumentType(DocumentTypes typeOfs)
         {
+            Watcher?.Lock();
+
             var typeOfList = new List<string>();
             foreach (var typeOf in typeOfs)
             {
                 if (LoadDocumentType(typeOf))
                 {
-                    typeOfList.Add(typeOf);
+                    typeOfList.Add(typeOf.ToLowerInvariant());
+                }
+            }
+            
+            Watcher?.UnLock();
+
+            return typeOfList;
+        }
+
+        //
+        public virtual bool LoadDocumentType(string typeOf)
+        {
+            var schema = GetDocumentSchema(typeOf);
+            var meta = new DocumentMeta(typeOf, schema, Connection);
+            var files = new List<DocumentInfo>();
+
+            #region Files
+            var directoryInfo = new DirectoryInfo(meta.Directory);
+            if (directoryInfo.Exists)
+            {
+                var extentions = Manifest.Documents.Extention;
+                var directoryFiles = directoryInfo.GetFiles(extentions, SearchOption.TopDirectoryOnly);
+
+                meta.HasData = directoryFiles.Length > 0;
+
+                var parts = new List<int>();
+                foreach (var file in directoryFiles)
+                {
+                    var info = new DocumentInfo(meta.TypeOf, file);
+
+                    if (info.Partition > meta.Partitions.Current)
+                    {
+                        meta.Partitions.Current = info.Partition;
+                    }
+
+                    if (!parts.Contains(info.Partition))
+                    {
+                        parts.Add(info.Partition);
+                    }
+
+                    meta.DiskSize += file.Length;
+
+                    files.Add(info);
+                }
+
+                parts = parts.OrderBy(p => p).ToList();
+
+                foreach (var part in parts)
+                {
+                    meta.Partitions.Add(part, 0);
+                }
+
+                meta.Partitions.Next = meta.Partitions.Current + 1;
+            }
+            #endregion
+
+            if (files.Count == 0)
+            {
+                return false;
+            }
+
+            int bufferSize = Manifest.Documents.BufferSize;
+            var serializer = new JsonSerializer();
+
+            foreach (DocumentInfo file in files)
+            {
+                using (FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize))
+                using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, true, bufferSize))
+                using (JsonReader reader = new JsonTextReader(sr))
+                {
+                    reader.SupportMultipleContent = false;
+
+                    while (reader.Read())
+                    {
+                        if (reader.TokenType == JsonToken.StartObject)
+                        {
+                            var document = new Document
+                            {
+                                TypeOf = typeOf,
+                                Data = serializer.Deserialize<JObject>(reader),
+                                Partition = file.Partition,
+                                HasLazy = meta.HasLazy,
+                                CreatedAt = DateTime.UtcNow
+                            };
+
+                            UpdateDocumentMeta(ref meta, ref document, file, OperationType.None);
+                            ParseDocumentData(ref meta, ref document, file);
+                            ParseDocumentRefs(meta.GetRefs(false), ref document);
+
+                            Cache.Set(document, meta.Cache.Expire);
+
+                            document.Dispose();
+                        }
+                    }
                 }
             }
 
-            return typeOfList;
+            Cache.Set(meta, meta.Cache.Expire);
+
+           
+
+            return true;
         }
 
         protected virtual DocumentSchema GetDocumentSchema(string typeOf)
@@ -51,12 +156,12 @@ namespace Objectiks
             if (schema == null)
             {
                 schema = ObjectiksOf.Core.DefaultSchema;
-                schema.Cache = Manifest.Cache;
+                schema.Cache = Manifest.Documents.Cache;
             }
 
             if (schema.Cache == null)
             {
-                schema.Cache = Manifest.Cache;
+                schema.Cache = Manifest.Documents.Cache;
             }
 
             if (String.IsNullOrEmpty(schema.ParseOf))
@@ -143,6 +248,7 @@ namespace Objectiks
                 meta.TotalRecords--;
                 meta.Partitions[file.Partition]--;
                 meta.RemoveKeys(document.Primary);
+                Cache.Remove(typeOf, document.Primary);
             }
             else if (operation == OperationType.Create || operation == OperationType.Append)
             {
@@ -272,98 +378,7 @@ namespace Objectiks
             return results;
         }
 
-        //
-        public virtual bool LoadDocumentType(string typeOf)
-        {
-            var schema = GetDocumentSchema(typeOf);
-            var meta = new DocumentMeta(typeOf, schema, Connection);
-            var files = new List<DocumentInfo>();
 
-            #region Files
-            var directoryInfo = new DirectoryInfo(meta.Directory);
-            if (directoryInfo.Exists)
-            {
-                var extentions = Manifest.Extention.Documents;
-                var directoryFiles = directoryInfo.GetFiles(extentions, SearchOption.TopDirectoryOnly);
-
-                meta.HasData = directoryFiles.Length > 0;
-
-                var parts = new List<int>();
-                foreach (var file in directoryFiles)
-                {
-                    var info = new DocumentInfo(meta.TypeOf, file);
-
-                    if (info.Partition > meta.Partitions.Current)
-                    {
-                        meta.Partitions.Current = info.Partition;
-                    }
-
-                    if (!parts.Contains(info.Partition))
-                    {
-                        parts.Add(info.Partition);
-                    }
-
-                    meta.DiskSize += file.Length;
-
-                    files.Add(info);
-                }
-
-                parts = parts.OrderBy(p => p).ToList();
-
-                foreach (var part in parts)
-                {
-                    meta.Partitions.Add(part, 0);
-                }
-
-                meta.Partitions.Next = meta.Partitions.Current + 1;
-            }
-            #endregion
-
-            if (files.Count == 0)
-            {
-                return false;
-            }
-
-            int bufferSize = Manifest.BufferSize;
-            var serializer = new JsonSerializer();
-
-            foreach (DocumentInfo file in files)
-            {
-                using (FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize))
-                using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, true, bufferSize))
-                using (JsonReader reader = new JsonTextReader(sr))
-                {
-                    reader.SupportMultipleContent = false;
-
-                    while (reader.Read())
-                    {
-                        if (reader.TokenType == JsonToken.StartObject)
-                        {
-                            var document = new Document
-                            {
-                                TypeOf = typeOf,
-                                Data = serializer.Deserialize<JObject>(reader),
-                                Partition = file.Partition,
-                                HasLazy = meta.HasLazy,
-                                CreatedAt = DateTime.UtcNow
-                            };
-
-                            UpdateDocumentMeta(ref meta, ref document, file, OperationType.None);
-                            ParseDocumentData(ref meta, ref document, file);
-                            ParseDocumentRefs(meta.GetRefs(false), ref document);
-
-                            Cache.Set(document, meta.Cache.Expire);
-
-                            document.Dispose();
-                        }
-                    }
-                }
-            }
-
-            Cache.Set(meta, meta.Cache.Expire);
-
-            return true;
-        }
 
         public virtual Document Read(string typeOf, object primaryOf)
         {
@@ -386,7 +401,7 @@ namespace Objectiks
 
             List<DocumentKey> documentKeys = meta.GetDocumentKeysFromQueryOf(query);
 
-            if (documentKeys.Count > 1)
+            if (documentKeys.Count > 1 || documentKeys.Count == 0)
             {
                 return null;
             }
@@ -573,18 +588,7 @@ namespace Objectiks
                 for (int i = 0; i < count; i++)
                 {
                     Document document = docs[i];
-                    document.Data = JObject.FromObject(document.Data);
                     UpdateDocumentMeta(ref meta, ref document, info, operation);
-
-                    if (operation != OperationType.Delete)
-                    {
-                        if (meta.Refs != null && meta.Refs.Count > 0)
-                        {
-                            ParseDocumentRefs(meta.GetRefs(false), ref document);
-                        }
-
-                        Cache.Set(document, meta.Cache.Expire);
-                    }
                 }
 
                 var json = new JSONSerializer();
@@ -606,6 +610,21 @@ namespace Objectiks
                 else if (operation == OperationType.Delete)
                 {
                     json.DeleteRows(info, docs.Select(d => d.Data).ToList(), map, true, formatting);
+                }
+
+                if (operation != OperationType.Delete)
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        Document document = docs[i];
+
+                        if (meta.Refs != null && meta.Refs.Count > 0)
+                        {
+                            ParseDocumentRefs(meta.GetRefs(false), ref document);
+                        }
+
+                        Cache.Set(document, meta.Cache.Expire);
+                    }
                 }
 
                 Cache.Set(meta, meta.Cache.Expire);

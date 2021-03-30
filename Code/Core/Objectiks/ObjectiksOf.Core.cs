@@ -2,6 +2,7 @@
 using Objectiks.Models;
 using Objectiks.Services;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,22 +15,18 @@ namespace Objectiks
         {
             public static DocumentManifest Manifest { get; private set; }
             public static DocumentEngine Engine { get; private set; }
-            public static DocumentCache Cache { get; private set; }
             public static IDocumentConnection Connection { get; private set; }
             public static List<IParser> ParseOf { get; private set; }
             public static List<string> TypeOf { get; private set; }
             public static DocumentSchema DefaultSchema { get; private set; }
-
 
             internal static DocumentEngine Initialize(DocumentOptions options)
             {
                 Connection = options.Connection;
                 DefaultSchema = DocumentSchema.Default();
                 Manifest = GetDocumentManifest();
-                Cache = GetDocumentCache(options);
                 Engine = GetDocumentEngine(options);
                 ParseOf = GetDocumentParsers(options);
-
                 TypeOf = Engine.LoadAllDocumentType(Manifest.TypeOf);
 
                 return Engine;
@@ -73,7 +70,9 @@ namespace Objectiks
 
             private static DocumentEngine GetDocumentEngine(DocumentOptions options)
             {
-                return (DocumentEngine)Activator.CreateInstance(options.Engine, Manifest, options.Connection, Cache);
+                var cache = GetDocumentCache(options);
+
+                return (DocumentEngine)Activator.CreateInstance(options.Engine, Manifest, options.Connection, cache);
             }
 
             private static List<IParser> GetDocumentParsers(DocumentOptions options)

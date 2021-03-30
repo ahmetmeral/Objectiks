@@ -35,11 +35,11 @@ namespace Objectiks.Engine
             TypeOf = typeOf;
             Engine = engine;
             Meta = engine.GetTypeMeta(typeOf);
-            IsPartialStore = Engine.Manifest.Documents.StoragePartial;
+            IsPartialStore = Engine.Manifest.Documents.Storage.Partial;
 
             if (IsPartialStore)
             {
-                PartialStoreLimit = Engine.Manifest.Documents.StoragePartialLimit;
+                PartialStoreLimit = Engine.Manifest.Documents.Storage.Limit;
             }
         }
 
@@ -224,6 +224,16 @@ namespace Objectiks.Engine
             }
         }
 
+        public void WatcherLock()
+        {
+            Engine.Watcher?.Lock();
+        }
+
+        public void WatcherUnLock()
+        {
+            Engine.Watcher?.UnLock();
+        }
+
         public void Add(T document, bool clearDocumentRefs = true)
         {
             if (document == null)
@@ -350,6 +360,8 @@ namespace Objectiks.Engine
 
             try
             {
+                Engine.Watcher?.Lock();
+
                 ReOrderPartitionByOperation();
 
                 while (Partitions.TryDequeue(out var partOf))
@@ -364,6 +376,8 @@ namespace Objectiks.Engine
 
                 Queue.Clear();
                 Partitions.Clear();
+
+                Engine.Watcher?.UnLock();
             }
             catch (IOException)
             {

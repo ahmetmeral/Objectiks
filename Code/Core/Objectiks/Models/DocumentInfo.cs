@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Objectiks.Models
@@ -106,6 +107,16 @@ namespace Objectiks.Models
             Name = file;
             NameWithoutExtension = Path.GetFileNameWithoutExtension(Name);
             FullName = Path.Combine(DirectoryName, Name);
+            Partition = GetPartitionIndex(NameWithoutExtension);
+        }
+
+        public static DocumentInfo Parse(string fullPath)
+        {
+            string name = Path.GetFileNameWithoutExtension(fullPath);
+
+            var info = new DocumentInfo("");
+
+            return null;
         }
     }
 }

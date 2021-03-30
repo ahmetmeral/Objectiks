@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Pages
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -8,4 +9,7 @@
 </div>
 
 @Model.Title
+<br />
 @Html.Raw(Model.Contents)
+<br />
+@Model.Category.Name

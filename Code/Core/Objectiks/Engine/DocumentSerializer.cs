@@ -22,7 +22,7 @@ namespace Objectiks.Engine
             }
             else if (ObjectiksOf.Core.Manifest != null)
             {
-                BufferSize = ObjectiksOf.Core.Manifest.BufferSize;
+                BufferSize = ObjectiksOf.Core.Manifest.Documents.BufferSize;
             }
             else
             {

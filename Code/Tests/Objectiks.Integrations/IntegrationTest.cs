@@ -239,10 +239,10 @@ namespace Objectiks.Integrations
 
             using (var writer = repos.WriterOf<Pages>())
             {
+                
                 writer.UseFormatting();
-
                 writer.Delete(mergePage);
-
+                
                 writer.SubmitChanges();
             }
 

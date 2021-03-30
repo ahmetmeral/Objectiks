@@ -20,7 +20,7 @@ namespace Objectiks.Helper
             }
             else if (ObjectiksOf.Core.Manifest != null)
             {
-                BufferSize = ObjectiksOf.Core.Manifest.BufferSize;
+                BufferSize = ObjectiksOf.Core.Manifest.Documents.BufferSize;
             }
         }
 
@@ -302,12 +302,19 @@ namespace Objectiks.Helper
             {
                 try
                 {
+                    
+
                     using (FileStream fsTemp = new FileStream(trans.Tempory, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Write, BufferSize))
                     using (StreamWriter sw = new StreamWriter(fsTemp, Encoding.UTF8, BufferSize))
                     using (JsonTextWriter writer = new JsonTextWriter(sw))
                     {
                         var match = 0;
                         var count = rows.Count;
+
+                        var settings = new JsonMergeSettings();
+                        settings.MergeArrayHandling = MergeArrayHandling.Replace;
+                        settings.PropertyNameComparison = StringComparison.OrdinalIgnoreCase;
+                        settings.MergeNullValueHandling = MergeNullValueHandling.Merge;
 
                         writer.Formatting = formatting;
                         writer.WriteStartArray();
@@ -333,7 +340,7 @@ namespace Objectiks.Helper
 
                                             if (readId == id)
                                             {
-                                                readRow.Merge(rowObject);
+                                                readRow.Merge(rowObject, settings);
                                                 match++;
                                                 break;
                                             }

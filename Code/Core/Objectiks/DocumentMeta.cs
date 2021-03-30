@@ -223,7 +223,6 @@ namespace Objectiks
             if (!key.Equals(null) && !String.IsNullOrEmpty(key.PrimaryOf))
             {
                 Keys.Remove(key);
-                ObjectiksOf.Core.Cache.Remove(TypeOf, key.PrimaryOf);
             }
         }
 

@@ -5,7 +5,7 @@
     "TagRefs": [ 1, 2 ],
     "Name": "Home",
     "Language": "tr",
-    "Title": "Home",
+    "Title": "Home Fire file watcher OK",
     "File": "Home.tr.md",
     "GroupRef": 1
   },
@@ -30,7 +30,7 @@
   {
     "Id": 4,
     "CategoryRef": 4,
-    "Tags": [ 1, 2, 3, 4 ],
+    "Tags": [ 1, 2, 3,4,5 ],
     "Name": "Contact",
     "Language": "tr",
     "Title": "İletişim",

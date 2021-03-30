@@ -13,11 +13,8 @@ namespace Objectiks.Engine
         public string Version { get; set; }
         public string Author { get; set; }
         public string Primary { get; set; }
-        public int BufferSize { get; set; }
         public DocumentSchemaKeys KeyOf { get; set; }
         public DocumentTypes TypeOf { get; set; }
-        public ExtentionNames Extention { get; set; }
-        public DocumentCacheInfo Cache { get; set; }
         public DocumentSettings Documents { get; set; }
         public DocumentVars Vars { get; set; }
 
@@ -33,9 +30,16 @@ namespace Objectiks.Engine
 
                 var manifest = new DocumentSerializer().Get<DocumentManifest>(path);
 
-                if (manifest.Cache == null)
+                if (manifest.Documents == null)
                 {
-                    manifest.Cache = new DocumentCacheInfo
+                    manifest.Documents = new DocumentSettings();
+                    manifest.Documents.Storage = new DocumentStorageSettings();
+                    manifest.Documents.Parser = new DocumentParserSettings();
+                }
+
+                if (manifest.Documents.Cache == null)
+                {
+                    manifest.Documents.Cache = new DocumentCacheInfo
                     {
                         Expire = DocumentDefaults.CacheExpire
                     };
