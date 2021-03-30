@@ -1,0 +1,9 @@
+{
+  "TypeOf": "Products",
+  "ParseOf": "Document",
+  "Primary": "Id",
+  "KeyOf": [],
+  "Refs": null,
+  "Cache": null,
+  "Vars": null
+}

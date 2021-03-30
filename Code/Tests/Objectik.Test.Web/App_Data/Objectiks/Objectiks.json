@@ -4,7 +4,7 @@
   "Author": "Ahmet Meral",
   "Primary": "Id",
   "KeyOf": [],
-  "TypeOf": [ "Pages", "Categories", "Tags" ],
+  "TypeOf": [ "Pages", "Categories", "Tags", "Products" ],
   "Documents": {
     "Extention": "*.json",
     "BufferSize": 512,

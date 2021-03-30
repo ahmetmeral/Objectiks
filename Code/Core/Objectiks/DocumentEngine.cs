@@ -42,12 +42,14 @@ namespace Objectiks
             var typeOfList = new List<string>();
             foreach (var typeOf in typeOfs)
             {
+                CheckDirectoryOrSchema(typeOf);
+
                 if (LoadDocumentType(typeOf))
                 {
                     typeOfList.Add(typeOf.ToLowerInvariant());
                 }
             }
-            
+
             Watcher?.UnLock();
 
             return typeOfList;
@@ -143,9 +145,39 @@ namespace Objectiks
 
             Cache.Set(meta, meta.Cache.Expire);
 
-           
+
 
             return true;
+        }
+
+        protected virtual void CheckDirectoryOrSchema(string typeOf)
+        {
+            var documents = Path.Combine(Connection.BaseDirectory, DocumentDefaults.Documents, typeOf);
+            if (!Directory.Exists(documents))
+            {
+                Directory.CreateDirectory(documents);
+            }
+
+            var docFile = Path.Combine(documents, $"{typeOf}.json");
+            if (!File.Exists(docFile))
+            {
+                File.WriteAllText(docFile, "[]");
+            }
+
+            var docSchema = Path.Combine(Connection.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json");
+
+            if (!File.Exists(docSchema))
+            {
+                var temporySchema = ObjectiksOf.Core.DefaultSchema;
+                temporySchema.TypeOf = typeOf;
+                temporySchema.ParseOf = "Document";
+                temporySchema.KeyOf = Manifest.KeyOf;
+                temporySchema.Primary = Manifest.Primary;
+
+                var schema = new DocumentSerializer().Serialize(temporySchema);
+
+                File.WriteAllText(docSchema, schema);
+            }
         }
 
         protected virtual DocumentSchema GetDocumentSchema(string typeOf)
