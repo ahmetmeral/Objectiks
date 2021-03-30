@@ -14,7 +14,7 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 
 ## Get Started
 
-> Install-Package Objectiks -Version 0.0.4-beta-6
+> ```Install-Package Objectiks -Version 0.0.4-beta-6```
 
 ##### Folder structure
 
