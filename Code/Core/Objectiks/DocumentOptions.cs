@@ -12,6 +12,9 @@ namespace Objectiks
     {
         internal Type Cache { get; private set; }
         internal Type Engine { get; private set; }
+        internal Type Watcher { get; private set; }
+        internal Type Logger { get; private set; }
+
         internal List<Type> ParserOf { get; private set; }
         internal IDocumentConnection Connection { get; private set; }
 
@@ -32,6 +35,7 @@ namespace Objectiks
 
             UseCacheTypeOf<DocumentInMemory>();
             UseEngineTypeOf<DocumentEngine>();
+            UseWatcher<DocumentWatcher>();
 
             AddParserTypeOf<DocumentDefaultParser>();
             AddParserTypeOf<DocumentOneToOneParser>();
@@ -48,6 +52,16 @@ namespace Objectiks
         public void UseCacheTypeOf<T>() where T : IDocumentCache
         {
             Cache = typeof(T);
+        }
+
+        public void UseWatcher<T>() where T : IDocumentWatcher
+        {
+            Watcher = typeof(T);
+        }
+
+        public void UseDocumentLogger<T>() where T : IDocumentLogger
+        {
+            Logger = typeof(T);
         }
 
         public void AddParserTypeOf<T>() where T : IParser

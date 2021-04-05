@@ -8,20 +8,31 @@ using System.Text;
 
 namespace Objectiks.Engine
 {
-    public class DocumentWatcher
+    public class DocumentWatcher : IDocumentWatcher
     {
         private bool IsLocked = false;
         private string DocumentExtention;
         private string[] Extentions;
         private string[] Prefixs;
 
-        public DocumentWatcher(IDocumentEngine engine, bool locked = true)
-        {
-            if (locked)
-            {
-                Lock();
-            }
+        private IDocumentEngine Engine = null;
 
+        public DocumentWatcher() { }
+
+        public virtual void Lock()
+        {
+            IsLocked = true;
+        }
+
+        public virtual void UnLock()
+        {
+            IsLocked = false;
+        }
+
+        public virtual void WaitForChanged(DocumentEngine engine)
+        {
+            Engine = engine;
+            Prefixs = new string[] { "Backup.", "Temp." };
             DocumentExtention = engine.Manifest.Documents.Extention.Replace("*", "");
             Extentions = new string[] {
                 DocumentExtention,
@@ -29,23 +40,7 @@ namespace Objectiks.Engine
                 ".html",
                 ".txt"
             };
-            Prefixs = new string[] { "Backup.", "Temp." };
 
-            Watch(engine);
-        }
-
-        public void Lock()
-        {
-            IsLocked = true;
-        }
-
-        public void UnLock()
-        {
-            IsLocked = false;
-        }
-
-        private void Watch(IDocumentEngine engine)
-        {
             var watcher = new FileSystemWatcher(engine.Connection.BaseDirectory);
             watcher.NotifyFilter = NotifyFilters.Attributes |
                 NotifyFilters.CreationTime |
@@ -63,46 +58,57 @@ namespace Objectiks.Engine
                 {
                     if (e.ChangeType == WatcherChangeTypes.Changed)
                     {
-                        TryLoadDocumentType(engine, e);
+                        OnChangeDocument(e);
                     }
                 }
             };
         }
 
-        private void TryLoadDocumentType(IDocumentEngine engine, FileSystemEventArgs e)
+        public virtual void OnChangeDocument(FileSystemEventArgs e)
         {
-            var file = new FileInfo(e.FullPath);
-
-            if (!IsAcceptExtention(file.Extension) || CheckIgnorePrefix(file.FullName))
+            try
             {
-                return;
-            }
+                var file = new FileInfo(e.FullPath);
 
-            var types = ObjectiksOf.Core.TypeOf;
-            var typeOf = file.Directory.Name;
-            if (typeOf == DocumentDefaults.Contents)
-            {
-                typeOf = file.Directory.Parent.Name;
-            }
-
-            if (types.Contains(typeOf.ToLowerInvariant()))
-            {
-                engine.LoadDocumentType(typeOf);
-
-                foreach (var relationType in types)
+                if (!IsAcceptExtention(file.Extension) || CheckIgnorePrefix(file.FullName))
                 {
-                    var meta = engine.GetTypeMeta(relationType);
+                    return;
+                }
 
-                    if (meta.Refs != null &&
-                        meta.Refs.Count(r => r.TypeOf == typeOf && r.Lazy == false && r.Disabled == false) > 0)
+                var types = ObjectiksOf.Core.TypeOf;
+                var typeOf = file.Directory.Name;
+                if (typeOf == DocumentDefaults.Contents)
+                {
+                    typeOf = file.Directory.Parent.Name;
+                }
+
+                if (types.Contains(typeOf.ToLowerInvariant()))
+                {
+                    Engine.Logger?.Debug(DebugType.Watcher, $"OnChangeDocument [{typeOf}] - File: {file.FullName}");
+
+                    Engine.LoadDocumentType(typeOf);
+
+                    foreach (var relationType in types)
                     {
-                        engine.LoadDocumentType(relationType);
+                        Engine.Logger?.Debug(DebugType.Watcher, $"{typeOf} Load releation type current: {relationType}");
+
+                        var meta = Engine.GetTypeMeta(relationType);
+
+                        if (meta.Refs != null &&
+                            meta.Refs.Count(r => r.TypeOf == typeOf && r.Lazy == false && r.Disabled == false) > 0)
+                        {
+                            Engine.LoadDocumentType(relationType);
+                        }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                Engine.Logger?.Error("Document watcher OnChangeDocument:", ex);
+            }
         }
 
-        private bool IsAcceptExtention(string fileExtention)
+        protected virtual bool IsAcceptExtention(string fileExtention)
         {
             var isAccept = false;
             foreach (var extention in Extentions)
@@ -117,7 +123,7 @@ namespace Objectiks.Engine
             return isAccept;
         }
 
-        private bool CheckIgnorePrefix(string fullname)
+        protected virtual bool CheckIgnorePrefix(string fullname)
         {
             bool ignored = false;
             string name = Path.GetFileNameWithoutExtension(fullname);

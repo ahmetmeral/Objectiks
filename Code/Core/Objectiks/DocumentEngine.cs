@@ -18,20 +18,28 @@ namespace Objectiks
     public class DocumentEngine : IDocumentEngine
     {
         public DocumentManifest Manifest { get; private set; }
+        public IDocumentLogger Logger { get; private set; }
         public IDocumentConnection Connection { get; private set; }
         public IDocumentCache Cache { get; private set; }
-        public DocumentWatcher Watcher { get; private set; }
+        public IDocumentWatcher Watcher { get; private set; }
 
+        public DocumentEngine(DocumentManifest manifest,
+            IDocumentLogger logger,
+            IDocumentConnection connections,
+            IDocumentCache cache,
+            IDocumentWatcher watcher
 
-        public DocumentEngine(DocumentManifest manifest, IDocumentConnection connections, IDocumentCache cache)
+            )
         {
             Manifest = manifest;
+            Logger = logger;
             Connection = connections;
             Cache = cache;
+            Watcher = watcher;
 
             if (Manifest.Documents.Watcher)
             {
-                Watcher = new DocumentWatcher(this);
+                Watcher?.WaitForChanged(this);
             }
         }
 

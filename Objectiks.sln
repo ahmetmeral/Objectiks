@@ -3,26 +3,26 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31025.194
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Objectiks", "Core\Objectiks\Objectiks.csproj", "{6CA092B9-B922-41F5-8F59-5D4421906C62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Objectiks", "Code\Core\Objectiks\Objectiks.csproj", "{6CA092B9-B922-41F5-8F59-5D4421906C62}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{24C2C85A-F1BA-4AC1-BEFE-8AC8D4BAE51E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{B984598E-8816-41EA-8E85-EE72E2B4A900}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Objectiks.Integrations", "Tests\Objectiks.Integrations\Objectiks.Integrations.csproj", "{24EA69DF-D12D-4F1D-950C-8D2763303F59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Objectiks.Integrations", "Code\Tests\Objectiks.Integrations\Objectiks.Integrations.csproj", "{24EA69DF-D12D-4F1D-950C-8D2763303F59}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Objectiks.Benchmark", "Tests\Objectiks.Benchmark\Objectiks.Benchmark.csproj", "{A6969037-A142-44CE-8D87-5BDA79B56355}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Objectiks.Benchmark", "Code\Tests\Objectiks.Benchmark\Objectiks.Benchmark.csproj", "{A6969037-A142-44CE-8D87-5BDA79B56355}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Objectik.Test.Web", "Tests\Objectik.Test.Web\Objectik.Test.Web.csproj", "{FE990494-479B-4CAF-A2C1-DDB61E89BB2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Objectik.Test.Web", "Code\Tests\Objectik.Test.Web\Objectik.Test.Web.csproj", "{FE990494-479B-4CAF-A2C1-DDB61E89BB2A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{B24CF3E5-3695-494F-A28C-B0C9613ECD5A}"
 	ProjectSection(SolutionItems) = preProject
-		..\README.md = ..\README.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Github", ".Github", "{CE99B25A-983D-469A-AEB4-2960241B7007}"
 	ProjectSection(SolutionItems) = preProject
-		..\.github\workflows\dotnet.yml = ..\.github\workflows\dotnet.yml
+		.github\workflows\DeployToNuget.yml = .github\workflows\DeployToNuget.yml
 	EndProjectSection
 EndProject
 Global
@@ -59,5 +59,14 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4ACF303-FBE3-4D6A-A43F-00ABED5D4F99}
+	EndGlobalSection
+	GlobalSection(AutomaticVersions) = postSolution
+		UpdateAssemblyVersion = False
+		UpdateAssemblyFileVersion = False
+		UpdateAssemblyInfoVersion = False
+		AdvancedSettingsExpanded = True
+		UpdatePackageVersion = False
+		AssemblyInfoVersionType = SettingsVersion
+		InheritWinAppVersionFrom = None
 	EndGlobalSection
 EndGlobal

@@ -4,6 +4,17 @@ using System.Text;
 
 namespace Objectiks
 {
+    public enum DebugType
+    {
+        None,
+        Core,
+        Watcher,
+        Reader,
+        Writer,
+        Query,
+        Repository
+    }
+
     //important index.. use document writer..partition queue
     public enum OperationType
     {

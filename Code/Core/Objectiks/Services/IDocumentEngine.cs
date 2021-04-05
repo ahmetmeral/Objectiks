@@ -10,9 +10,11 @@ namespace Objectiks.Services
 {
     public interface IDocumentEngine
     {
+        DocumentManifest Manifest { get; }
+        IDocumentLogger Logger { get; }
         IDocumentCache Cache { get; }
         IDocumentConnection Connection { get; }
-        DocumentManifest Manifest { get; }
+     
 
         bool LoadDocumentType(string typeOf);
 

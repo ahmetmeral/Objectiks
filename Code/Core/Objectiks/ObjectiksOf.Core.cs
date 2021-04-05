@@ -68,11 +68,33 @@ namespace Objectiks
                 return (DocumentCache)Activator.CreateInstance(options.Cache, Manifest, options.Connection);
             }
 
+            private static DocumentWatcher GetDocumentWatcher(DocumentOptions options)
+            {
+                if (options.Watcher == null)
+                {
+                    return null;
+                }
+
+                return (DocumentWatcher)Activator.CreateInstance(options.Watcher);
+            }
+
+            public static IDocumentLogger GetDocumentLogger(DocumentOptions options)
+            {
+                if (options.Logger == null)
+                {
+                    return null;
+                }
+
+                return (IDocumentLogger)Activator.CreateInstance(options.Logger);
+            }
+
             private static DocumentEngine GetDocumentEngine(DocumentOptions options)
             {
+                var logger = GetDocumentLogger(options);
                 var cache = GetDocumentCache(options);
+                var watcher = GetDocumentWatcher(options);
 
-                return (DocumentEngine)Activator.CreateInstance(options.Engine, Manifest, options.Connection, cache);
+                return (DocumentEngine)Activator.CreateInstance(options.Engine, Manifest, logger, options.Connection, cache, watcher);
             }
 
             private static List<IParser> GetDocumentParsers(DocumentOptions options)

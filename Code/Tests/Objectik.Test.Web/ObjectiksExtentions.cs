@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Objectiks;
+using Objectiks.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,29 @@ using System.Threading.Tasks;
 
 namespace Objectik.Test.Web
 {
+    public class DocumentLogger : IDocumentLogger
+    {
+        public void Debug(DebugType debugType, string msg)
+        {
+           
+        }
+
+        public void Error(string msg, Exception exception = null)
+        {
+
+        }
+
+        public void Fatal(string msg, Exception exception = null)
+        {
+
+        }
+
+        public void Info(string msg)
+        {
+
+        }
+    }
+
     public static class ObjectiksExtentions
     {
         public static void AddObjectiks(this IServiceCollection services)
@@ -18,6 +42,8 @@ namespace Objectik.Test.Web
                 "App_Data",
                 DocumentDefaults.Root
                 ));
+            options.UseDocumentLogger<DocumentLogger>();
+
             services.AddSingleton(options);
             services.AddSingleton<ObjectiksOf>();
         }
