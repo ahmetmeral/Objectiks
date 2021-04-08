@@ -39,7 +39,7 @@ jobs:
           #dotnet-version: '3.1.x'
 
       - name: 'Restore packages'
-        run: dotnet restore ${{ env.PROJECT_PATH }} -s https://api.nuget.org/
+        run: dotnet restore ${{ env.PROJECT_PATH }} -s https://api.nuget.org/v3/index.json
 
       - name: 'Build project'
         run: dotnet build ${{ env.PROJECT_PATH }} --no-restore --configuration Release
@@ -51,5 +51,5 @@ jobs:
       - name: 'Push github.com package'
         run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s ${{ env.GIT_SOURCE_URL }} --skip-duplicate
 
-      #- name: 'Push nuget.org package'
-      #  run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\*.nupkg -k ${{ secrets.NUGET_TOKEN }} -s ${{ env.NUGET_SOURCE_URL }} --skip-duplicate
+      - name: 'Push nuget.org package'
+        run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\*.nupkg -k ${{ secrets.NUGET_TOKEN }} -s ${{ env.NUGET_SOURCE_URL }} --skip-duplicate
