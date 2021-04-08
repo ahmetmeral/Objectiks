@@ -266,7 +266,8 @@ namespace Objectiks
             {
                 FileUnlocked(Document.NameWithoutExtension);
 
-                throw new Exception("Backup file not found --> Backup=false");
+                if (Operation != OperationType.Read)
+                    throw new Exception("Backup file not found --> Backup=false");
             }
         }
 

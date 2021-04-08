@@ -44,7 +44,14 @@ namespace Objectiks.Parsers
                 var path = Path.Combine(engine.Connection.BaseDirectory, DocumentDefaults.Documents,
                     typeOf, DocumentDefaults.Contents, fileName);
 
-                source[docRef.MapOf.Target] = FileHelper.Get(path, engine.Manifest.Documents.BufferSize);
+                if (File.Exists(path))
+                {
+                    source[docRef.MapOf.Target] = FileHelper.Get(path, engine.Manifest.Documents.BufferSize);
+                }
+                else
+                {
+                    source[docRef.MapOf.Target] = string.Empty;
+                }
             }
 
             document.Data = source;

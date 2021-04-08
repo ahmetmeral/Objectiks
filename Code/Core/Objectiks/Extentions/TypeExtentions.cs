@@ -49,7 +49,7 @@ namespace Objectiks.Extentions
             return propertyItems;
         }
 
-        
+
 
 
         public static IOrderedEnumerable<TSource> OrderByWithDirection<TSource, TKey>
@@ -116,6 +116,11 @@ namespace Objectiks.Extentions
         public static object GetPropValue(this object obj, string propName)
         {
             return obj.GetType().GetProperty(propName).GetValue(obj, null);
+        }
+
+        public static void SetPropValue(this object obj, string propName, object value)
+        {
+            obj.GetType().GetProperty(propName).SetValue(obj, value);
         }
 
         public static bool IsGenericType(this Type type)

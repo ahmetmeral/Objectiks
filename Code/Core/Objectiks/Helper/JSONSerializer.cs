@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Objectiks.Models;
+using Objectiks.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,9 +12,12 @@ namespace Objectiks.Helper
     public class JSONSerializer
     {
         private int BufferSize = 128;
+        private IDocumentLogger Logger = null;
 
-        public JSONSerializer(int? bufferSize = null)
+        public JSONSerializer(IDocumentLogger documentLogger, int? bufferSize = null)
         {
+            Logger = documentLogger;
+
             if (bufferSize.HasValue)
             {
                 BufferSize = bufferSize.Value;
@@ -124,6 +128,8 @@ namespace Objectiks.Helper
                 {
                     trans.Rollback();
 
+                    Logger?.Fatal(ex);
+
                     throw ex;
                 }
             }
@@ -173,6 +179,9 @@ namespace Objectiks.Helper
                 catch (Exception ex)
                 {
                     trans.Rollback();
+
+                    Logger?.Fatal(ex);
+
                     throw ex;
                 }
             }
@@ -224,6 +233,8 @@ namespace Objectiks.Helper
                 catch (Exception ex)
                 {
                     trans.Rollback();
+
+                    Logger?.Fatal(ex);
 
                     throw ex;
                 }
@@ -291,6 +302,8 @@ namespace Objectiks.Helper
                 {
                     trans.Rollback();
 
+                    Logger?.Fatal(ex);
+
                     throw ex;
                 }
             }
@@ -302,7 +315,7 @@ namespace Objectiks.Helper
             {
                 try
                 {
-                    
+
 
                     using (FileStream fsTemp = new FileStream(trans.Tempory, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Write, BufferSize))
                     using (StreamWriter sw = new StreamWriter(fsTemp, Encoding.UTF8, BufferSize))
@@ -362,6 +375,8 @@ namespace Objectiks.Helper
                 catch (Exception ex)
                 {
                     trans.Rollback();
+
+                    Logger?.Fatal(ex);
 
                     throw ex;
                 }
@@ -431,6 +446,8 @@ namespace Objectiks.Helper
                 {
                     trans.Rollback();
 
+                    Logger?.Fatal(ex);
+
                     throw ex;
                 }
             }
@@ -499,6 +516,8 @@ namespace Objectiks.Helper
                 {
                     trans.Rollback();
 
+                    Logger?.Fatal(ex);
+
                     throw ex;
                 }
             }
@@ -534,6 +553,8 @@ namespace Objectiks.Helper
                 {
                     trans.Rollback();
 
+                    Logger?.Fatal(ex);
+
                     throw ex;
                 }
             }
@@ -566,6 +587,8 @@ namespace Objectiks.Helper
                 catch (Exception ex)
                 {
                     trans.Rollback();
+
+                    Logger?.Fatal(ex);
 
                     throw ex;
                 }

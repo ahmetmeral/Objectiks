@@ -41,6 +41,8 @@ namespace Objectiks.Engine
                 ".txt"
             };
 
+            engine.Logger?.Debug(DebugType.Writer, $"Watch Directory : {engine.Connection.BaseDirectory}");
+
             var watcher = new FileSystemWatcher(engine.Connection.BaseDirectory);
             watcher.NotifyFilter = NotifyFilters.Attributes |
                 NotifyFilters.CreationTime |
@@ -49,7 +51,8 @@ namespace Objectiks.Engine
                 NotifyFilters.LastWrite |
                 NotifyFilters.Size |
                 NotifyFilters.Security;
-            watcher.Filter = "*.*";
+            watcher.Filter = engine.Manifest.Documents.Extention;
+            watcher.InternalBufferSize = 8192 * 5;
             watcher.IncludeSubdirectories = true;
             watcher.EnableRaisingEvents = true;
             watcher.Changed += delegate (object sender, FileSystemEventArgs e)
@@ -72,6 +75,8 @@ namespace Objectiks.Engine
 
                 if (!IsAcceptExtention(file.Extension) || CheckIgnorePrefix(file.FullName))
                 {
+                    Engine.Logger?.Debug(DebugType.Watcher, $"Skip File : {file.FullName}");
+
                     return;
                 }
 
@@ -80,17 +85,19 @@ namespace Objectiks.Engine
                 if (typeOf == DocumentDefaults.Contents)
                 {
                     typeOf = file.Directory.Parent.Name;
+
+                    Engine.Logger?.Debug(DebugType.Watcher, $"TypeOf: {typeOf} Contents changes");
                 }
 
                 if (types.Contains(typeOf.ToLowerInvariant()))
                 {
-                    Engine.Logger?.Debug(DebugType.Watcher, $"OnChangeDocument [{typeOf}] - File: {file.FullName}");
+                    Engine.Logger?.Debug(DebugType.Watcher, $"OnChangeDocument TypeOf: {typeOf} - File: {file.FullName}");
 
                     Engine.LoadDocumentType(typeOf);
 
                     foreach (var relationType in types)
                     {
-                        Engine.Logger?.Debug(DebugType.Watcher, $"{typeOf} Load releation type current: {relationType}");
+                        Engine.Logger?.Debug(DebugType.Watcher, $"{typeOf} Load releation types - TypeOf: {relationType}");
 
                         var meta = Engine.GetTypeMeta(relationType);
 

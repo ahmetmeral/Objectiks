@@ -8,6 +8,8 @@ namespace Objectiks
     {
         None,
         Core,
+        Engine,
+        Serializer,
         Watcher,
         Reader,
         Writer,

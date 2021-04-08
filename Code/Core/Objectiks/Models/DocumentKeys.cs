@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Objectiks.Models
 {
-    public class DocumentKeys : DynamicArray<DocumentKey>
+    public class DocumentKeyIndex : DynamicArray<DocumentKey>
     {
        
     }

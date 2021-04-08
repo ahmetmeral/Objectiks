@@ -106,7 +106,7 @@ namespace Objectiks
             return Engine.GetTypeMetaAll();
         }
 
-        private string GetTypeOfName<T>()
+        public string GetTypeOfName<T>()
         {
             var attr = typeof(T).GetCustomAttribute<TypeOfAttribute>();
 

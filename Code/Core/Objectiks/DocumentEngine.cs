@@ -28,7 +28,6 @@ namespace Objectiks
             IDocumentConnection connections,
             IDocumentCache cache,
             IDocumentWatcher watcher
-
             )
         {
             Manifest = manifest;
@@ -41,6 +40,9 @@ namespace Objectiks
             {
                 Watcher?.WaitForChanged(this);
             }
+
+            Logger?.Debug(DebugType.Engine, Manifest != null, "Manifest is not null");
+            Logger?.Debug(DebugType.Engine, Manifest.Documents.Watcher, "Document watcher enable");
         }
 
         internal virtual List<string> LoadAllDocumentType(DocumentTypes typeOfs)
@@ -55,6 +57,7 @@ namespace Objectiks
                 if (LoadDocumentType(typeOf))
                 {
                     typeOfList.Add(typeOf.ToLowerInvariant());
+
                 }
             }
 
@@ -66,6 +69,8 @@ namespace Objectiks
         //
         public virtual bool LoadDocumentType(string typeOf)
         {
+            Logger?.Debug(DebugType.Engine, $"Load TypeOf: {typeOf}");
+
             var schema = GetDocumentSchema(typeOf);
             var meta = new DocumentMeta(typeOf, schema, Connection);
             var files = new List<DocumentInfo>();
@@ -112,64 +117,81 @@ namespace Objectiks
 
             if (files.Count == 0)
             {
+                Logger?.Debug(DebugType.Engine, "LoadDocumentType files.count = 0");
+
                 return false;
             }
+
+            Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} number of files : {files.Count}");
 
             int bufferSize = Manifest.Documents.BufferSize;
             var serializer = new JsonSerializer();
 
             foreach (DocumentInfo file in files)
             {
-                using (FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize))
-                using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, true, bufferSize))
-                using (JsonReader reader = new JsonTextReader(sr))
+                Logger?.Debug(DebugType.Engine, $"Read TypeOf: {file.TypeOfName} - File : {file.FullName}");
+
+                try
                 {
-                    reader.SupportMultipleContent = false;
-
-                    while (reader.Read())
+                    using (FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize))
+                    using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, true, bufferSize))
+                    using (JsonReader reader = new JsonTextReader(sr))
                     {
-                        if (reader.TokenType == JsonToken.StartObject)
+                        reader.SupportMultipleContent = false;
+
+                        while (reader.Read())
                         {
-                            var document = new Document
+                            if (reader.TokenType == JsonToken.StartObject)
                             {
-                                TypeOf = typeOf,
-                                Data = serializer.Deserialize<JObject>(reader),
-                                Partition = file.Partition,
-                                HasLazy = meta.HasLazy,
-                                CreatedAt = DateTime.UtcNow
-                            };
+                                var document = new Document
+                                {
+                                    TypeOf = typeOf,
+                                    Data = serializer.Deserialize<JObject>(reader),
+                                    Partition = file.Partition,
+                                    HasLazy = meta.HasLazy,
+                                    CreatedAt = DateTime.UtcNow
+                                };
 
-                            UpdateDocumentMeta(ref meta, ref document, file, OperationType.None);
-                            ParseDocumentData(ref meta, ref document, file);
-                            ParseDocumentRefs(meta.GetRefs(false), ref document);
+                                UpdateDocumentMeta(ref meta, ref document, file, OperationType.None);
+                                ParseDocumentData(ref meta, ref document, file);
+                                ParseDocumentRefs(meta.GetRefs(false), ref document);
 
-                            Cache.Set(document, meta.Cache.Expire);
+                                Cache.Set(document, meta.Cache.Expire);
 
-                            document.Dispose();
+                                document.Dispose();
+                            }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Logger?.Fatal($"Exception Read TypeOf: {file.TypeOfName} File : {file.FullName}", ex);
                 }
             }
 
             Cache.Set(meta, meta.Cache.Expire);
-
-
 
             return true;
         }
 
         protected virtual void CheckDirectoryOrSchema(string typeOf)
         {
+            Logger?.Debug(DebugType.Engine, "Check Document Directory and Schema");
+
             var documents = Path.Combine(Connection.BaseDirectory, DocumentDefaults.Documents, typeOf);
             if (!Directory.Exists(documents))
             {
                 Directory.CreateDirectory(documents);
+
+                Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} directory created.. Directory : {documents}");
             }
 
             var docFile = Path.Combine(documents, $"{typeOf}.json");
             if (!File.Exists(docFile))
             {
-                File.WriteAllText(docFile, "[]");
+                File.WriteAllText(docFile, "[]", Encoding.UTF8);
+
+                Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} document created.. File: {docFile}");
             }
 
             var docSchema = Path.Combine(Connection.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json");
@@ -184,7 +206,9 @@ namespace Objectiks
 
                 var schema = new DocumentSerializer().Serialize(temporySchema);
 
-                File.WriteAllText(docSchema, schema);
+                File.WriteAllText(docSchema, schema, Encoding.UTF8);
+
+                Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} schema created.. File: {docSchema}");
             }
         }
 
@@ -197,6 +221,8 @@ namespace Objectiks
             {
                 schema = ObjectiksOf.Core.DefaultSchema;
                 schema.Cache = Manifest.Documents.Cache;
+
+                Logger?.Debug(DebugType.Engine, $"TypeOf: {typeOf} GetDocumentSchema Schema is null");
             }
 
             if (schema.Cache == null)
@@ -242,7 +268,7 @@ namespace Objectiks
             }
 
             #region KeyOf Generate
-            var keyOfProperties = meta.KeyOf;
+            var keyOfProperties = meta.KeyOfNames;
             var keyOfValues = new List<string>();
 
             if (!keyOfProperties.Contains(primary))
@@ -625,49 +651,60 @@ namespace Objectiks
 
             if (count > 0)
             {
-                for (int i = 0; i < count; i++)
-                {
-                    Document document = docs[i];
-                    UpdateDocumentMeta(ref meta, ref document, info, operation);
-                }
+                Logger?.Debug(DebugType.Engine, $"Document write : number of documents : {count}");
 
-                var json = new JSONSerializer();
-                var map = new DocumentMap(meta.Primary, meta.Primary);
-                var formatting = format == Format.Indented ? Formatting.Indented : Formatting.None;
-
-                if (operation == OperationType.Append)
-                {
-                    json.AppendRows(info, docs.Select(d => d.Data).ToList(), true, formatting);
-                }
-                else if (operation == OperationType.Merge)
-                {
-                    json.MergeRows(info, docs.Select(d => d.Data).ToList(), map, true, formatting);
-                }
-                else if (operation == OperationType.Create)
-                {
-                    json.CreateRows(info, docs.Select(d => d.Data).ToList(), formatting);
-                }
-                else if (operation == OperationType.Delete)
-                {
-                    json.DeleteRows(info, docs.Select(d => d.Data).ToList(), map, true, formatting);
-                }
-
-                if (operation != OperationType.Delete)
+                try
                 {
                     for (int i = 0; i < count; i++)
                     {
                         Document document = docs[i];
-
-                        if (meta.Refs != null && meta.Refs.Count > 0)
-                        {
-                            ParseDocumentRefs(meta.GetRefs(false), ref document);
-                        }
-
-                        Cache.Set(document, meta.Cache.Expire);
+                        UpdateDocumentMeta(ref meta, ref document, info, operation);
                     }
-                }
 
-                Cache.Set(meta, meta.Cache.Expire);
+                    var json = new JSONSerializer(Logger);
+                    var map = new DocumentMap(meta.Primary, meta.Primary);
+                    var formatting = format == Format.Indented ? Formatting.Indented : Formatting.None;
+
+                    if (operation == OperationType.Append)
+                    {
+                        json.AppendRows(info, docs.Select(d => d.Data).ToList(), true, formatting);
+                    }
+                    else if (operation == OperationType.Merge)
+                    {
+                        json.MergeRows(info, docs.Select(d => d.Data).ToList(), map, true, formatting);
+                    }
+                    else if (operation == OperationType.Create)
+                    {
+                        json.CreateRows(info, docs.Select(d => d.Data).ToList(), formatting);
+                    }
+                    else if (operation == OperationType.Delete)
+                    {
+                        json.DeleteRows(info, docs.Select(d => d.Data).ToList(), map, true, formatting);
+                    }
+
+                    if (operation != OperationType.Delete)
+                    {
+                        for (int i = 0; i < count; i++)
+                        {
+                            Document document = docs[i];
+
+                            if (meta.Refs != null && meta.Refs.Count > 0)
+                            {
+                                ParseDocumentRefs(meta.GetRefs(false), ref document);
+                            }
+
+                            Cache.Set(document, meta.Cache.Expire);
+                        }
+                    }
+
+                    Cache.Set(meta, meta.Cache.Expire);
+                }
+                catch (Exception ex)
+                {
+                    Logger?.Fatal(ex);
+
+                    throw ex;
+                }
             }
         }
     }

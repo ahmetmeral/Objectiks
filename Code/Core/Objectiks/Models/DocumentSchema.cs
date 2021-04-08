@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Objectiks.Models
 {
-    public class DocumentSchemaKeys : List<string> { }
+    public class DocumentKeyOfNames : List<string> { }
 
     public class DocumentSchema : IDisposable
     {
@@ -23,7 +23,7 @@ namespace Objectiks.Models
         /// <summary>
         /// Unique Keys..
         /// </summary>
-        public DocumentSchemaKeys KeyOf { get; set; }
+        public DocumentKeyOfNames KeyOf { get; set; }
         /// <summary>
         /// Nesnenin ilişkilerini saklar
         /// </summary>

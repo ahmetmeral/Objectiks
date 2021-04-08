@@ -14,6 +14,7 @@ namespace Objectiks
         public static class Core
         {
             public static DocumentManifest Manifest { get; private set; }
+            public static IDocumentLogger Logger { get; private set; }
             public static DocumentEngine Engine { get; private set; }
             public static IDocumentConnection Connection { get; private set; }
             public static List<IParser> ParseOf { get; private set; }
@@ -25,9 +26,14 @@ namespace Objectiks
                 Connection = options.Connection;
                 DefaultSchema = DocumentSchema.Default();
                 Manifest = GetDocumentManifest();
+                Logger = GetDocumentLogger(options);
                 Engine = GetDocumentEngine(options);
                 ParseOf = GetDocumentParsers(options);
                 TypeOf = Engine.LoadAllDocumentType(Manifest.TypeOf);
+
+                Logger?.Debug(DebugType.Core, Engine != null, $"Engine instance created..");
+                Logger?.Debug(DebugType.Core, Engine == null, $"Engine instance is null..");
+                Logger?.Debug(DebugType.Core, TypeOf.Count > 0, $"Number of Document Types : {TypeOf.Count}");
 
                 return Engine;
             }
@@ -90,11 +96,14 @@ namespace Objectiks
 
             private static DocumentEngine GetDocumentEngine(DocumentOptions options)
             {
-                var logger = GetDocumentLogger(options);
                 var cache = GetDocumentCache(options);
                 var watcher = GetDocumentWatcher(options);
 
-                return (DocumentEngine)Activator.CreateInstance(options.Engine, Manifest, logger, options.Connection, cache, watcher);
+                Logger?.Debug(DebugType.Core, "Cache instance created");
+                Logger?.Debug(DebugType.Core, watcher != null, "Watcher instance created");
+                Logger?.Debug(DebugType.Core, watcher == null, "Watcher instance is null");
+
+                return (DocumentEngine)Activator.CreateInstance(options.Engine, Manifest, Logger, options.Connection, cache, watcher);
             }
 
             private static List<IParser> GetDocumentParsers(DocumentOptions options)

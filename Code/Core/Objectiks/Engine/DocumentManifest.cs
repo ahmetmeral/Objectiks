@@ -13,7 +13,7 @@ namespace Objectiks.Engine
         public string Version { get; set; }
         public string Author { get; set; }
         public string Primary { get; set; }
-        public DocumentSchemaKeys KeyOf { get; set; }
+        public DocumentKeyOfNames KeyOf { get; set; }
         public DocumentTypes TypeOf { get; set; }
         public DocumentSettings Documents { get; set; }
         public DocumentVars Vars { get; set; }
@@ -47,7 +47,7 @@ namespace Objectiks.Engine
 
                 if (manifest.KeyOf == null)
                 {
-                    manifest.KeyOf = new DocumentSchemaKeys();
+                    manifest.KeyOf = new DocumentKeyOfNames();
                 }
 
                 return manifest;

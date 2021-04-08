@@ -23,8 +23,8 @@ namespace Objectiks
         public long MemorySize { get; set; }
         public bool HasLazy { get; set; }
         public bool HasData { get; set; }
-        public DocumentKeys Keys { get; set; }
-        public DocumentSchemaKeys KeyOf { get; set; }
+        public DocumentKeyIndex Keys { get; set; }
+        public DocumentKeyOfNames KeyOfNames { get; set; }
         public DocumentRefs Refs { get; set; }
         public DocumentCacheInfo Cache { get; set; }
         public DocumentPartitions Partitions { get; set; }
@@ -39,10 +39,10 @@ namespace Objectiks
             TypeOf = typeOf;
             ParseOf = schema.ParseOf;
             Primary = schema.Primary;
-            KeyOf = schema.KeyOf;
+            KeyOfNames = schema.KeyOf;
             Refs = schema.Refs;
             Cache = schema.Cache;
-            Keys = new DocumentKeys();
+            Keys = new DocumentKeyIndex();
             Partitions = new DocumentPartitions();
             Partitions.Current = 0;
             Partitions.Next = 0;
