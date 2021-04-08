@@ -39,7 +39,7 @@ jobs:
           #dotnet-version: '3.1.x'
 
       - name: 'Restore packages'
-        run: dotnet restore ${{ env.PROJECT_PATH }}
+        run: dotnet restore ${{ env.PROJECT_PATH }} -s https://api.nuget.org/
 
       - name: 'Build project'
         run: dotnet build ${{ env.PROJECT_PATH }} --no-restore --configuration Release

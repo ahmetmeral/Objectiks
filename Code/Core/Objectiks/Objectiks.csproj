@@ -15,7 +15,7 @@
     <PackageTags>nodb json document store</PackageTags>
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>Copyright 2021</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyVersion>0.0.4.9</AssemblyVersion>
