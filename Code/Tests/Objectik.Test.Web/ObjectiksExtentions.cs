@@ -14,22 +14,37 @@ namespace Objectik.Test.Web
     {
         public void Debug(DebugType debugType, string msg)
         {
-           
+            
+        }
+
+        public void Debug(DebugType debugType, bool condition, string msg)
+        {
+            
+        }
+
+        public void Error(Exception exception)
+        {
+            
         }
 
         public void Error(string msg, Exception exception = null)
         {
-
+            
         }
 
         public void Fatal(string msg, Exception exception = null)
         {
+            
+        }
 
+        public void Fatal(Exception exception)
+        {
+            
         }
 
         public void Info(string msg)
         {
-
+            
         }
     }
 
