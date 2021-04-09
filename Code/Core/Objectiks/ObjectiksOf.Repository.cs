@@ -10,89 +10,81 @@ namespace Objectiks
 {
     public partial class ObjectiksOf
     {
-        public DocumentEngine Engine { get; private set; }
+        public DocumentProvider Engine { get; private set; }
 
         public ObjectiksOf()
         {
-            Engine = Core.Initialize(new DocumentOptions());
+            Core.Initialize(new ObjectiksOptions());
+        }
+
+        public ObjectiksOf(ObjectiksOptions options)
+        {
+            Core.Initialize(options);
         }
 
         public ObjectiksOf(string baseDirectory)
         {
-            Engine = Core.Initialize(new DocumentOptions(baseDirectory));
-        }
-
-        public ObjectiksOf(DocumentOptions options)
-        {
-            Engine = Core.Initialize(options);
+            Core.Initialize(new ObjectiksOptions(baseDirectory));
         }
 
         public DocumentReader<T> TypeOf<T>()
         {
-            return new DocumentReader<T>(Engine, GetTypeOfName<T>());
+            return new DocumentReader<T>(GetTypeOfName<T>());
         }
 
         public DocumentReader<dynamic> TypeOf(string typeOf)
         {
-            return new DocumentReader<dynamic>(Engine, typeOf);
+            return new DocumentReader<dynamic>(typeOf);
         }
 
         public DocumentWriter<T> WriterOf<T>()
         {
-            return new DocumentWriter<T>(Engine, GetTypeOfName<T>());
+            return new DocumentWriter<T>(GetTypeOfName<T>());
         }
 
         public DocumentWriter<T> WriterOf<T>(string typeOf)
         {
-            return new DocumentWriter<T>(Engine, typeOf);
+            return new DocumentWriter<T>(GetTypeOfName<T>());
         }
 
         public T First<T>(string typeOf, object primaryOf) where T : class
         {
-            var query = new QueryOf(typeOf);
-
-            query.PrimaryOf(primaryOf);
-
-            return Engine.Read<T>(query);
+            return new DocumentReader<T>(typeOf, primaryOf).First();
         }
 
         public T First<T>(object primaryOf) where T : class
         {
-            var query = new QueryOf(GetTypeOfName<T>());
-
-            query.PrimaryOf(primaryOf);
-
-            return Engine.Read<T>(query);
+            return new DocumentReader<T>(GetTypeOfName<T>(), primaryOf).First();
         }
 
         public long Count<T>()
         {
-            return Engine.GetCount<long>(new QueryOf(GetTypeOfName<T>()));
+            return Core.GetTypeOfProvider<T>().GetCount<long>(new QueryOf(GetTypeOfName<T>()));
         }
 
         public long Count(string typeOf)
         {
-            return Engine.GetCount<long>(new QueryOf(typeOf));
+            return Core.GetTypeOfProvider(typeOf).GetCount<long>(new QueryOf(typeOf));
         }
 
         public DocumentMeta GetTypeMeta<T>()
         {
-            return Engine.GetTypeMeta(GetTypeOfName<T>());
+            return Core.GetTypeMeta(GetTypeOfName<T>());
         }
 
         public DocumentMeta GetTypeMeta(string typeOf)
         {
-            return Engine.GetTypeMeta(typeOf);
+            return Core.GetTypeMeta(typeOf);
         }
 
         public List<T> ToList<T>(string typeOf)
         {
-            return new DocumentReader<T>(Engine, typeOf).ToList();
+            return new DocumentReader<T>(typeOf).ToList();
         }
 
         public List<T> ToList<T>(params object[] keyOf)
         {
-            return new DocumentReader<T>(Engine, GetTypeOfName<T>(), keyOf).ToList();
+            return new DocumentReader<T>(GetTypeOfName<T>(), keyOf).ToList();
         }
 
 
@@ -103,21 +95,12 @@ namespace Objectiks
 
         public List<DocumentMeta> GetTypeMetaAll()
         {
-            return Engine.GetTypeMetaAll();
+            return Core.GetTypeMetaAll();
         }
 
         public string GetTypeOfName<T>()
         {
-            var attr = typeof(T).GetCustomAttribute<TypeOfAttribute>();
-
-            Ensure.NotNull(attr, "TypeOf undefined..");
-
-            if (String.IsNullOrEmpty(attr.Name))
-            {
-                attr.Name = typeof(T).Name;
-            }
-
-            return attr.Name;
+            return Core.GetTypeOfName<T>();
         }
     }
 }

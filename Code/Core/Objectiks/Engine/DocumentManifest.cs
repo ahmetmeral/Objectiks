@@ -15,6 +15,7 @@ namespace Objectiks.Engine
         public string Primary { get; set; }
         public DocumentKeyOfNames KeyOf { get; set; }
         public DocumentTypes TypeOf { get; set; }
+        public DocumentProviders ProviderOf { get; set; }
         public DocumentSettings Documents { get; set; }
         public DocumentVars Vars { get; set; }
 
@@ -22,12 +23,10 @@ namespace Objectiks.Engine
 
         public DocumentManifest() { }
 
-        public static DocumentManifest Get(IDocumentConnection connection)
+        public static DocumentManifest Get(string path)
         {
             try
             {
-                var path = Path.Combine(connection.BaseDirectory, DocumentDefaults.Manifest);
-
                 var manifest = new DocumentSerializer().Get<DocumentManifest>(path);
 
                 if (manifest.Documents == null)
@@ -48,6 +47,32 @@ namespace Objectiks.Engine
                 if (manifest.KeyOf == null)
                 {
                     manifest.KeyOf = new DocumentKeyOfNames();
+                }
+
+                if (manifest.ProviderOf == null)
+                {
+                    manifest.ProviderOf = new DocumentProviders();
+                    manifest.ProviderOf.Add(DocumentDefaults.ProviderOf, new DocumentOptions
+                    {
+                        Name = DocumentDefaults.ProviderOf,
+                        BaseDirectory = Path.Combine(Directory.GetCurrentDirectory(), DocumentDefaults.Root),
+                        BufferSize = DocumentDefaults.BufferSize,
+                        Extention = DocumentDefaults.Extention,
+                        TypeOf = manifest.TypeOf
+                    });
+                }
+                else if (manifest.ProviderOf.Count == 1 && manifest.ProviderOf.ContainsKey(DocumentDefaults.ProviderOf)
+                    && manifest.ProviderOf[DocumentDefaults.ProviderOf].TypeOf == null)
+                {
+                    manifest.ProviderOf[DocumentDefaults.ProviderOf].TypeOf = manifest.TypeOf;
+                }
+
+                foreach (var providerOf in manifest.ProviderOf)
+                {
+                    if (!String.IsNullOrWhiteSpace(providerOf.Value.Extention))
+                    {
+                        providerOf.Value.BaseDirectory = Path.Combine(Directory.GetCurrentDirectory(), DocumentDefaults.Root);
+                    }
                 }
 
                 return manifest;

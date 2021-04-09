@@ -6,7 +6,7 @@ namespace Objectiks.Models
 {
     public class DocumentSettings
     {
-        public string Extention { get; set; }
+        public string Extention { get; set; } = "*.json";
         public bool Watcher { get; set; } = false;
         public int BufferSize { get; set; }
         public DocumentParserSettings Parser { get; set; }

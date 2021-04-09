@@ -15,6 +15,9 @@ namespace Objectiks
         public const string Partitions = "Partitions";
 
         public const int CacheExpire = 100000;
+        public const int BufferSize = 128;
+        public const string ProviderOf = "Default";
+        public const string Extention = "*.json";
 
         //kaldıracağız..buna gerek kalmadı Ref içerisinde file referans verebiliyoruz...
         //yani statik olarak yazması gerekiyor..

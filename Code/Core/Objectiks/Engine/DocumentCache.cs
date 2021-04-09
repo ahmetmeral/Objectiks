@@ -1,4 +1,6 @@
-﻿using Objectiks.Services;
+﻿using Objectiks.Helper;
+using Objectiks.Models;
+using Objectiks.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,18 +10,19 @@ namespace Objectiks.Engine
     public abstract class DocumentCache : IDocumentCache
     {
         public abstract DocumentManifest Manifest { get; set; }
-        public abstract IDocumentConnection Connection { get; set; }
+        public string Hash { get; set; }
 
-        public DocumentCache(DocumentManifest manifest, IDocumentConnection connection)
+        public DocumentCache(DocumentManifest manifest)
         {
             Manifest = manifest;
-            Connection = connection;
+            Hash = HashHelper.CreateMD5(manifest.Name);
         }
 
         public abstract Document Get(string typeOf, object primaryOf);
         public abstract DocumentMeta Get(string typeOf);
         public abstract Document GetOrCreate(string typeOf, object primaryOf, Func<Document> func);
         public abstract DocumentMeta GetOrCreate(string typeOf, Func<DocumentMeta> func);
+        public abstract DocumentTypeStatus GetStatus(string typeOf);
         public abstract void Remove(string typeOf, object primaryOf);
         public abstract void Remove(string typeOf);
         public abstract void Remove(Document document);
@@ -27,8 +30,18 @@ namespace Objectiks.Engine
         public abstract void Reset();
         public abstract void Set(Document document, int expire);
         public abstract void Set(DocumentMeta meta, int expire);
+        public abstract void SetStatus(DocumentTypeStatus status);
 
 
+        public virtual string CacheOf(DocumentTypeStatus status)
+        {
+            return CacheOfStatus(status.TypeOf);
+        }
+
+        public virtual string CacheOfStatus(string typeOf)
+        {
+            return $"objectiks:{Hash}:{DocumentDefaults.Documents}:status:{typeOf}".ToLowerInvariant();
+        }
 
         public virtual string CacheOf(Document doc)
         {
@@ -37,7 +50,7 @@ namespace Objectiks.Engine
 
         public virtual string CacheOfDocument(string typeOf, object primaryOf)
         {
-            return $"objectiks:{Connection.Hash}:{DocumentDefaults.Documents}:{typeOf}:{primaryOf}".ToLowerInvariant();
+            return $"objectiks:{Hash}:{DocumentDefaults.Documents}:{typeOf}:{primaryOf}".ToLowerInvariant();
         }
 
         public virtual string CacheOf(DocumentMeta meta)
@@ -47,7 +60,7 @@ namespace Objectiks.Engine
 
         public virtual string CacheOfMeta(string typeOf)
         {
-            return $"objectiks:{Connection.Hash}:{DocumentDefaults.Meta}:{typeOf}".ToLowerInvariant();
+            return $"objectiks:{Hash}:{DocumentDefaults.Meta}:{typeOf}".ToLowerInvariant();
         }
 
         protected virtual T CreateNotExistEntity<T>() where T : class

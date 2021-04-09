@@ -27,11 +27,11 @@ namespace Objectiks.Parsers
             return true;
         }
 
-        public void Parse(IDocumentEngine engine, Document document, DocumentRef docRef)
+        public void Parse(IDocumentProvider provider, Document document, DocumentRef docRef)
         {
             var query = new QueryOf(docRef.TypeOf);
-            var manifest = engine.Manifest;
-            var meta = engine.GetTypeMeta(query.TypeOf);
+            var manifest = provider.Manifest;
+            var meta = provider.GetTypeMeta(query.TypeOf);
             JObject source = document.Data;
 
             if (docRef.KeyOf != null)
@@ -61,7 +61,7 @@ namespace Objectiks.Parsers
                 foreach (var key in keys)
                 {
                     var queryOfFromKey = new QueryOf(meta.TypeOf, key.PrimaryOf);
-                    var target = engine.Read<JObject>(queryOfFromKey, meta);
+                    var target = provider.Read<JObject>(queryOfFromKey, meta);
 
                     var sourcePropertyName = target[docRef.MapOf.Target].ToString();
                     source[property][sourcePropertyName] = target;
@@ -77,7 +77,7 @@ namespace Objectiks.Parsers
                     }
                 }
 
-                source[property] = engine.ReadList(keys.GetQueryOfFromPrimaryOf(meta.TypeOf), meta);
+                source[property] = provider.ReadList(keys.GetQueryOfFromPrimaryOf(meta.TypeOf), meta);
             }
 
             document.Data = source;

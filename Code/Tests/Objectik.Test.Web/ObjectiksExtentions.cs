@@ -58,7 +58,7 @@ namespace Objectik.Test.Web
                 DocumentDefaults.Root
                 ));
             options.UseDocumentLogger<DocumentLogger>();
-
+            
             services.AddSingleton(options);
             services.AddSingleton<ObjectiksOf>();
         }

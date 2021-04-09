@@ -14,7 +14,8 @@
       },
       "MapOf": {
         "Source": "Tags"
-      }
+      },
+      "Disabled": false
     },
     {
       "ParseOf": "1:1",
@@ -25,14 +26,16 @@
       },
       "MapOf": {
         "Source": "Category"
-      }
+      },
+      "Disabled": true
     },
     {
       "ParseOf": "1:M",
       "TypeOf": "Categories",
       "MapOf": {
         "Source": "Categories"
-      }
+      },
+      "Disabled": true
     },
     {
       "ParseOf": "1:1F",
@@ -40,7 +43,8 @@
       "MapOf": {
         "Source": "File",
         "Target": "Contents"
-      }
+      },
+      "Disabled": true
     }
   ],
   "Cache": {

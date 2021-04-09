@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Objectiks.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,6 +13,9 @@ namespace Objectiks.Services
         DocumentMeta GetOrCreate(string typeOf, Func<DocumentMeta> func);
         Document Get(string typeOf, object primaryOf);
         DocumentMeta Get(string typeOf);
+        DocumentTypeStatus GetStatus(string typeOf);
+        void SetStatus(DocumentTypeStatus status);
+
         void Remove(string typeOf, object primaryOf);
         void Remove(string typeOf);
         void Remove(Document document);

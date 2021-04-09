@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>0.0.4-beta-10</Version>
+    <Version>0.9.0-beta-01</Version>
     <Authors>Ahmet MERAL</Authors>
     <Title>Objectiks - NoDb json document store</Title>
     <PackageId>Objectiks</PackageId>
@@ -15,11 +15,11 @@
     <PackageTags>nodb json document store</PackageTags>
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Copyright>Copyright 2021</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <AssemblyVersion>0.0.4.10</AssemblyVersion>
-    <FileVersion>0.0.4.10</FileVersion>
+    <AssemblyVersion>0.9.0.1</AssemblyVersion>
+    <FileVersion>0.9.0.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

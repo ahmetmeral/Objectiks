@@ -25,7 +25,7 @@ namespace Objectiks.Models
         public DocumentInfo(string typeOf, FileInfo info)
         {
             TypeOfName = typeOf;
-            BaseDirectory = ObjectiksOf.Core.Connection.BaseDirectory;
+            BaseDirectory = ObjectiksOf.Core.GetBaseDirectory(typeOf);
             DirectoryName = info.DirectoryName;
             Name = info.Name;
             NameWithoutExtension = Path.GetFileNameWithoutExtension(Name);
@@ -91,7 +91,7 @@ namespace Objectiks.Models
         {
             Partition = partition;
             TypeOfName = typeOf;
-            BaseDirectory = ObjectiksOf.Core.Connection.BaseDirectory;
+            BaseDirectory = ObjectiksOf.Core.GetBaseDirectory(typeOf);
             DirectoryName = Path.Combine(BaseDirectory, DocumentDefaults.Documents, TypeOfName);
             Name = Partition > 0 ? $"{TypeOfName}.{Partition.ToString("0000")}.json" : $"{TypeOfName}.json";
             NameWithoutExtension = Path.GetFileNameWithoutExtension(Name);
@@ -102,7 +102,7 @@ namespace Objectiks.Models
         internal void ChangeFileInfo(string typeOf, string file)
         {
             TypeOfName = typeOf;
-            BaseDirectory = ObjectiksOf.Core.Connection.BaseDirectory;
+            BaseDirectory = ObjectiksOf.Core.GetBaseDirectory(typeOf);
             DirectoryName = Path.Combine(BaseDirectory, DocumentDefaults.Documents, TypeOfName);
             Name = file;
             NameWithoutExtension = Path.GetFileNameWithoutExtension(Name);
@@ -110,13 +110,6 @@ namespace Objectiks.Models
             Partition = GetPartitionIndex(NameWithoutExtension);
         }
 
-        public static DocumentInfo Parse(string fullPath)
-        {
-            string name = Path.GetFileNameWithoutExtension(fullPath);
 
-            var info = new DocumentInfo("");
-
-            return null;
-        }
     }
 }

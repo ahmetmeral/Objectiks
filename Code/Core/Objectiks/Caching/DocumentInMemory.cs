@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Primitives;
 using Objectiks.Engine;
 using Objectiks.Extentions;
+using Objectiks.Models;
 using Objectiks.Services;
 using System;
 using System.Collections.Generic;
@@ -13,15 +14,38 @@ namespace Objectiks.Caching
     public class DocumentInMemory : DocumentCache
     {
         public override DocumentManifest Manifest { get; set; }
-        public override IDocumentConnection Connection { get; set; }
 
         private IMemoryCache Cache;
         private static CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
-        public DocumentInMemory(DocumentManifest manifest, IDocumentConnection connection)
-            : base(manifest, connection)
+        public DocumentInMemory(DocumentManifest manifest)
+            : base(manifest)
         {
             Cache = new MemoryCache(new MemoryCacheOptions { });
+        }
+
+        public override DocumentTypeStatus GetStatus(string typeOf)
+        {
+            if (Cache.TryGetValue(CacheOfStatus(typeOf), out DocumentTypeStatus status))
+            {
+                return status;
+            }
+
+            var defaultT = CreateNotExistEntity<DocumentTypeStatus>();
+            defaultT.TypeOf = typeOf;
+
+            return defaultT;
+        }
+
+        public override void SetStatus(DocumentTypeStatus status)
+        {
+            var expiration = TimeSpan.FromMinutes(100000);
+            var options = new MemoryCacheEntryOptions()
+                .SetPriority(CacheItemPriority.High)
+                .SetAbsoluteExpiration(expiration);
+            options.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
+
+            Cache.Set(CacheOf(status), status, options);
         }
 
         public override void Set(Document document, int expire)
@@ -124,5 +148,7 @@ namespace Objectiks.Caching
 
             _resetCacheToken = new CancellationTokenSource();
         }
+
+
     }
 }

@@ -15,24 +15,26 @@ using Objectiks.Helper;
 
 namespace Objectiks
 {
-    public class DocumentEngine : IDocumentEngine
+    public class DocumentProvider : IDocumentProvider
     {
         public DocumentManifest Manifest { get; private set; }
         public IDocumentLogger Logger { get; private set; }
-        public IDocumentConnection Connection { get; private set; }
+        public DocumentOptions Options { get; private set; }
         public IDocumentCache Cache { get; private set; }
         public IDocumentWatcher Watcher { get; private set; }
+        public DocumentTypes TypeOf { get; set; }
 
-        public DocumentEngine(DocumentManifest manifest,
-            IDocumentLogger logger,
-            IDocumentConnection connections,
+        public DocumentProvider(
+            DocumentManifest manifest,
+            DocumentOptions options,
             IDocumentCache cache,
+            IDocumentLogger logger,
             IDocumentWatcher watcher
             )
         {
             Manifest = manifest;
             Logger = logger;
-            Connection = connections;
+            Options = options;
             Cache = cache;
             Watcher = watcher;
 
@@ -41,10 +43,11 @@ namespace Objectiks
                 Watcher?.WaitForChanged(this);
             }
 
-            Logger?.Debug(DebugType.Engine, Manifest != null, "Manifest is not null");
+            Logger?.Debug(DebugType.Engine, Manifest == null, "Manifest is null");
             Logger?.Debug(DebugType.Engine, Manifest.Documents.Watcher, "Document watcher enable");
         }
 
+        //remove
         internal virtual List<string> LoadAllDocumentType(DocumentTypes typeOfs)
         {
             Watcher?.Lock();
@@ -52,7 +55,7 @@ namespace Objectiks
             var typeOfList = new List<string>();
             foreach (var typeOf in typeOfs)
             {
-                CheckDirectoryOrSchema(typeOf);
+                CheckTypeOfSchema(typeOf);
 
                 if (LoadDocumentType(typeOf))
                 {
@@ -66,13 +69,21 @@ namespace Objectiks
             return typeOfList;
         }
 
-        //
-        public virtual bool LoadDocumentType(string typeOf)
+        public virtual bool LoadDocumentType(string typeOf, bool isCheckLoadedSkip = false)
         {
             Logger?.Debug(DebugType.Engine, $"Load TypeOf: {typeOf}");
 
+            var status = ObjectiksOf.Core.GetTypeOfStatus(typeOf);
+
+            if (isCheckLoadedSkip && status.Loaded)
+            {
+                ObjectiksOf.Core.UpdateTypeOfStatus(status, true);
+
+                return true;
+            }
+
             var schema = GetDocumentSchema(typeOf);
-            var meta = new DocumentMeta(typeOf, schema, Connection);
+            var meta = new DocumentMeta(typeOf, schema, Options);
             var files = new List<DocumentInfo>();
 
             #region Files
@@ -171,14 +182,16 @@ namespace Objectiks
 
             Cache.Set(meta, meta.Cache.Expire);
 
+            ObjectiksOf.Core.UpdateTypeOfStatus(status, meta.Exists);
+
             return true;
         }
 
-        protected virtual void CheckDirectoryOrSchema(string typeOf)
+        public virtual void CheckTypeOfSchema(string typeOf)
         {
             Logger?.Debug(DebugType.Engine, "Check Document Directory and Schema");
 
-            var documents = Path.Combine(Connection.BaseDirectory, DocumentDefaults.Documents, typeOf);
+            var documents = Path.Combine(Options.BaseDirectory, DocumentDefaults.Documents, typeOf);
             if (!Directory.Exists(documents))
             {
                 Directory.CreateDirectory(documents);
@@ -194,7 +207,7 @@ namespace Objectiks
                 Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} document created.. File: {docFile}");
             }
 
-            var docSchema = Path.Combine(Connection.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json");
+            var docSchema = Path.Combine(Options.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json");
 
             if (!File.Exists(docSchema))
             {
@@ -214,7 +227,7 @@ namespace Objectiks
 
         protected virtual DocumentSchema GetDocumentSchema(string typeOf)
         {
-            var schema_file = new FileInfo(Path.Combine(Connection.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json"));
+            var schema_file = new FileInfo(Path.Combine(Options.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json"));
             var schema = new DocumentSerializer().Get<DocumentSchema>(schema_file.FullName);
 
             if (schema == null)
@@ -351,7 +364,15 @@ namespace Objectiks
                     throw new Exception($"Document ref schema incorrect {document.TypeOf} -> {docRef?.ParseOf} - {docRef?.TypeOf}");
                 }
 
-                parser.Parse(this, document, docRef);
+                if (Options.TypeOf.Contains(docRef.TypeOf))
+                {
+                    parser.Parse(this, document, docRef);
+                }
+                else
+                {
+                    var provider = ObjectiksOf.Core.GetTypeOfProvider(docRef.TypeOf);
+                    parser.Parse(provider, document, docRef);
+                }
             }
 
             return true;
@@ -444,12 +465,11 @@ namespace Objectiks
             return results;
         }
 
-
-
         public virtual Document Read(string typeOf, object primaryOf)
         {
             var document = Cache.GetOrCreate(typeOf, primaryOf, () =>
             {
+                //ObjectiksOf.Core.LoadDocumentType(typeOf);
                 LoadDocumentType(typeOf);
 
                 return Cache.Get(typeOf, primaryOf);
@@ -616,33 +636,9 @@ namespace Objectiks
             }
         }
 
-        public virtual List<DocumentMeta> GetTypeMetaAll()
-        {
-            var list = new List<DocumentMeta>();
-
-            foreach (var typeOf in ObjectiksOf.Core.TypeOf)
-            {
-                var meta = GetTypeMeta(typeOf);
-
-                if (meta != null)
-                {
-                    list.Add(meta);
-                }
-            }
-
-            return list;
-        }
-
         public virtual DocumentMeta GetTypeMeta(string typeOf)
         {
-            var meta = Cache.GetOrCreate(typeOf, () =>
-            {
-                LoadDocumentType(typeOf);
-
-                return Cache.Get(typeOf);
-            });
-
-            return meta;
+            return ObjectiksOf.Core.GetTypeMeta(typeOf);
         }
 
         public virtual void Write(DocumentMeta meta, DocumentInfo info, List<Document> docs, OperationType operation, Format format)
