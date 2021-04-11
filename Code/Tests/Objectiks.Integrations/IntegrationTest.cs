@@ -13,6 +13,7 @@ namespace Objectiks.Integrations
         {
         }
 
+
         [Order(1)]
         [Test]
         public void DocumentSequence()
@@ -239,10 +240,10 @@ namespace Objectiks.Integrations
 
             using (var writer = repos.WriterOf<Pages>())
             {
-                
+
                 writer.UseFormatting();
                 writer.Delete(mergePage);
-                
+
                 writer.SubmitChanges();
             }
 

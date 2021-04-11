@@ -4,87 +4,106 @@ using Objectiks.Engine.Query;
 using Objectiks.Extentions;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace Objectiks
 {
     public partial class ObjectiksOf
     {
-        public DocumentProvider Engine { get; private set; }
+        private DocumentEngine Engine;
 
         public ObjectiksOf()
         {
-            Core.Initialize(new ObjectiksOptions());
+            Engine = Core.GetDefault(new DocumentProvider(), new DocumentOptions());
         }
 
-        public ObjectiksOf(ObjectiksOptions options)
+        public ObjectiksOf(DocumentOptions options)
         {
-            Core.Initialize(options);
+            Engine = Core.GetDefault(new DocumentProvider(), options);
         }
 
-        public ObjectiksOf(string baseDirectory)
+        public ObjectiksOf(string baseDirectory, DocumentOptions options = null)
         {
-            Core.Initialize(new ObjectiksOptions(baseDirectory));
+            Engine = Core.GetDefault(new DocumentProvider(baseDirectory), options);
+        }
+
+        public ObjectiksOf(DocumentProvider fileProvider, DocumentOptions options = null)
+        {
+            Engine = Core.Get(fileProvider, options);
+        }
+
+        public ObjectiksOf(IDbConnection connection, DocumentOptions options)
+        {
+            Engine = Core.Get(new DocumentProvider(connection), options);
         }
 
         public DocumentReader<T> TypeOf<T>()
         {
-            return new DocumentReader<T>(GetTypeOfName<T>());
+            return new DocumentReader<T>(Engine, GetTypeOfName<T>());
         }
 
         public DocumentReader<dynamic> TypeOf(string typeOf)
         {
-            return new DocumentReader<dynamic>(typeOf);
+            return new DocumentReader<dynamic>(Engine, typeOf);
         }
 
         public DocumentWriter<T> WriterOf<T>()
         {
-            return new DocumentWriter<T>(GetTypeOfName<T>());
+            return new DocumentWriter<T>(Engine, GetTypeOfName<T>());
         }
 
         public DocumentWriter<T> WriterOf<T>(string typeOf)
         {
-            return new DocumentWriter<T>(GetTypeOfName<T>());
+            return new DocumentWriter<T>(Engine, typeOf);
         }
 
         public T First<T>(string typeOf, object primaryOf) where T : class
         {
-            return new DocumentReader<T>(typeOf, primaryOf).First();
+            var query = new QueryOf(typeOf);
+
+            query.PrimaryOf(primaryOf);
+
+            return Engine.Read<T>(query);
         }
 
         public T First<T>(object primaryOf) where T : class
         {
-            return new DocumentReader<T>(GetTypeOfName<T>(), primaryOf).First();
+            var query = new QueryOf(GetTypeOfName<T>());
+
+            query.PrimaryOf(primaryOf);
+
+            return Engine.Read<T>(query);
         }
 
         public long Count<T>()
         {
-            return Core.GetTypeOfProvider<T>().GetCount<long>(new QueryOf(GetTypeOfName<T>()));
+            return Engine.GetCount<long>(new QueryOf(GetTypeOfName<T>()));
         }
 
         public long Count(string typeOf)
         {
-            return Core.GetTypeOfProvider(typeOf).GetCount<long>(new QueryOf(typeOf));
+            return Engine.GetCount<long>(new QueryOf(typeOf));
         }
 
         public DocumentMeta GetTypeMeta<T>()
         {
-            return Core.GetTypeMeta(GetTypeOfName<T>());
+            return Engine.GetTypeMeta(GetTypeOfName<T>());
         }
 
         public DocumentMeta GetTypeMeta(string typeOf)
         {
-            return Core.GetTypeMeta(typeOf);
+            return Engine.GetTypeMeta(typeOf);
         }
 
         public List<T> ToList<T>(string typeOf)
         {
-            return new DocumentReader<T>(typeOf).ToList();
+            return new DocumentReader<T>(Engine, typeOf).ToList();
         }
 
         public List<T> ToList<T>(params object[] keyOf)
         {
-            return new DocumentReader<T>(GetTypeOfName<T>(), keyOf).ToList();
+            return new DocumentReader<T>(Engine, GetTypeOfName<T>(), keyOf).ToList();
         }
 
 
@@ -95,12 +114,21 @@ namespace Objectiks
 
         public List<DocumentMeta> GetTypeMetaAll()
         {
-            return Core.GetTypeMetaAll();
+            return Engine.GetTypeMetaAll();
         }
 
         public string GetTypeOfName<T>()
         {
-            return Core.GetTypeOfName<T>();
+            var attr = typeof(T).GetCustomAttribute<TypeOfAttribute>();
+
+            Ensure.NotNull(attr, "TypeOf undefined..");
+
+            if (String.IsNullOrEmpty(attr.Name))
+            {
+                attr.Name = typeof(T).Name;
+            }
+
+            return attr.Name;
         }
     }
 }

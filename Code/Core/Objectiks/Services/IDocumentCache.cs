@@ -13,9 +13,6 @@ namespace Objectiks.Services
         DocumentMeta GetOrCreate(string typeOf, Func<DocumentMeta> func);
         Document Get(string typeOf, object primaryOf);
         DocumentMeta Get(string typeOf);
-        DocumentTypeStatus GetStatus(string typeOf);
-        void SetStatus(DocumentTypeStatus status);
-
         void Remove(string typeOf, object primaryOf);
         void Remove(string typeOf);
         void Remove(Document document);
@@ -25,5 +22,8 @@ namespace Objectiks.Services
         string CacheOfDocument(string typeOf, object primaryOf);
         string CacheOf(DocumentMeta meta);
         string CacheOfMeta(string typeOf);
+
+        public abstract void Set(EngineStatus engineStatus);
+        public abstract EngineStatus GetStatus(string engineOf);
     }
 }

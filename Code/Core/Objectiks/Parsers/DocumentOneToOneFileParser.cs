@@ -27,7 +27,7 @@ namespace Objectiks.Parsers
             return true;
         }
 
-        public void Parse(IDocumentProvider provider, Document document, DocumentRef docRef)
+        public void Parse(IDocumentEngine engine, Document document, DocumentRef docRef)
         {
             JObject source = document.Data;
 
@@ -41,12 +41,12 @@ namespace Objectiks.Parsers
 
             if (!String.IsNullOrWhiteSpace(fileName))
             {
-                var path = Path.Combine(provider.Options.BaseDirectory, DocumentDefaults.Documents,
+                var path = Path.Combine(engine.Provider.BaseDirectory, DocumentDefaults.Documents,
                     typeOf, DocumentDefaults.Contents, fileName);
 
                 if (File.Exists(path))
                 {
-                    source[docRef.MapOf.Target] = FileHelper.Get(path, provider.Manifest.Documents.BufferSize);
+                    source[docRef.MapOf.Target] = FileHelper.Get(path, engine.Manifest.Documents.BufferSize);
                 }
                 else
                 {

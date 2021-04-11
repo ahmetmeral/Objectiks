@@ -22,10 +22,6 @@ namespace Objectiks.Helper
             {
                 BufferSize = bufferSize.Value;
             }
-            else if (ObjectiksOf.Core.Manifest != null)
-            {
-                BufferSize = ObjectiksOf.Core.Manifest.Documents.BufferSize;
-            }
         }
 
         public T Deserialize<T>(string contents) where T : class, new()

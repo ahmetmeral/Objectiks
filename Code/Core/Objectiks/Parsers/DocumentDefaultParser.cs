@@ -15,7 +15,7 @@ namespace Objectiks.Parsers
 
         public DocumentDefaultParser() { }
 
-        public void Parse(IDocumentProvider provider, DocumentMeta meta, Document document, DocumentInfo file)
+        public void Parse(IDocumentEngine engine, DocumentMeta meta, Document document, DocumentInfo file)
         {
 
         }

@@ -28,14 +28,12 @@ namespace Objectiks.Parsers
             return true;
         }
 
-        public void Parse(IDocumentProvider provider, Document document, DocumentRef docRef)
+        public void Parse(IDocumentEngine engine, Document document, DocumentRef docRef)
         {
             JObject source = document.Data;
-            var manifest = provider.Manifest;
+            var manifest = engine.Manifest;
             var query = new QueryOf(docRef.TypeOf);
-            
-            var meta = provider.GetTypeMeta(query.TypeOf);
-
+            var meta = engine.GetTypeMeta(query.TypeOf);
             var property = docRef.GetTargetProperty();
 
             #region QueryBuilder
@@ -74,7 +72,7 @@ namespace Objectiks.Parsers
             //(KeyOf.Contains(@0) OR KeyOf.Contains(@1)) AND KeyOf.Contains(@2)
             #endregion
 
-            source[property] = provider.ReadList(query, meta); ;
+            source[property] = engine.ReadList(query, meta); ;
 
             document.Data = source;
         }

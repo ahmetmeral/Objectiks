@@ -8,15 +8,15 @@ using System.Text;
 
 namespace Objectiks.Services
 {
-    public interface IDocumentProvider
+    public interface IDocumentEngine
     {
         DocumentManifest Manifest { get; }
         IDocumentLogger Logger { get; }
         IDocumentCache Cache { get; }
-        DocumentOptions Options { get; }
+        DocumentProvider Provider { get; }
 
 
-        bool LoadDocumentType(string typeOf, bool isCheckLoadedSkip = false);
+        bool LoadDocumentType(string typeOf);
 
         Document Read(QueryOf query, DocumentMeta meta = null);
         Document Read(string typeOf, object primaryOf);
@@ -26,6 +26,7 @@ namespace Objectiks.Services
         T Read<T>(QueryOf query, DocumentMeta meta = null);
         T GetCount<T>(QueryOf query, DocumentMeta meta = null);
 
+        List<DocumentMeta> GetTypeMetaAll();
         DocumentMeta GetTypeMeta(string typeOf);
 
         void Write(DocumentMeta meta, DocumentInfo info, List<Document> docs, OperationType operation, Format format);

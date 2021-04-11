@@ -15,7 +15,7 @@ namespace Objectiks.Engine
         private string[] Extentions;
         private string[] Prefixs;
 
-        private IDocumentProvider Engine = null;
+        private DocumentEngine Engine = null;
 
         public DocumentWatcher() { }
 
@@ -29,7 +29,7 @@ namespace Objectiks.Engine
             IsLocked = false;
         }
 
-        public virtual void WaitForChanged(DocumentProvider engine)
+        public virtual void WaitForChanged(DocumentEngine engine)
         {
             Engine = engine;
             Prefixs = new string[] { "Backup.", "Temp." };
@@ -41,9 +41,9 @@ namespace Objectiks.Engine
                 ".txt"
             };
 
-            engine.Logger?.Debug(DebugType.Writer, $"Watch Directory : {engine.Options.BaseDirectory}");
+            engine.Logger?.Debug(DebugType.Writer, $"Watch Directory : {engine.Provider.BaseDirectory}");
 
-            var watcher = new FileSystemWatcher(engine.Options.BaseDirectory);
+            var watcher = new FileSystemWatcher(engine.Provider.BaseDirectory);
             watcher.NotifyFilter = NotifyFilters.Attributes |
                 NotifyFilters.CreationTime |
                 NotifyFilters.FileName |
@@ -80,7 +80,7 @@ namespace Objectiks.Engine
                     return;
                 }
 
-                var types = ObjectiksOf.Core.TypeOf;
+                var types = Engine.TypeOf;
                 var typeOf = file.Directory.Name;
                 if (typeOf == DocumentDefaults.Contents)
                 {

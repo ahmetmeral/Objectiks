@@ -10,24 +10,24 @@ namespace Objectiks.Engine
 {
     public class DocumentReader<T> : IDocumentReader<T>
     {
-        private readonly DocumentProvider Provider = null;
+        private readonly DocumentEngine Engine = null;
         private readonly QueryOf Query = null;
 
-        public DocumentReader(DocumentProvider provider)
+        public DocumentReader(DocumentEngine engine)
         {
-            Provider = provider;
+            Engine = engine;
             Query = new QueryOf();
         }
 
-        public DocumentReader(string typeOf)
+        public DocumentReader(DocumentEngine engine, string typeOf)
         {
-            Provider = ObjectiksOf.Core.GetTypeOfProvider(typeOf);
+            Engine = engine;
             Query = new QueryOf(typeOf);
         }
 
-        public DocumentReader(string typeOf, params object[] primaryOf)
+        public DocumentReader(DocumentEngine engine, string typeOf, params object[] primaryOf)
         {
-            Provider = ObjectiksOf.Core.GetTypeOfProvider(typeOf);
+            Engine = engine;
             Query = new QueryOf(typeOf, primaryOf);
         }
 
@@ -148,12 +148,12 @@ namespace Objectiks.Engine
 
         public long Count()
         {
-            return Provider.GetCount<long>(Query);
+            return Engine.GetCount<long>(Query);
         }
 
         public List<T> ToList()
         {
-            return Provider.ReadList<T>(Query);
+            return Engine.ReadList<T>(Query);
         }
 
         public T First()
@@ -161,7 +161,7 @@ namespace Objectiks.Engine
             Ensure.Try(Query.PrimaryOfList.Count > 0 && Query.KeyOfList.Count > 0, "PrimarOf and KeyOf cannot be used together");
             Ensure.Try(Query.PrimaryOfList.Count > 1, "Use ToList() for multiple results");
 
-            return Provider.Read<T>(Query);
+            return Engine.Read<T>(Query);
         }
 
         #endregion

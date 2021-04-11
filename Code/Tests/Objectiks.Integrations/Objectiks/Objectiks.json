@@ -5,24 +5,10 @@
   "Primary": "Id",
   "KeyOf": [],
   "TypeOf": [ "Pages", "Categories", "Tags", "Products" ],
-  "ProviderOf": {
-    "Default": {
-      "TypeOf": [ "Pages", "Categories", "Products" ],
-      "Extention": "*.json",
-      "BufferSize": 512,
-      "SupportPartialStorage": true
-    },
-    "Default2": {
-      "TypeOf": [ "Tags" ],
-      "Extention": "*.json",
-      "BufferSize": 512,
-      "SupportPartialStorage": true
-    }
-  },
   "Documents": {
     "Extention": "*.json",
     "BufferSize": 512,
-    "Watcher": false,
+    "Watcher": true,
     "Storage": {
       "Parital": true,
       "Limit": 1000

@@ -17,15 +17,15 @@ namespace Objectiks.Models
         public string FullName { get; set; }
         public bool Exist { get; set; }
 
-        public DocumentInfo(string typeOf, int partition = 0)
+        public DocumentInfo(string typeOf, string baseDirectory, int partition = 0)
         {
-            ChangeFileInfo(typeOf, partition);
+            ChangeFileInfo(typeOf, baseDirectory, partition);
         }
 
-        public DocumentInfo(string typeOf, FileInfo info)
+        public DocumentInfo(string typeOf, string baseDirectory, FileInfo info)
         {
             TypeOfName = typeOf;
-            BaseDirectory = ObjectiksOf.Core.GetBaseDirectory(typeOf);
+            BaseDirectory = baseDirectory;
             DirectoryName = info.DirectoryName;
             Name = info.Name;
             NameWithoutExtension = Path.GetFileNameWithoutExtension(Name);
@@ -36,14 +36,14 @@ namespace Objectiks.Models
 
         public DocumentInfo TypeOf(string typeOf, int partition)
         {
-            ChangeFileInfo(typeOf, partition);
+            ChangeFileInfo(typeOf, BaseDirectory, partition);
 
             return this;
         }
 
         public DocumentInfo PartOf(int id)
         {
-            ChangeFileInfo(TypeOfName, id);
+            ChangeFileInfo(TypeOfName, BaseDirectory, id);
 
             return this;
         }
@@ -87,11 +87,11 @@ namespace Objectiks.Models
         }
 
 
-        internal void ChangeFileInfo(string typeOf, int partition = 0)
+        internal void ChangeFileInfo(string typeOf, string baseDirectory, int partition = 0)
         {
             Partition = partition;
             TypeOfName = typeOf;
-            BaseDirectory = ObjectiksOf.Core.GetBaseDirectory(typeOf);
+            BaseDirectory = baseDirectory;
             DirectoryName = Path.Combine(BaseDirectory, DocumentDefaults.Documents, TypeOfName);
             Name = Partition > 0 ? $"{TypeOfName}.{Partition.ToString("0000")}.json" : $"{TypeOfName}.json";
             NameWithoutExtension = Path.GetFileNameWithoutExtension(Name);
@@ -99,10 +99,10 @@ namespace Objectiks.Models
             Exist = new FileInfo(FullName).Exists;
         }
 
-        internal void ChangeFileInfo(string typeOf, string file)
+        internal void ChangeFileInfo(string typeOf, string baseDirectory, string file)
         {
             TypeOfName = typeOf;
-            BaseDirectory = ObjectiksOf.Core.GetBaseDirectory(typeOf);
+            BaseDirectory = baseDirectory;
             DirectoryName = Path.Combine(BaseDirectory, DocumentDefaults.Documents, TypeOfName);
             Name = file;
             NameWithoutExtension = Path.GetFileNameWithoutExtension(Name);

@@ -28,7 +28,7 @@ namespace Objectiks
 
         public DocumentTransaction(string path, OperationType operation, bool isBackup)
         {
-            var document = new DocumentInfo("Stream", new FileInfo(path));
+            var document = new DocumentInfo("Stream", String.Empty, new FileInfo(path));
             Initialize(document, operation, isBackup);
         }
 

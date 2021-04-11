@@ -20,10 +20,6 @@ namespace Objectiks.Engine
             {
                 BufferSize = bufferSize.Value;
             }
-            else if (ObjectiksOf.Core.Manifest != null)
-            {
-                BufferSize = ObjectiksOf.Core.Manifest.Documents.BufferSize;
-            }
             else
             {
                 BufferSize = 128;

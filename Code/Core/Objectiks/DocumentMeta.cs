@@ -34,7 +34,7 @@ namespace Objectiks
 
         public DocumentMeta() { }
 
-        public DocumentMeta(string typeOf, DocumentSchema schema, DocumentOptions options)
+        public DocumentMeta(string typeOf, DocumentSchema schema, DocumentProvider fileProvider)
         {
             TypeOf = typeOf;
             ParseOf = schema.ParseOf;
@@ -46,7 +46,7 @@ namespace Objectiks
             Partitions = new DocumentPartitions();
             Partitions.Current = 0;
             Partitions.Next = 0;
-            Directory = Path.Combine(options.BaseDirectory, DocumentDefaults.Documents, typeOf);
+            Directory = Path.Combine(fileProvider.BaseDirectory, DocumentDefaults.Documents, typeOf);
             HasLazy = GetRefs(true).Count > 0;
             Exists = true;
 

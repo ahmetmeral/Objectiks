@@ -25,8 +25,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Github", ".Github", "{CE99
 		.github\workflows\DeployToNuget.yml = .github\workflows\DeployToNuget.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Objectiks.PostgreSql", "Code\Core\Objectiks.PostgreSql\Objectiks.PostgreSql.csproj", "{BE9BF594-8D3C-4669-BE0B-99A8B8765D94}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,10 +47,6 @@ Global
 		{FE990494-479B-4CAF-A2C1-DDB61E89BB2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE990494-479B-4CAF-A2C1-DDB61E89BB2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE990494-479B-4CAF-A2C1-DDB61E89BB2A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BE9BF594-8D3C-4669-BE0B-99A8B8765D94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BE9BF594-8D3C-4669-BE0B-99A8B8765D94}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BE9BF594-8D3C-4669-BE0B-99A8B8765D94}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BE9BF594-8D3C-4669-BE0B-99A8B8765D94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -62,7 +56,6 @@ Global
 		{24EA69DF-D12D-4F1D-950C-8D2763303F59} = {24C2C85A-F1BA-4AC1-BEFE-8AC8D4BAE51E}
 		{A6969037-A142-44CE-8D87-5BDA79B56355} = {24C2C85A-F1BA-4AC1-BEFE-8AC8D4BAE51E}
 		{FE990494-479B-4CAF-A2C1-DDB61E89BB2A} = {24C2C85A-F1BA-4AC1-BEFE-8AC8D4BAE51E}
-		{BE9BF594-8D3C-4669-BE0B-99A8B8765D94} = {B984598E-8816-41EA-8E85-EE72E2B4A900}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4ACF303-FBE3-4D6A-A43F-00ABED5D4F99}

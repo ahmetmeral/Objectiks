@@ -15,11 +15,11 @@ namespace Objectiks.Integrations
         private static Random random = new Random(1);
         private static List<int> idList = new List<int>();
 
-        public static ObjectiksOptions Options
+        public static DocumentOptions Options
         {
             get
             {
-                return new ObjectiksOptions();
+                return new DocumentOptions();
             }
         }
 

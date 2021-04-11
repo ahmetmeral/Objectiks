@@ -22,7 +22,7 @@ namespace Objectiks.Engine
         private ConcurrentQueue<DocumentPartition> Partitions = new ConcurrentQueue<DocumentPartition>();
         private Format Formatting = Format.None;
         private readonly string TypeOf = string.Empty;
-        private readonly DocumentProvider Provider = null;
+        private readonly DocumentEngine Engine = null;
         //meta : should not be read-only 
         private DocumentMeta Meta = null;
         private bool IsPartialStore = false;
@@ -30,16 +30,16 @@ namespace Objectiks.Engine
 
         public DocumentWriter() { }
 
-        internal DocumentWriter(string typeOf)
+        internal DocumentWriter(DocumentEngine engine, string typeOf)
         {
             TypeOf = typeOf;
-            Provider = ObjectiksOf.Core.GetTypeOfProvider(typeOf);
-            Meta = ObjectiksOf.Core.GetTypeMeta(typeOf);
-            IsPartialStore = Provider.Manifest.Documents.Storage.Partial;
+            Engine = engine;
+            Meta = engine.GetTypeMeta(typeOf);
+            IsPartialStore = Engine.Manifest.Documents.Storage.Partial;
 
             if (IsPartialStore)
             {
-                PartialStoreLimit = Provider.Manifest.Documents.Storage.Limit;
+                PartialStoreLimit = Engine.Manifest.Documents.Storage.Limit;
             }
         }
 
@@ -60,7 +60,7 @@ namespace Objectiks.Engine
 
         private Document GetDocument(T document, ref DocumentAttributes attr, bool clearDocumentRefs)
         {
-            var cacheOf = Provider.Cache.CacheOfDocument(attr.TypeOf.Name, attr.Primary?.Value.ToString());
+            var cacheOf = Engine.Cache.CacheOfDocument(attr.TypeOf.Name, attr.Primary?.Value.ToString());
 
             DocumentKey? documentKey = Meta.GetDocumentKeyFromCacheOf(cacheOf);
             var exists = documentKey.HasValue && !String.IsNullOrEmpty(documentKey.Value.PrimaryOf);
@@ -226,12 +226,12 @@ namespace Objectiks.Engine
 
         public void WatcherLock()
         {
-            Provider.Watcher?.Lock();
+            Engine.Watcher?.Lock();
         }
 
         public void WatcherUnLock()
         {
-            Provider.Watcher?.UnLock();
+            Engine.Watcher?.UnLock();
         }
 
         public void Add(T document, bool clearDocumentRefs = true)
@@ -360,24 +360,24 @@ namespace Objectiks.Engine
 
             try
             {
-                Provider.Watcher?.Lock();
+                Engine.Watcher?.Lock();
 
                 ReOrderPartitionByOperation();
 
                 while (Partitions.TryDequeue(out var partOf))
                 {
-                    var info = new DocumentInfo(Meta.TypeOf, partOf.Partition);
+                    var info = new DocumentInfo(Meta.TypeOf, Engine.Provider?.BaseDirectory, partOf.Partition);
 
                     var docs = Queue.Where(q => q.PartOf.Partition == partOf.Partition &&
                     q.PartOf.Operation == partOf.Operation).Select(s => s.Document).ToList();
 
-                    Provider.Write(Meta, info, docs, partOf.Operation, Formatting);
+                    Engine.Write(Meta, info, docs, partOf.Operation, Formatting);
                 }
 
                 Queue.Clear();
                 Partitions.Clear();
 
-                Provider.Watcher?.UnLock();
+                Engine.Watcher?.UnLock();
             }
             catch (IOException)
             {

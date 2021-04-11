@@ -9,6 +9,6 @@ namespace Objectiks.Services
     public interface IDocumentRefParser : IParser
     {
         bool IsValidRef(DocumentRef docRef);
-        void Parse(IDocumentProvider provider, Document document, DocumentRef docRef);
+        void Parse(IDocumentEngine engine, Document document, DocumentRef docRef);
     }
 }

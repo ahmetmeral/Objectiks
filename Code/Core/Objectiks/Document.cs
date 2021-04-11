@@ -15,7 +15,6 @@ namespace Objectiks
         public bool HasLazy { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool Exists { get; set; }
-        
 
         public Document() { }
 
