@@ -129,7 +129,5 @@ namespace Objectiks.Caching
 
             _resetCacheToken = new CancellationTokenSource();
         }
-
-
     }
 }

@@ -35,6 +35,18 @@ namespace Objectiks.Integrations.Options
             SupportPartialStorage = false;
             SupportTypeOfCache = true;
             SupportTypeOfRefs = false;
+
+            RegisterDefaultTypeOrParser();
+
+            UseSqlEngine<DocumentCustomSqlEngine>();
+        }
+    }
+
+    public class DocumentCustomSqlEngine : DocumentEngine
+    {
+        public DocumentCustomSqlEngine(DocumentProvider documentProvider, DocumentOption options) : base(documentProvider, options)
+        {
+
         }
     }
 }

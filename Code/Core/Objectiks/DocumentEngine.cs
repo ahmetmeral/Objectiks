@@ -28,7 +28,7 @@ namespace Objectiks
 
         public DocumentEngine() { }
 
-        internal DocumentEngine(DocumentProvider documentProvider, DocumentOption option)
+        public DocumentEngine(DocumentProvider documentProvider, DocumentOption option)
         {
             Option = option;
             Provider = documentProvider;
@@ -70,7 +70,7 @@ namespace Objectiks
             Logger?.Debug(DebugType.Engine, $"Load TypeOf: {typeOf}");
 
             var schema = GetDocumentSchema(typeOf);
-            var meta = new DocumentMeta(typeOf, schema, Provider);
+            var meta = new DocumentMeta(typeOf, schema, Provider, Option);
             var files = new List<DocumentInfo>();
 
             #region Files
@@ -152,7 +152,11 @@ namespace Objectiks
 
                                 UpdateDocumentMeta(ref meta, ref document, file, OperationType.None);
                                 ParseDocumentData(ref meta, ref document, file);
-                                ParseDocumentRefs(meta.GetRefs(false), ref document);
+
+                                if (Option.SupportLoaderRefsManipulation)
+                                {
+                                    ParseDocumentRefs(meta.GetRefs(false), ref document);
+                                }
 
                                 Cache.Set(document, meta.Cache.Expire);
 

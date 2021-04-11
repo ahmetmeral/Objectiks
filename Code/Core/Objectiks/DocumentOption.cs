@@ -36,6 +36,7 @@ namespace Objectiks
         public bool SupportProperyOverride { get; set; } = true;
         public bool SupportLoaderPaging { get; set; } = false;
         public bool SupportDocumentWriter { get; set; } = true;
+        public bool SupportLoaderRefsManipulation { get; set; } = false;
 
         public DocumentCacheInfo Cache { get; set; } = new DocumentCacheInfo { Expire = 10000 };
         public DocumentSchemes Schemes { get; set; } = new DocumentSchemes();
@@ -43,6 +44,7 @@ namespace Objectiks
 
         internal Type CacheType { get; private set; } = typeof(DocumentInMemory);
         internal Type WatcherType { get; private set; } = typeof(DocumentWatcher);
+        internal Type SqlEngineType { get; private set; } = typeof(DocumentSqlEngine);
         internal Type LoggerType { get; private set; }
         internal List<Type> ParserOfTypes { get; private set; }
 
@@ -81,6 +83,11 @@ namespace Objectiks
         public void AddParserTypeOf<T>() where T : IParser
         {
             ParserOfTypes.Add(typeof(T));
+        }
+
+        public void UseSqlEngine<T>() where T : IDocumentEngine
+        {
+            SqlEngineType = typeof(T);
         }
 
         public void ClearParserOf()

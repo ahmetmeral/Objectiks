@@ -34,7 +34,7 @@ namespace Objectiks
 
         public DocumentMeta() { }
 
-        public DocumentMeta(string typeOf, DocumentSchema schema, DocumentProvider fileProvider)
+        public DocumentMeta(string typeOf, DocumentSchema schema, DocumentProvider fileProvider, DocumentOption option)
         {
             TypeOf = typeOf;
             ParseOf = schema.ParseOf;
@@ -50,7 +50,7 @@ namespace Objectiks
             HasLazy = GetRefs(true).Count > 0;
             Exists = true;
 
-            RefsIndexBuild();
+            RefsIndexBuild(option.SupportLoaderRefsManipulation);
         }
 
         public void UpdateSequence(object primary)
@@ -110,16 +110,23 @@ namespace Objectiks
             return Sequence;
         }
 
-        public void RefsIndexBuild()
+        public void RefsIndexBuild(bool supportLoaderRefsManipulation)
         {
             if (Refs != null)
             {
                 int index = 0;
                 foreach (var item in Refs)
                 {
+                    if (!supportLoaderRefsManipulation)
+                    {
+                        item.Lazy = true;
+                    }
+
                     item.Index = index;
                     index++;
                 }
+
+                HasLazy = GetRefs(true).Count > 0;
             }
         }
 

@@ -35,7 +35,14 @@ namespace Objectiks
                     }
                     else
                     {
-                        engine = new DocumentSqlEngine(documentProvider, option);
+                        if (option.SqlEngineType != null)
+                        {
+                            engine = (DocumentEngine)Activator.CreateInstance(option.SqlEngineType, documentProvider, option);
+                        }
+                        else
+                        {
+                            engine = new DocumentSqlEngine(documentProvider, option);
+                        }
                     }
 
                     engine.FirstLoadAllDocumentType();
