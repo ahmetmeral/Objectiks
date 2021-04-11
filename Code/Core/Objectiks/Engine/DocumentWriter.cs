@@ -35,11 +35,11 @@ namespace Objectiks.Engine
             TypeOf = typeOf;
             Engine = engine;
             Meta = engine.GetTypeMeta(typeOf);
-            IsPartialStore = Engine.Manifest.Documents.Storage.Partial;
+            IsPartialStore = Engine.Option.SupportPartialStorage;
 
             if (IsPartialStore)
             {
-                PartialStoreLimit = Engine.Manifest.Documents.Storage.Limit;
+                PartialStoreLimit = Engine.Option.PartialStorageLimit;
             }
         }
 

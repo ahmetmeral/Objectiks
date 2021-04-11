@@ -11,14 +11,15 @@ namespace Objectiks
 {
     public class DocumentProvider
     {
-        public string Bucket { get; private set; }
+        public string CacheBucket { get; private set; }
         public string BaseDirectory { get; private set; }
-        public IDbConnection Connection { get; private set; }
+
+        internal IDbConnection Connection { get; private set; }
 
         public DocumentProvider()
         {
             BaseDirectory = Path.Combine(Directory.GetCurrentDirectory(), DocumentDefaults.Root);
-            Bucket = HashHelper.CreateMD5(BaseDirectory);
+            CacheBucket = HashHelper.CreateMD5(BaseDirectory);
         }
 
         public DocumentProvider(string baseDirectory)
@@ -29,19 +30,19 @@ namespace Objectiks
             }
 
             BaseDirectory = baseDirectory;
-            Bucket = HashHelper.CreateMD5(baseDirectory);
+            CacheBucket = HashHelper.CreateMD5(baseDirectory);
         }
 
-        public DocumentProvider(IDbConnection connection)
+        internal DocumentProvider(IDbConnection connection)
         {
             BaseDirectory = Path.Combine(Directory.GetCurrentDirectory(), DocumentDefaults.Root);
-            Bucket = HashHelper.CreateMD5(connection.ConnectionString);
+            CacheBucket = HashHelper.CreateMD5(connection.ConnectionString);
         }
 
-        public DocumentProvider(IDbConnection connection, string baseDirectory)
+        internal DocumentProvider(IDbConnection connection, string baseDirectory)
         {
             BaseDirectory = baseDirectory;
-            Bucket = HashHelper.CreateMD5(connection.ConnectionString);
+            CacheBucket = HashHelper.CreateMD5(connection.ConnectionString);
         }
     }
 }

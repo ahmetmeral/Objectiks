@@ -17,7 +17,7 @@ namespace Objectiks
 {
     public class DocumentEngine : IDocumentEngine
     {
-        public DocumentManifest Manifest { get; private set; }
+        public DocumentOption Option { get; private set; }
         public IDocumentLogger Logger { get; private set; }
         public DocumentProvider Provider { get; internal set; }
         public IDocumentCache Cache { get; private set; }
@@ -28,33 +28,27 @@ namespace Objectiks
 
         public DocumentEngine() { }
 
-        public DocumentEngine(DocumentManifest manifest, DocumentProvider documentFileProvider, DocumentOptions options)
+        internal DocumentEngine(DocumentProvider documentProvider, DocumentOption option)
         {
-
-        }
-
-        public DocumentEngine(DocumentProvider documentProvider, DocumentOptions options)
-        {
-            Manifest = GetDocumentManifest(documentProvider.BaseDirectory);
+            Option = option;
             Provider = documentProvider;
-            Cache = GetDocumentCache(options.Cache, Provider.Bucket);
-            Logger = GetDocumentLogger(options.Logger);
-            Watcher = GetDocumentWatcher(options.Watcher);
-            ParseOf = GetDocumentParsers(options.ParserOf);
+            Cache = GetDocumentCache(option.CacheType, Provider.CacheBucket);
+            Logger = GetDocumentLogger(option.LoggerType);
+            Watcher = GetDocumentWatcher(option.WatcherType);
+            ParseOf = GetDocumentParsers(option.ParserOfTypes);
             TypeOf = new DocumentTypes();
 
-            if (Manifest.Documents.Watcher)
+            if (Option.SupportDocumentWatcher)
             {
                 Watcher?.WaitForChanged(this);
             }
         }
 
-
         internal virtual void FirstLoadAllDocumentType()
         {
             Watcher?.Lock();
 
-            foreach (var typeOf in Manifest.TypeOf)
+            foreach (var typeOf in Option.TypeOf)
             {
                 CheckDirectoryOrSchema(typeOf);
 
@@ -83,7 +77,7 @@ namespace Objectiks
             var directoryInfo = new DirectoryInfo(meta.Directory);
             if (directoryInfo.Exists)
             {
-                var extentions = Manifest.Documents.Extention;
+                var extentions = Option.Extention;
                 var directoryFiles = directoryInfo.GetFiles(extentions, SearchOption.TopDirectoryOnly);
 
                 meta.HasData = directoryFiles.Length > 0;
@@ -128,7 +122,7 @@ namespace Objectiks
 
             Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} number of files : {files.Count}");
 
-            int bufferSize = Manifest.Documents.BufferSize;
+            int bufferSize = Option.BufferSize;
             var serializer = new JsonSerializer();
 
             foreach (DocumentInfo file in files)
@@ -208,8 +202,8 @@ namespace Objectiks
                 var temporySchema = DocumentSchema.Default();
                 temporySchema.TypeOf = typeOf;
                 temporySchema.ParseOf = "Document";
-                temporySchema.KeyOf = Manifest.KeyOf;
-                temporySchema.Primary = Manifest.Primary;
+                temporySchema.KeyOf = Option.KeyOf;
+                temporySchema.Primary = Option.Primary;
 
                 var schema = new DocumentSerializer().Serialize(temporySchema);
 
@@ -221,20 +215,30 @@ namespace Objectiks
 
         protected virtual DocumentSchema GetDocumentSchema(string typeOf)
         {
-            var schema_file = new FileInfo(Path.Combine(Provider.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json"));
-            var schema = new DocumentSerializer().Get<DocumentSchema>(schema_file.FullName);
+            DocumentSchema schema = null;
+
+            if (Option.Schemes != null)
+            {
+                schema = Option.Schemes.Where(s => s.TypeOf == typeOf).FirstOrDefault();
+            }
+
+            if (schema == null)
+            {
+                var schema_file = new FileInfo(Path.Combine(Provider.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json"));
+                schema = new DocumentSerializer().Get<DocumentSchema>(schema_file.FullName);
+            }
 
             if (schema == null)
             {
                 schema = DocumentSchema.Default();
-                schema.Cache = Manifest.Documents.Cache;
+                schema.Cache = Option.Cache;
 
                 Logger?.Debug(DebugType.Engine, $"TypeOf: {typeOf} GetDocumentSchema Schema is null");
             }
 
             if (schema.Cache == null)
             {
-                schema.Cache = Manifest.Documents.Cache;
+                schema.Cache = Option.Cache;
             }
 
             if (String.IsNullOrEmpty(schema.ParseOf))
@@ -249,11 +253,11 @@ namespace Objectiks
 
             if (schema.KeyOf == null)
             {
-                schema.KeyOf = Manifest.KeyOf;
+                schema.KeyOf = Option.KeyOf != null ? Option.KeyOf : new DocumentKeyOfNames();
             }
             else if (schema.KeyOf.Count == 0)
             {
-                schema.KeyOf = Manifest.KeyOf;
+                schema.KeyOf = Option.KeyOf != null ? Option.KeyOf : new DocumentKeyOfNames();
             }
 
             return schema;

@@ -30,7 +30,7 @@ namespace Objectiks.Parsers
         public void Parse(IDocumentEngine engine, Document document, DocumentRef docRef)
         {
             var query = new QueryOf(docRef.TypeOf);
-            var manifest = engine.Manifest;
+            var option = engine.Option;
             var meta = engine.GetTypeMeta(query.TypeOf);
             JObject source = document.Data;
 
@@ -50,7 +50,7 @@ namespace Objectiks.Parsers
             {
                 if (source.ContainsKey(property))
                 {
-                    if (!manifest.Documents.Parser.PropertyOverride)
+                    if (!option.RefProperyOverride)
                     {
                         throw new ArgumentException($"ParserOf:{ParseOf} - Ref Type : {docRef.TypeOf} - Ref Index: {docRef.Index} --> Document ref already define.. Use MapOf Target Property", docRef.TypeOf);
                     }
@@ -71,7 +71,7 @@ namespace Objectiks.Parsers
             {
                 if (source.ContainsKey(property))
                 {
-                    if (!manifest.Documents.Parser.PropertyOverride)
+                    if (!option.RefProperyOverride)
                     {
                         throw new ArgumentException($"ParserOf:{ParseOf} - Ref Type : {docRef.TypeOf} - Ref Index: {docRef.Index} --> Document ref already define.. Use MapOf Target Property", docRef.TypeOf);
                     }

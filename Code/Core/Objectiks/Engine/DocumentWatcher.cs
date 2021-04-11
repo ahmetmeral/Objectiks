@@ -33,7 +33,7 @@ namespace Objectiks.Engine
         {
             Engine = engine;
             Prefixs = new string[] { "Backup.", "Temp." };
-            DocumentExtention = engine.Manifest.Documents.Extention.Replace("*", "");
+            DocumentExtention = engine.Option.Extention.Replace("*", "");
             Extentions = new string[] {
                 DocumentExtention,
                 ".md",
@@ -51,7 +51,7 @@ namespace Objectiks.Engine
                 NotifyFilters.LastWrite |
                 NotifyFilters.Size |
                 NotifyFilters.Security;
-            watcher.Filter = engine.Manifest.Documents.Extention;
+            watcher.Filter = engine.Option.Extention;
             watcher.InternalBufferSize = 8192 * 5;
             watcher.IncludeSubdirectories = true;
             watcher.EnableRaisingEvents = true;

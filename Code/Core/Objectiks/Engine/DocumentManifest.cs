@@ -7,15 +7,15 @@ using System.Text;
 
 namespace Objectiks.Engine
 {
-    public class DocumentManifest
+    public class DocumentManifest : DocumentOption
     {
-        public string Name { get; set; }
-        public string Version { get; set; }
-        public string Author { get; set; }
-        public string Primary { get; set; }
-        public DocumentKeyOfNames KeyOf { get; set; }
-        public DocumentTypes TypeOf { get; set; }
-        public DocumentSettings Documents { get; set; }
+        //public string Name { get; set; }
+        //public string Version { get; set; }
+        //public string Author { get; set; }
+        //public string Primary { get; set; }
+        //public DocumentKeyOfNames KeyOf { get; set; }
+        //public DocumentTypes TypeOf { get; set; }
+        //public DocumentSetting Documents { get; set; }
         public DocumentVars Vars { get; set; }
 
         public bool Empty { get; set; }
@@ -26,28 +26,24 @@ namespace Objectiks.Engine
         {
             try
             {
-               
-
                 var manifest = new DocumentSerializer().Get<DocumentManifest>(path);
 
-                if (manifest.Documents == null)
+                if (manifest.TypeOf == null)
                 {
-                    manifest.Documents = new DocumentSettings();
-                    manifest.Documents.Storage = new DocumentStorageSettings();
-                    manifest.Documents.Parser = new DocumentParserSettings();
-                }
-
-                if (manifest.Documents.Cache == null)
-                {
-                    manifest.Documents.Cache = new DocumentCacheInfo
-                    {
-                        Expire = DocumentDefaults.CacheExpire
-                    };
+                    manifest.TypeOf = new DocumentTypes();
                 }
 
                 if (manifest.KeyOf == null)
                 {
                     manifest.KeyOf = new DocumentKeyOfNames();
+                }
+
+                if (manifest.Cache == null)
+                {
+                    manifest.Cache = new DocumentCacheInfo
+                    {
+                        Expire = DocumentDefaults.CacheExpire
+                    };
                 }
 
                 return manifest;

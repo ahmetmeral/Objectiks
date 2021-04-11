@@ -15,54 +15,31 @@ namespace Objectiks
     {
         public static class Core
         {
-            private static ConcurrentDictionary<string, DocumentEngine> Engines = new ConcurrentDictionary<string, DocumentEngine>();
+            private static DocumentEngines Engines = new DocumentEngines();
+            private static DocumentOptions Options = new DocumentOptions();
 
-            public static DocumentEngine Get(DocumentProvider documentProvider, DocumentOptions options)
+            public static DocumentEngine Get(DocumentProvider documentProvider, DocumentOption option)
             {
-                if (documentProvider.Connection != null)
-                {
-                    return GetSql(documentProvider, options);
-                }
-                return GetDefault(documentProvider, options);
-            }
-
-            public static DocumentEngine GetDefault(DocumentProvider fileProvider, DocumentOptions options)
-            {
-                if (options == null)
-                {
-                    options = new DocumentOptions();
-                }
-
-                Engines.TryGetValue(fileProvider.Bucket, out DocumentEngine engine);
+                Engines.TryGetValue(documentProvider.CacheBucket, out DocumentEngine engine);
 
                 if (engine == null)
                 {
-                    engine = new DocumentEngine(fileProvider, options);
+                    if (option == null)
+                    {
+                        option = GetOption(documentProvider);
+                    }
+
+                    if (documentProvider.Connection == null)
+                    {
+                        engine = new DocumentEngine(documentProvider, option);
+                    }
+                    else
+                    {
+                        engine = new DocumentSqlEngine(documentProvider, option);
+                    }
+
                     engine.FirstLoadAllDocumentType();
-                    Engines.TryAdd(fileProvider.Bucket, engine);
-                }
-
-                return engine;
-            }
-
-            public static DocumentEngine GetSql(DocumentProvider sqlProvider, DocumentOptions options)
-            {
-                if (options == null)
-                {
-                    options = new DocumentOptions();
-                }
-
-                Engines.TryGetValue(sqlProvider.Bucket, out DocumentEngine engine);
-
-                if (engine == null)
-                {
-                    engine = new DocumentSqlEngine(sqlProvider, options);
-                    engine.FirstLoadAllDocumentType();
-                    Engines.TryAdd(sqlProvider.Bucket, engine);
-                }
-                else
-                {
-                    engine.Provider = sqlProvider;
+                    Engines.TryAdd(documentProvider.CacheBucket, engine);
                 }
 
                 return engine;
@@ -76,6 +53,45 @@ namespace Objectiks
                 }
 
                 return engine;
+            }
+
+            public static void Map(Type type, DocumentOption option)
+            {
+                var key = type.Name;
+
+                if (Options.ContainsKey(key))
+                {
+                    Options[key] = option;
+                }
+                else
+                {
+                    Options.TryAdd(key, option);
+                }
+            }
+
+            public static DocumentOption GetOption(DocumentProvider provider)
+            {
+                var key = provider.Connection != null ? provider.Connection.GetType().Name : typeof(DocumentProvider).Name;
+
+                Options.TryGetValue(key, out DocumentOption setting);
+
+                if (setting == null)
+                {
+                    var path = Path.Combine(provider.BaseDirectory, DocumentDefaults.Manifest);
+
+                    setting = DocumentManifest.Get(path);
+
+                    if (Options.ContainsKey(key))
+                    {
+                        Options[key] = setting;
+                    }
+                    else
+                    {
+                        Options.TryAdd(key, setting);
+                    }
+                }
+
+                return setting;
             }
         }
     }

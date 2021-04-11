@@ -1,7 +1,9 @@
 ﻿using NUnit.Framework;
 using Objectiks.Engine.Query;
 using Objectiks.Integrations.Models;
+using Objectiks.Models;
 using System;
+using System.Data.SqlClient;
 using System.IO;
 
 namespace Objectiks.Integrations
@@ -11,6 +13,7 @@ namespace Objectiks.Integrations
         [SetUp]
         public void Setup()
         {
+            ObjectiksOf.Core.Map(typeof(DocumentProvider), new FileProviderOptions());
         }
 
 
@@ -18,7 +21,7 @@ namespace Objectiks.Integrations
         [Test]
         public void DocumentSequence()
         {
-            var repos = new ObjectiksOf(TestSetup.Options);
+            var repos = new ObjectiksOf();
             var meta = repos.GetTypeMeta("pages");
 
             var int_ = meta.GetNewSequenceId(typeof(int));

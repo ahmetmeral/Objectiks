@@ -4,7 +4,25 @@ using System.Text;
 
 namespace Objectiks.Models
 {
-    public class DocumentKeyOfNames : List<string> { }
+    public class DocumentKeyOfNames : List<string>
+    {
+        public DocumentKeyOfNames() : base() { }
+
+        public DocumentKeyOfNames(params string[] keyOfNames)
+        {
+            this.AddRange(keyOfNames);
+        }
+    }
+
+    public class DocumentSchemes : List<DocumentSchema>
+    {
+        public DocumentSchemes() : base() { }
+
+        public DocumentSchemes(params DocumentSchema[] schemes)
+        {
+            this.AddRange(schemes);
+        }
+    }
 
     public class DocumentSchema : IDisposable
     {

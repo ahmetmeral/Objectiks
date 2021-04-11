@@ -1,4 +1,5 @@
 ﻿using Objectiks.Engine;
+using Objectiks.Models;
 using Objectiks.Services;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace Objectiks
 {
     public class DocumentSqlEngine : DocumentEngine
     {
-        public DocumentSqlEngine(DocumentProvider documentProvider, DocumentOptions options)
+        public DocumentSqlEngine(DocumentProvider documentProvider, DocumentOption options)
         {
 
         }

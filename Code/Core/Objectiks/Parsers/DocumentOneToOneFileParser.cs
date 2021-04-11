@@ -46,7 +46,7 @@ namespace Objectiks.Parsers
 
                 if (File.Exists(path))
                 {
-                    source[docRef.MapOf.Target] = FileHelper.Get(path, engine.Manifest.Documents.BufferSize);
+                    source[docRef.MapOf.Target] = FileHelper.Get(path, engine.Option.BufferSize);
                 }
                 else
                 {

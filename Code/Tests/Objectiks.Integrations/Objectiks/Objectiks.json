@@ -5,20 +5,20 @@
   "Primary": "Id",
   "KeyOf": [],
   "TypeOf": [ "Pages", "Categories", "Tags", "Products" ],
-  "Documents": {
-    "Extention": "*.json",
-    "BufferSize": 512,
-    "Watcher": true,
-    "Storage": {
-      "Parital": true,
-      "Limit": 1000
-    },
-    "Parser": {
-      "PropertyOverride": true
-    },
-    "Cache": {
-      "Expire": 1000
-    }
+  "BufferSize": 512,
+  "Extention": "*.json",
+  "SupportPartialStorage": true,
+  "PartialStorageLimit": 1000,
+  "SupportTypeOfSchema": true,
+  "SupportTypeOfCache": true,
+  "SupportTypeOfRefs": true,
+  "SupportMetaCache": true,
+  "SupportFileAppend": true,
+  "SupportTransaction": false,
+  "RefProperyOverride": true,
+  "SupportDocumentWatcher": true,
+  "Cache": {
+    "Expire": 10000
   },
   "Vars": {
     "AnyVariables": true

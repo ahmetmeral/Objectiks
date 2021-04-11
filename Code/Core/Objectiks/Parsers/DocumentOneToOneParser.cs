@@ -21,7 +21,6 @@ namespace Objectiks.Parsers
         public void Parse(IDocumentEngine engine, Document document, DocumentRef docRef)
         {
             JObject source = document.Data;
-            var manifest = engine.Manifest;
             var query = new QueryOf(docRef.TypeOf);
             var meta = engine.GetTypeMeta(query.TypeOf);
             var property = docRef.GetTargetProperty();

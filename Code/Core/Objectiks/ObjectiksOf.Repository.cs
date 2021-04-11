@@ -15,25 +15,25 @@ namespace Objectiks
 
         public ObjectiksOf()
         {
-            Engine = Core.GetDefault(new DocumentProvider(), new DocumentOptions());
+            Engine = Core.Get(new DocumentProvider(), null);
         }
 
-        public ObjectiksOf(DocumentOptions options)
+        public ObjectiksOf(DocumentOption options)
         {
-            Engine = Core.GetDefault(new DocumentProvider(), options);
+            Engine = Core.Get(new DocumentProvider(), options);
         }
 
-        public ObjectiksOf(string baseDirectory, DocumentOptions options = null)
+        public ObjectiksOf(string baseDirectory, DocumentOption options = null)
         {
-            Engine = Core.GetDefault(new DocumentProvider(baseDirectory), options);
+            Engine = Core.Get(new DocumentProvider(baseDirectory), options);
         }
 
-        public ObjectiksOf(DocumentProvider fileProvider, DocumentOptions options = null)
+        public ObjectiksOf(DocumentProvider fileProvider, DocumentOption options = null)
         {
             Engine = Core.Get(fileProvider, options);
         }
 
-        public ObjectiksOf(IDbConnection connection, DocumentOptions options)
+        public ObjectiksOf(IDbConnection connection, DocumentOption options)
         {
             Engine = Core.Get(new DocumentProvider(connection), options);
         }

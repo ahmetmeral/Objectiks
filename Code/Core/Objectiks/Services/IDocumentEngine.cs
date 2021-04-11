@@ -10,7 +10,7 @@ namespace Objectiks.Services
 {
     public interface IDocumentEngine
     {
-        DocumentManifest Manifest { get; }
+        DocumentOption Option { get; }
         IDocumentLogger Logger { get; }
         IDocumentCache Cache { get; }
         DocumentProvider Provider { get; }
