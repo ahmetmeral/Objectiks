@@ -37,12 +37,14 @@ namespace Objectiks
         {
             BaseDirectory = Path.Combine(Directory.GetCurrentDirectory(), DocumentDefaults.Root);
             CacheBucket = HashHelper.CreateMD5(connection.ConnectionString);
+            Connection = connection;
         }
 
         internal DocumentProvider(IDbConnection connection, string baseDirectory)
         {
             BaseDirectory = baseDirectory;
             CacheBucket = HashHelper.CreateMD5(connection.ConnectionString);
+            Connection = connection;
         }
     }
 }

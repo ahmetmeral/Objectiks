@@ -39,7 +39,7 @@ namespace Objectiks.Engine
 
             if (IsPartialStore)
             {
-                PartialStoreLimit = Engine.Option.PartialStorageLimit;
+                PartialStoreLimit = Engine.Option.SupportPartialLimit;
             }
         }
 

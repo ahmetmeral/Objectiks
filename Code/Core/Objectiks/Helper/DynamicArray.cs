@@ -4,9 +4,11 @@ using System.Text;
 
 namespace Objectiks.Helper
 {
-    public class DynamicArray<T> : IEnumerable<T> where T : struct
+    public class DynamicArray<T> : ICollection<T> where T : struct
     {
         private List<T> _items = new List<T>();
+
+        public DynamicArray() { }
 
         public DynamicArray(params T[] items)
         {
@@ -21,22 +23,41 @@ namespace Objectiks.Helper
 
         public int Count { get { return _items.Count; } }
 
-        public void AddNew(T item)
+        public bool IsReadOnly => false;
+
+        public void Add(T item)
         {
             _items.Add(item);
         }
-        public void RemoveAt(int index)
+
+        public void Clear()
         {
-            _items.RemoveAt(index);
+            _items.Clear();
         }
-        public void Remove(T item)
+
+        public bool Contains(T item)
         {
-            _items.Remove(item);
+            return _items.Contains(item);
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            _items.CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<T> GetEnumerator()
         {
             return _items.GetEnumerator();
+        }
+
+        public bool Remove(T item)
+        {
+            return _items.Remove(item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            _items.RemoveAt(index);
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()

@@ -13,7 +13,6 @@ namespace Objectiks
         public const string Documents = "Documents";
         public const string Contents = "Contents";
         public const string Partitions = "Partitions";
-        public const string Status = "Status";
 
         public const int CacheExpire = 100000;
 

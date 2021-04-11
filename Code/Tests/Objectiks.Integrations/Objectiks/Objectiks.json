@@ -7,16 +7,13 @@
   "TypeOf": [ "Pages", "Categories", "Tags", "Products" ],
   "BufferSize": 512,
   "Extention": "*.json",
+  "SupportPartialLimit": 1000,
   "SupportPartialStorage": true,
-  "PartialStorageLimit": 1000,
-  "SupportTypeOfSchema": true,
-  "SupportTypeOfCache": true,
   "SupportTypeOfRefs": true,
-  "SupportMetaCache": true,
   "SupportFileAppend": true,
   "SupportTransaction": false,
-  "RefProperyOverride": true,
   "SupportDocumentWatcher": true,
+  "SupportProperyOverride": true,
   "Cache": {
     "Expire": 10000
   },

@@ -16,7 +16,7 @@ namespace Objectiks.Engine
         //public DocumentKeyOfNames KeyOf { get; set; }
         //public DocumentTypes TypeOf { get; set; }
         //public DocumentSetting Documents { get; set; }
-        public DocumentVars Vars { get; set; }
+        
 
         public bool Empty { get; set; }
 

@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Objectiks.Integrations
+namespace Objectiks.Integrations.Option
 {
-    public class FileProviderOptions : DocumentOption
+    public class FileProviderOption : DocumentOption
     {
-        public FileProviderOptions() : base()
+        public FileProviderOption() : base()
         {
             var page = new DocumentSchema
             {
@@ -29,6 +29,8 @@ namespace Objectiks.Integrations
             TypeOf = new DocumentTypes("Pages", "Categories");
             Schemes = new DocumentSchemes(page, category);
             BufferSize = 512;
+
+            RegisterDefaultTypeOrParser();
         }
     }
 }

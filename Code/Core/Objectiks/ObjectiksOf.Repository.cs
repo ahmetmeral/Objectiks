@@ -33,7 +33,7 @@ namespace Objectiks
             Engine = Core.Get(fileProvider, options);
         }
 
-        public ObjectiksOf(IDbConnection connection, DocumentOption options)
+        public ObjectiksOf(IDbConnection connection, DocumentOption options = null)
         {
             Engine = Core.Get(new DocumentProvider(connection), options);
         }

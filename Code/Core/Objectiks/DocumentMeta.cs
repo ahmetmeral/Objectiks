@@ -202,7 +202,7 @@ namespace Objectiks
 
         public void AddKeys(DocumentKey documentKey)
         {
-            Keys.AddNew(documentKey);
+            Keys.Add(documentKey);
         }
 
         public void UpdateKeys(DocumentKey documentKey)

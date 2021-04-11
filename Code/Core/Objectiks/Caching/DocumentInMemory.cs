@@ -1,11 +1,14 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 using Objectiks.Engine;
 using Objectiks.Extentions;
 using Objectiks.Models;
 using Objectiks.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 
@@ -30,7 +33,7 @@ namespace Objectiks.Caching
                 .SetAbsoluteExpiration(expiration);
             options.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
 
-            Cache.Set(CacheOf(document), document, options);
+            Cache.Set(CacheOf(document), DocumentSerializer.ToBson(document), options);
         }
 
         public override void Set(DocumentMeta meta, int expire)
@@ -41,34 +44,15 @@ namespace Objectiks.Caching
                 .SetAbsoluteExpiration(expiration);
             options.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
 
-            Cache.Set(CacheOf(meta), meta, options);
-        }
-
-        public override void Set(EngineStatus status)
-        {
-            var expiration = TimeSpan.FromMinutes(100000000);
-            var options = new MemoryCacheEntryOptions()
-                .SetPriority(CacheItemPriority.Normal)
-                .SetAbsoluteExpiration(expiration);
-            options.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
-
-            Cache.Set(EngineOf(status.EngineOf), status);
-        }
-
-        public override EngineStatus GetStatus(string engineOf)
-        {
-            if (Cache.TryGetValue(EngineOf(engineOf), out EngineStatus status))
-            {
-                return status;
-            }
-
-            return CreateNotExistEntity<EngineStatus>();
+            Cache.Set(CacheOf(meta), DocumentSerializer.ToBson(meta), options);
         }
 
         public override Document Get(string typeOf, object primary)
         {
-            if (Cache.TryGetValue(CacheOfDocument(typeOf, primary), out Document document))
+            if (Cache.TryGetValue(CacheOfDocument(typeOf, primary), out byte[] data))
             {
+                var document = DocumentSerializer.FromBson<Document>(data);
+
                 document.Exists = true;
 
                 return document;
@@ -79,8 +63,10 @@ namespace Objectiks.Caching
 
         public override DocumentMeta Get(string typeOf)
         {
-            if (Cache.TryGetValue(CacheOfMeta(typeOf), out DocumentMeta meta))
+            if (Cache.TryGetValue(CacheOfMeta(typeOf), out byte[] data))
             {
+                DocumentMeta meta = DocumentSerializer.FromBson<DocumentMeta>(data);
+
                 meta.Exists = true;
 
                 return meta;

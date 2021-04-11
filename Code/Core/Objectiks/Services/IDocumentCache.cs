@@ -22,8 +22,5 @@ namespace Objectiks.Services
         string CacheOfDocument(string typeOf, object primaryOf);
         string CacheOf(DocumentMeta meta);
         string CacheOfMeta(string typeOf);
-
-        public abstract void Set(EngineStatus engineStatus);
-        public abstract EngineStatus GetStatus(string engineOf);
     }
 }

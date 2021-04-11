@@ -50,7 +50,7 @@ namespace Objectiks.Parsers
             {
                 if (source.ContainsKey(property))
                 {
-                    if (!option.RefProperyOverride)
+                    if (!option.SupportProperyOverride)
                     {
                         throw new ArgumentException($"ParserOf:{ParseOf} - Ref Type : {docRef.TypeOf} - Ref Index: {docRef.Index} --> Document ref already define.. Use MapOf Target Property", docRef.TypeOf);
                     }
@@ -71,7 +71,7 @@ namespace Objectiks.Parsers
             {
                 if (source.ContainsKey(property))
                 {
-                    if (!option.RefProperyOverride)
+                    if (!option.SupportProperyOverride)
                     {
                         throw new ArgumentException($"ParserOf:{ParseOf} - Ref Type : {docRef.TypeOf} - Ref Index: {docRef.Index} --> Document ref already define.. Use MapOf Target Property", docRef.TypeOf);
                     }

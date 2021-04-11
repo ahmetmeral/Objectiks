@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 using Newtonsoft.Json.Linq;
 using Objectiks.Engine;
 using Objectiks.Helper;
@@ -53,6 +54,33 @@ namespace Objectiks.Engine
                 {
                     var contents = sr.ReadToEnd();
                     return Deserialize<T>(contents);
+                }
+            }
+        }
+
+        public static byte[] ToBson<T>(T obj)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (BsonDataWriter writer = new BsonDataWriter(ms))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Serialize(writer, obj);
+
+                    return ms.ToArray();
+                }
+            }
+        }
+
+        public static T FromBson<T>(byte[] data)
+        {
+            using (MemoryStream ms = new MemoryStream(data))
+            {
+                using (BsonDataReader reader = new BsonDataReader(ms))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+
+                    return serializer.Deserialize<T>(reader);
                 }
             }
         }

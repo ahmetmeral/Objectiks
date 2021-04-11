@@ -27,19 +27,7 @@ namespace Objectiks.Engine
         public abstract void Reset();
         public abstract void Set(Document document, int expire);
         public abstract void Set(DocumentMeta meta, int expire);
-        public abstract void Set(EngineStatus engineStatus);
-        public abstract EngineStatus GetStatus(string engineOf);
-
-
-        public virtual string EngineOf(EngineStatus status)
-        {
-            return EngineOf(status.EngineOf);
-        }
-
-        public virtual string EngineOf(string engineOf)
-        {
-            return $"{Bucket}:objectiks:{DocumentDefaults.Status}:{engineOf}".ToLowerInvariant();
-        }
+       
 
         public virtual string CacheOf(Document doc)
         {

@@ -19,23 +19,27 @@ namespace Objectiks
         public string UserOf { get; set; } = "UserRef";
         public string AccountOf { get; set; } = "AccountRef";
         public string ParseOf { get; set; } = "Document";
-        public DocumentKeyOfNames KeyOf { get; set; }
+        public DocumentKeyOfNames KeyOf { get; set; } = new DocumentKeyOfNames();
         public DocumentTypes TypeOf { get; set; }
-        public string DbSchema { get; set; }
-        public string DbSchemaSeperator { get; set; } = ".";
+        public string DbProviderSchema { get; set; }
+        public string DbProviderSchemaSeperator { get; set; } = ".";
         public string Extention { get; set; } = "*.json";
         public int BufferSize { get; set; } = 512;
+
         public bool SupportPartialStorage { get; set; } = true;
-        public bool SupportTypeOfSchema { get; set; } = true;
-        public bool SupportTypeOfCache { get; set; } = true;
+        public int SupportPartialLimit { get; set; } = 1000;
         public bool SupportTypeOfRefs { get; set; } = true;
         public bool SupportFileAppend { get; set; } = true;
         public bool SupportTransaction { get; set; } = true;
-        public int PartialStorageLimit { get; set; } = 1000;
-        public bool RefProperyOverride { get; set; } = true;
         public bool SupportDocumentWatcher { get; set; } = false;
+        public bool SupportTypeOfCache { get; set; } = true;
+        public bool SupportProperyOverride { get; set; } = true;
+        public bool SupportLoaderPaging { get; set; } = false;
+        public bool SupportDocumentWriter { get; set; } = true;
+
         public DocumentCacheInfo Cache { get; set; } = new DocumentCacheInfo { Expire = 10000 };
         public DocumentSchemes Schemes { get; set; } = new DocumentSchemes();
+        public DocumentVars Vars { get; set; }
 
         internal Type CacheType { get; private set; } = typeof(DocumentInMemory);
         internal Type WatcherType { get; private set; } = typeof(DocumentWatcher);

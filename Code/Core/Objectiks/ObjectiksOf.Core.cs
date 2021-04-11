@@ -80,6 +80,7 @@ namespace Objectiks
                     var path = Path.Combine(provider.BaseDirectory, DocumentDefaults.Manifest);
 
                     setting = DocumentManifest.Get(path);
+                    setting.RegisterDefaultTypeOrParser();
 
                     if (Options.ContainsKey(key))
                     {

@@ -1,6 +1,9 @@
-﻿using NUnit.Framework;
+﻿using Npgsql;
+using NUnit.Framework;
 using Objectiks.Engine.Query;
 using Objectiks.Integrations.Models;
+using Objectiks.Integrations.Option;
+using Objectiks.Integrations.Options;
 using Objectiks.Models;
 using System;
 using System.Data.SqlClient;
@@ -13,9 +16,24 @@ namespace Objectiks.Integrations
         [SetUp]
         public void Setup()
         {
-            ObjectiksOf.Core.Map(typeof(DocumentProvider), new FileProviderOptions());
+            //ObjectiksOf.Core.Map(typeof(DocumentProvider), new FileProviderOption());
+            ObjectiksOf.Core.Map(typeof(NpgsqlConnection), new SqlProviderOption());
         }
 
+        [Test]
+        public void DocumentSqlProvider()
+        {
+            var connectionString = "Server=.\\SqlExpress;Database=INBOX;User Id=sa;Password=data1;";
+            var repos = new ObjectiksOf(new NpgsqlConnection(connectionString));
+        }
+
+        [Test]
+        public void TestNewOption()
+        {
+            var repos = new ObjectiksOf();
+            var meta = repos.GetTypeMeta("pages");
+            var page = repos.TypeOf<Pages>().PrimaryOf(1).First();
+        }
 
         [Order(1)]
         [Test]
@@ -27,7 +45,6 @@ namespace Objectiks.Integrations
             var int_ = meta.GetNewSequenceId(typeof(int));
             var long_ = meta.GetNewSequenceId(typeof(long));
             var guid_ = meta.GetNewSequenceId(typeof(Guid));
-            var str_ = meta.GetNewSequenceId(typeof(string));
         }
 
         [Test(Description = "Document Reader Test")]
