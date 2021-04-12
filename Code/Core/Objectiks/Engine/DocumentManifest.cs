@@ -16,7 +16,7 @@ namespace Objectiks.Engine
         //public DocumentKeyOfNames KeyOf { get; set; }
         //public DocumentTypes TypeOf { get; set; }
         //public DocumentSetting Documents { get; set; }
-        
+
 
         public bool Empty { get; set; }
 
@@ -44,6 +44,11 @@ namespace Objectiks.Engine
                     {
                         Expire = DocumentDefaults.CacheExpire
                     };
+                }
+
+                if (manifest.SupportDocumentWatcher)
+                {
+                    manifest.UseWatcher<DocumentWatcher>();
                 }
 
                 return manifest;

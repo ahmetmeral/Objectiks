@@ -46,6 +46,7 @@ namespace Objectiks
                     }
 
                     engine.FirstLoadAllDocumentType();
+
                     Engines.TryAdd(documentProvider.CacheBucket, engine);
                 }
 

@@ -1,10 +1,11 @@
-﻿using Objectiks.Engine;
+﻿using Objectiks;
+using Objectiks.Engine;
 using Objectiks.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Objectiks.Integrations.Option
+namespace Objectik.Test.Web.Providers
 {
     public class FileProviderOption : DocumentOption
     {
@@ -30,7 +31,6 @@ namespace Objectiks.Integrations.Option
             TypeOf = new DocumentTypes("Pages", "Categories");
             Schemes = new DocumentSchemes(page, category);
             BufferSize = 512;
-            SupportLoaderInRefs = true;
 
             RegisterDefaultTypeOrParser();
             UseWatcher<DocumentWatcher>();

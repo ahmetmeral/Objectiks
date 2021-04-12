@@ -16,8 +16,11 @@ namespace Objectiks.Integrations
         [SetUp]
         public void Setup()
         {
-            //ObjectiksOf.Core.Map(typeof(DocumentProvider), new FileProviderOption());
-            ObjectiksOf.Core.Map(typeof(NpgsqlConnection), new SqlProviderOption());
+            ObjectiksOf.Core.Map(typeof(DocumentProvider),
+                new FileProviderOption());
+
+            ObjectiksOf.Core.Map(typeof(NpgsqlConnection),
+                new SqlProviderOption());
         }
 
         [Test]

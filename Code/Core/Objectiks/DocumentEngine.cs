@@ -151,14 +151,18 @@ namespace Objectiks
                                 };
 
                                 UpdateDocumentMeta(ref meta, ref document, file, OperationType.None);
-                                ParseDocumentData(ref meta, ref document, file);
 
-                                if (Option.SupportLoaderRefsManipulation)
+                                if (Option.SupportDocumentParser)
+                                {
+                                    ParseDocumentData(ref meta, ref document, file);
+                                }
+
+                                if (Option.SupportLoaderInRefs)
                                 {
                                     ParseDocumentRefs(meta.GetRefs(false), ref document);
                                 }
 
-                                Cache.Set(document, meta.Cache.Expire);
+                                Cache?.Set(document, meta.Cache.Expire);
 
                                 document.Dispose();
                             }
@@ -171,7 +175,7 @@ namespace Objectiks
                 }
             }
 
-            Cache.Set(meta, meta.Cache.Expire);
+            Cache?.Set(meta, meta.Cache.Expire);
 
             return true;
         }
@@ -745,6 +749,11 @@ namespace Objectiks
                     {
                         Document document = docs[i];
                         UpdateDocumentMeta(ref meta, ref document, info, operation);
+
+                        if (!Option.SupportLoaderInRefs)
+                        {
+                            Cache?.Set(docs[i], meta.Cache.Expire);
+                        }
                     }
 
                     var json = new JSONSerializer(Logger);
@@ -770,20 +779,20 @@ namespace Objectiks
 
                     if (operation != OperationType.Delete)
                     {
-                        for (int i = 0; i < count; i++)
+                        if (Option.SupportLoaderInRefs && meta.Refs !=null && meta.Refs.Count > 0)
                         {
-                            Document document = docs[i];
+                            var refs = meta.GetRefs(false);
 
-                            if (meta.Refs != null && meta.Refs.Count > 0)
+                            for (int i = 0; i < count; i++)
                             {
-                                ParseDocumentRefs(meta.GetRefs(false), ref document);
+                                Document document = docs[i];
+                                ParseDocumentRefs(refs, ref document);
+                                Cache?.Set(document, meta.Cache.Expire);
                             }
-
-                            Cache.Set(document, meta.Cache.Expire);
                         }
                     }
 
-                    Cache.Set(meta, meta.Cache.Expire);
+                    Cache?.Set(meta, meta.Cache.Expire);
                 }
                 catch (Exception ex)
                 {

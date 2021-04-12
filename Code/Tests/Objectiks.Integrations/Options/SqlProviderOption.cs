@@ -33,7 +33,6 @@ namespace Objectiks.Integrations.Options
             Schemes = new DocumentSchemes(page, category);
             SupportFileAppend = false;
             SupportPartialStorage = false;
-            SupportTypeOfCache = true;
             SupportTypeOfRefs = false;
 
             RegisterDefaultTypeOrParser();

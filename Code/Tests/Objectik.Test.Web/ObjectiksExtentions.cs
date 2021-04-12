@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Objectik.Test.Web.Providers;
 using Objectiks;
 using Objectiks.Services;
 using System;
@@ -14,37 +15,37 @@ namespace Objectik.Test.Web
     {
         public void Debug(DebugType debugType, string msg)
         {
-            
+
         }
 
         public void Debug(DebugType debugType, bool condition, string msg)
         {
-            
+
         }
 
         public void Error(Exception exception)
         {
-            
+
         }
 
         public void Error(string msg, Exception exception = null)
         {
-            
+
         }
 
         public void Fatal(string msg, Exception exception = null)
         {
-            
+
         }
 
         public void Fatal(Exception exception)
         {
-            
+
         }
 
         public void Info(string msg)
         {
-            
+
         }
     }
 
@@ -52,15 +53,9 @@ namespace Objectik.Test.Web
     {
         public static void AddObjectiks(this IServiceCollection services)
         {
-            var options = new DocumentOptions(
-                Path.Combine(Directory.GetCurrentDirectory(),
-                "App_Data",
-                DocumentDefaults.Root
-                ));
-            options.UseDocumentLogger<DocumentLogger>();
-            
-            services.AddSingleton(options);
-            services.AddSingleton<ObjectiksOf>();
+            //ObjectiksOf.Core.Map(typeof(DocumentProvider), new FileProviderOption());
+            var baseDirectory = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", DocumentDefaults.Root);
+            services.AddSingleton(new ObjectiksOf(baseDirectory));
         }
 
     }
