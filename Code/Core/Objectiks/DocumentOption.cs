@@ -16,13 +16,15 @@ namespace Objectiks
         public string Version { get; set; }
         public string Author { get; set; }
         public string Primary { get; set; } = "Id";
-        public string UserOf { get; set; } = "UserRef";
-        public string AccountOf { get; set; } = "AccountRef";
+        public string User { get; set; } = "UserRef";
+        public string Account { get; set; } = "AccountRef";
         public string ParseOf { get; set; } = "Document";
         public DocumentKeyOfNames KeyOf { get; set; } = new DocumentKeyOfNames();
         public DocumentTypes TypeOf { get; set; }
-        public string DbProviderSchema { get; set; }
-        public string DbProviderSchemaSeperator { get; set; } = ".";
+        public string SqlProviderSchema { get; set; }
+        public string SqlProviderSchemaSeperator { get; set; } = ".";
+        public int SqlProviderPageLimit { get; set; } = 2;
+        public bool SupportSqlReaderPaging { get; set; } = true;
         public string Extention { get; set; } = "*.json";
         public int BufferSize { get; set; } = 512;
 
@@ -44,7 +46,7 @@ namespace Objectiks
 
         internal Type CacheType { get; private set; } = typeof(DocumentInMemory);
         internal Type WatcherType { get; private set; }
-        internal Type SqlEngineType { get; private set; } = typeof(DocumentSqlEngine);
+        internal Type SqlEngineType { get; private set; }
         internal Type LoggerType { get; private set; }
         internal List<Type> ParserOfTypes { get; private set; }
 

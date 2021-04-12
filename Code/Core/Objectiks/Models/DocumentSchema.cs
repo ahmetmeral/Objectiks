@@ -38,6 +38,10 @@ namespace Objectiks.Models
         /// Identity Property
         /// </summary>
         public string Primary { get; set; }
+
+        public string Account { get; set; }
+
+        public string User { get; set; }
         /// <summary>
         /// Unique Keys..
         /// </summary>

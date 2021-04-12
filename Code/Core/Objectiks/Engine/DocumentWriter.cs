@@ -58,6 +58,10 @@ namespace Objectiks.Engine
             }
         }
 
+        //todo: buraları düzelteceğiz.
+        //keyOf ları set 
+        //accountof 
+        //userof
         private Document GetDocument(T document, ref DocumentAttributes attr, bool clearDocumentRefs)
         {
             var cacheOf = Engine.Cache.CacheOfDocument(attr.TypeOf.Name, attr.Primary?.Value.ToString());
@@ -66,15 +70,16 @@ namespace Objectiks.Engine
             var exists = documentKey.HasValue && !String.IsNullOrEmpty(documentKey.Value.PrimaryOf);
             var partition = documentKey.HasValue && !String.IsNullOrEmpty(documentKey.Value.PrimaryOf) ? documentKey.Value.Partition : 0;
 
+            //keyof u da burada set edelim.. tekrar tekrar gidip çekmesin..
+
             var doc = new Document
             {
                 TypeOf = attr.TypeOf.Name,
-                Primary = attr.Primary.Value,
+                PrimaryOf = attr.Primary.Value.ToString(),
                 CacheOf = cacheOf,
+                Data = JObject.FromObject(document),
                 Partition = partition,
                 HasArray = false,
-                HasLazy = Meta.HasLazy,
-                Data = JObject.FromObject(document),
                 Exists = exists
             };
 
@@ -371,7 +376,7 @@ namespace Objectiks.Engine
                     var docs = Queue.Where(q => q.PartOf.Partition == partOf.Partition &&
                     q.PartOf.Operation == partOf.Operation).Select(s => s.Document).ToList();
 
-                    Engine.Write(Meta, info, docs, partOf.Operation, Formatting);
+                    Engine.SubmitChanges(Meta, info, docs, partOf.Operation, Formatting);
                 }
 
                 Queue.Clear();

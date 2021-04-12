@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 
 
-namespace Objectiks
+namespace Objectiks.Engine
 {
     public class DocumentTransaction : IDisposable
     {

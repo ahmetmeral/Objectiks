@@ -16,18 +16,25 @@ namespace Objectiks.Integrations
         [SetUp]
         public void Setup()
         {
-            ObjectiksOf.Core.Map(typeof(DocumentProvider),
-                new FileProviderOption());
-
-            ObjectiksOf.Core.Map(typeof(NpgsqlConnection),
-                new SqlProviderOption());
+            ObjectiksOf.Core.Map(typeof(DocumentProvider), new FileProviderOption());
+            ObjectiksOf.Core.Map(typeof(NpgsqlConnection), new PostgreSqlProviderOption());
         }
 
         [Test]
-        public void DocumentSqlProvider()
+        public void MssqlProvider()
         {
             var connectionString = "Server=.\\SqlExpress;Database=INBOX;User Id=sa;Password=data1;";
-            var repos = new ObjectiksOf(new NpgsqlConnection(connectionString));
+            var conn = new SqlConnection(connectionString);
+        }
+
+        [Test]
+        public void PostgreSqlProvider()
+        {
+            var connectionString = "Host=localhost;Port=5432;Database=objectiks;User id=postgres;Password=data1;SslMode=Disable;";
+            var conn = new NpgsqlConnection(connectionString);
+            var repos = new ObjectiksOf(conn);
+            var meta = repos.GetTypeMeta<Pages>();
+            var page = repos.TypeOf<Pages>().PrimaryOf(1).First();
         }
 
         [Test]

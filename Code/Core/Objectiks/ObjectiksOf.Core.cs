@@ -41,7 +41,7 @@ namespace Objectiks
                         }
                         else
                         {
-                            engine = new DocumentSqlEngine(documentProvider, option);
+                            throw new Exception("Sql engine type undefined..");
                         }
                     }
 

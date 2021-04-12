@@ -31,7 +31,7 @@ namespace Objectiks.Engine
 
         public virtual string CacheOf(Document doc)
         {
-            return CacheOfDocument(doc.TypeOf, doc.Primary);
+            return CacheOfDocument(doc.TypeOf, doc.PrimaryOf);
         }
 
         public virtual string CacheOfDocument(string typeOf, object primaryOf)

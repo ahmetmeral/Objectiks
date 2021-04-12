@@ -19,6 +19,36 @@ namespace Objectiks.Extentions
 {
     public static class DocumentExtentions
     {
+        public static string[] ToKeyOfValues(this JObject target, string typeOf, DocumentKeyOfNames keyOfNames, string primary)
+        {
+            var keyOfProperties = keyOfNames;
+            var keyOfValues = new List<string>();
+
+            if (!keyOfProperties.Contains(primary))
+            {
+                keyOfProperties.Add(primary);
+            }
+
+            foreach (var key in keyOfProperties)
+            {
+                if (target.ContainsKey(key))
+                {
+                    var keyValue = target[key].AsString().ToLowerInvariant();
+
+                    if (!String.IsNullOrEmpty(keyValue))
+                    {
+                        keyOfValues.Add(keyValue);
+                    }
+                }
+                else
+                {
+                    throw new ArgumentNullException($"{typeOf} Schema Key {key} undefined..");
+                }
+            }
+
+            return keyOfValues.ToArray();
+        }
+
         public static bool AsBool(this DocumentVars obj, string key)
         {
             if (obj.ContainsKey(key))
@@ -75,7 +105,7 @@ namespace Objectiks.Extentions
 
         public static bool HasArray(this object obj)
         {
-            if(obj != null)
+            if (obj != null)
             {
                 return obj.GetType().Name == "JArray";
             }
@@ -168,6 +198,6 @@ namespace Objectiks.Extentions
             return string.Empty;
         }
 
-        
+
     }
 }

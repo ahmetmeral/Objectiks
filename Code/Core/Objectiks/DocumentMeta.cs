@@ -17,6 +17,8 @@ namespace Objectiks
         public string TypeOf { get; set; }
         public string ParseOf { get; set; }
         public string Primary { get; set; }
+        public string Account { get; set; }
+        public string User { get; set; }
         public object Sequence { get; set; } = 0;
         public long TotalRecords { get; set; }
         public long DiskSize { get; set; }
@@ -39,6 +41,8 @@ namespace Objectiks
             TypeOf = typeOf;
             ParseOf = schema.ParseOf;
             Primary = schema.Primary;
+            User = schema.User;
+
             KeyOfNames = schema.KeyOf;
             Refs = schema.Refs;
             Cache = schema.Cache;
@@ -210,6 +214,47 @@ namespace Objectiks
         public void AddKeys(DocumentKey documentKey)
         {
             Keys.Add(documentKey);
+        }
+
+        public string SubmitChanges(Document document, OperationType operation)
+        {
+            if (operation == OperationType.Read || operation == OperationType.Create || operation == OperationType.Append)
+            {
+                AddKeys(
+                    new DocumentKey(
+                    document.PrimaryOf,
+                    document.AccountOf,
+                    document.UserOf,
+                    document.CacheOf,
+                    document.KeyOf,
+                    document.Partition
+                    ));
+
+                TotalRecords++;
+                Partitions[document.Partition]++;
+                UpdateSequence(document.PrimaryOf);
+            }
+            else if (operation == OperationType.Merge)
+            {
+                UpdateKeys(
+                    new DocumentKey(
+                    document.PrimaryOf,
+                    document.AccountOf,
+                    document.UserOf,
+                    document.CacheOf,
+                    document.KeyOf,
+                    document.Partition
+                    ));
+            }
+            else if (operation == OperationType.Delete)
+            {
+                TotalRecords--;
+                Partitions[document.Partition]--;
+                RemoveKeys(document.PrimaryOf);
+                //todo:remove cache..
+            }
+
+            return document.PrimaryOf;
         }
 
         public void UpdateKeys(DocumentKey documentKey)

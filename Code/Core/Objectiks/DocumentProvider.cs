@@ -15,6 +15,7 @@ namespace Objectiks
         public string BaseDirectory { get; private set; }
 
         internal IDbConnection Connection { get; private set; }
+        internal string ConnectionString { get; private set; }
 
         public DocumentProvider()
         {
@@ -38,6 +39,7 @@ namespace Objectiks
             BaseDirectory = Path.Combine(Directory.GetCurrentDirectory(), DocumentDefaults.Root);
             CacheBucket = HashHelper.CreateMD5(connection.ConnectionString);
             Connection = connection;
+            ConnectionString = connection.ConnectionString;
         }
 
         internal DocumentProvider(IDbConnection connection, string baseDirectory)
@@ -45,6 +47,22 @@ namespace Objectiks
             BaseDirectory = baseDirectory;
             CacheBucket = HashHelper.CreateMD5(connection.ConnectionString);
             Connection = connection;
+            ConnectionString = connection.ConnectionString;
+        }
+
+        public IDbConnection GetDbConnection()
+        {
+            if (Connection.State != ConnectionState.Open)
+            {
+                Connection.Open();
+            }
+
+            return Connection;
+        }
+
+        public string GetConnectionString()
+        {
+            return Connection.ConnectionString;
         }
     }
 }

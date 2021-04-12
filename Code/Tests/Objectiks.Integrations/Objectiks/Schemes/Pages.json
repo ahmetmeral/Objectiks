@@ -2,6 +2,8 @@
   "TypeOf": "Pages",
   "ParseOf": "Document",
   "Primary": "Id",
+  "Account": "AccountRef",
+  "User": "UserRef",
   "KeyOf": [ "Name", "Language", "CategoryRef" ],
   "Refs": [
     {
@@ -14,7 +16,8 @@
       },
       "MapOf": {
         "Source": "Tags"
-      }
+      },
+      "Disabled": true
     },
     {
       "ParseOf": "1:1",

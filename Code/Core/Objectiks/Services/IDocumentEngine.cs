@@ -29,6 +29,11 @@ namespace Objectiks.Services
         List<DocumentMeta> GetTypeMetaAll();
         DocumentMeta GetTypeMeta(string typeOf);
 
-        void Write(DocumentMeta meta, DocumentInfo info, List<Document> docs, OperationType operation, Format format);
+        void SubmitChanges(DocumentMeta meta, DocumentInfo info, List<Document> docs, OperationType operation, Format format);
+
+        void BulkCreate(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None);
+        void BulkAppend(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None);
+        void BulkMerge(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None);
+        void BulkDelete(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None);
     }
 }

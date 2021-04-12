@@ -17,6 +17,8 @@ namespace Objectiks.Models
         public string FullName { get; set; }
         public bool Exist { get; set; }
 
+        public DocumentInfo() { }
+
         public DocumentInfo(string typeOf, string baseDirectory, int partition = 0)
         {
             ChangeFileInfo(typeOf, baseDirectory, partition);
