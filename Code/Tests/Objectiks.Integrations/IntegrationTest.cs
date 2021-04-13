@@ -20,6 +20,7 @@ namespace Objectiks.Integrations
             ObjectiksOf.Core.Map(typeof(NpgsqlConnection), new PostgreSqlProviderOption());
         }
 
+
         [Test]
         public void MssqlProvider()
         {
@@ -45,7 +46,6 @@ namespace Objectiks.Integrations
             var page = repos.TypeOf<Pages>().PrimaryOf(1).First();
         }
 
-        [Order(1)]
         [Test]
         public void DocumentSequence()
         {
@@ -67,12 +67,24 @@ namespace Objectiks.Integrations
              .First();
         }
 
-        [Order(2)]
-        [Test(Description = "Document Writer Bulk Test")]
+        [Test]
         public void DocumentWriterBulk()
         {
             var pages = TestSetup.GeneratePages(5000);
-            var repos = new ObjectiksOf(TestSetup.Options);
+            var repos = new ObjectiksOf();
+            using (var writer = repos.WriterOf<Pages>())
+            {
+                writer.Add(pages);
+                writer.UseFormatting();
+                writer.SubmitChanges();
+            }
+        }
+
+        [Test]
+        public void DocumentWriterBulkPartial()
+        {
+            var pages = TestSetup.GeneratePages(5000);
+            var repos = new ObjectiksOf();
             using (var writer = repos.WriterOf<Pages>())
             {
                 writer.UsePartialStore(1000);
@@ -82,11 +94,10 @@ namespace Objectiks.Integrations
             }
         }
 
-        [Order(3)]
         [Test(Description = "Document Writer Test")]
         public void DocumentWriter()
         {
-            var repos = new ObjectiksOf(TestSetup.Options);
+            var repos = new ObjectiksOf();
 
             var meta_first = repos.GetTypeMeta<Pages>();
             var count_first = meta_first.TotalRecords;

@@ -31,6 +31,7 @@ namespace Objectiks.Integrations.Option
             Schemes = new DocumentSchemes(page, category);
             BufferSize = 512;
             SupportLoaderInRefs = true;
+            SupportPartialStorage = false;
 
             RegisterDefaultTypeOrParser();
             UseWatcher<DocumentWatcher>();

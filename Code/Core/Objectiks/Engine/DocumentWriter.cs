@@ -11,12 +11,12 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using Objectiks.Models;
 using Newtonsoft.Json;
+using System.Reflection;
 
 namespace Objectiks.Engine
 {
     public class DocumentWriter<T> : IDisposable
     {
-
         private Task ExecuteTask;
         private ConcurrentQueue<DocumentQueue> Queue = new ConcurrentQueue<DocumentQueue>();
         private ConcurrentQueue<DocumentPartition> Partitions = new ConcurrentQueue<DocumentPartition>();
@@ -58,112 +58,54 @@ namespace Objectiks.Engine
             }
         }
 
-        //todo: buraları düzelteceğiz.
-        //keyOf ları set 
-        //accountof 
-        //userof
-        private Document GetDocument(T document, ref DocumentAttributes attr, bool clearDocumentRefs)
+        private Document GetDocument(T model, bool clearDocumentRefs)
         {
-            var cacheOf = Engine.Cache.CacheOfDocument(attr.TypeOf.Name, attr.Primary?.Value.ToString());
+            var attrValues = GetDocumentAttributes(model);
+            var cacheOf = Engine.Cache.CacheOfDocument(attrValues.TypeOf, attrValues.Primary);
 
             DocumentKey? documentKey = Meta.GetDocumentKeyFromCacheOf(cacheOf);
-            var exists = documentKey.HasValue && !String.IsNullOrEmpty(documentKey.Value.PrimaryOf);
-            var partition = documentKey.HasValue && !String.IsNullOrEmpty(documentKey.Value.PrimaryOf) ? documentKey.Value.Partition : 0;
 
-            //keyof u da burada set edelim.. tekrar tekrar gidip çekmesin..
-
-            var doc = new Document
+            var document = new Document
             {
-                TypeOf = attr.TypeOf.Name,
-                PrimaryOf = attr.Primary.Value.ToString(),
                 CacheOf = cacheOf,
-                Data = JObject.FromObject(document),
-                Partition = partition,
+                PrimaryOf = attrValues.Primary,
+                AccountOf = attrValues.Account,
+                UserOf = attrValues.User,
+                Data = JObject.FromObject(model),
+                Partition = documentKey.HasValue && !String.IsNullOrEmpty(documentKey.Value.PrimaryOf) ? documentKey.Value.Partition : 0,
                 HasArray = false,
-                Exists = exists
+                Exists = documentKey.HasValue && !String.IsNullOrEmpty(documentKey.Value.PrimaryOf)
             };
 
             if (clearDocumentRefs)
             {
-                RemoveIgnoredOrRefProperty(attr, ref doc);
+                RemoveIgnoredOrRefProperty(ref document, attrValues);
             }
 
-            return doc;
+            return document;
         }
 
-        private DocumentAttributes GetDocumentAttributes(T model, bool keyOfProp = false)
+        private DocumentAttributes GetDocumentAttributes(T model)
         {
+            var doc = new DocumentAttributes();
+
             var type = model.GetType();
             var properties = type.FindProperties();
-
             var typeOf = type.GetCustomAttribute<TypeOfAttribute>();
 
             if (typeOf == null)
             {
-                typeOf = new TypeOfAttribute();
+                doc.TypeOf = type.Name;
+            }
+            else
+            {
+                doc.TypeOf = typeOf.Name;
             }
 
-            if (String.IsNullOrWhiteSpace(typeOf.Name))
+
+            foreach (PropertyInfo property in properties)
             {
-                typeOf.Name = type.Name;
-            }
-
-            var document = new DocumentAttributes(typeOf);
-
-            foreach (var property in properties)
-            {
-                #region Primary
-                var primary = property.GetAttribute<PrimaryAttribute>();
-
-                if (primary != null)
-                {
-                    primary.Value = property.GetValue(model, null);
-
-                    if (primary.Value == null)
-                    {
-                        primary.Value = Meta.GetNewSequenceId(property.PropertyType);
-
-                        Ensure.NotNull(primary.Value, $"TypeOf:{typeOf.Name} Primary value is null");
-
-                        property.SetValue(model, primary.Value);
-
-                        document.IsNew = true;
-                    }
-
-                    document.Primary = primary;
-
-                    continue;
-                }
-                #endregion
-
-                #region KeyOf
-                if (keyOfProp)
-                {
-                    var keyOf = property.GetAttribute<KeyOfAttribute>();
-                    if (keyOf != null)
-                    {
-                        keyOf.Name = property.Name;
-
-                        var value = property.GetValue(model, null);
-
-                        if (value != null)
-                        {
-                            document.KeyOfValues.Add(value.ToString());
-                        }
-                        else
-                        {
-                            throw new ArgumentNullException(keyOf.Name);
-                        }
-
-
-                        document.Add(keyOf);
-
-                        continue;
-                    }
-                }
-                #endregion
-
-                #region Requried
+                #region Requried - throw exception..
                 var requried = property.GetAttribute<RequriedAttribute>();
                 if (requried != null)
                 {
@@ -175,28 +117,80 @@ namespace Objectiks.Engine
                         throw new ArgumentNullException(requried.Name);
                     }
 
-                    document.Add(requried);
-
                     continue;
                 }
                 #endregion
 
-                #region Ignore
+                #region PrimaryOf set..
+                var primary = property.GetAttribute<PrimaryAttribute>();
+
+                if (primary != null)
+                {
+                    primary.Value = property.GetValue(model, null);
+
+                    if (primary.Value == null)
+                    {
+                        primary.Value = Meta.GetNewSequenceId(property.PropertyType);
+                    }
+
+                    doc.Primary = primary.Value.ToString();
+
+                    property.SetValue(model, primary.Value);
+                }
+                #endregion
+
+                #region Add keyOfList items..
+                var keyOf = property.GetAttribute<KeyOfAttribute>();
+                if (keyOf != null)
+                {
+                    var value = property.GetValue(model, null);
+                    if (value != null)
+                    {
+                        doc.KeyOfValues.Add(value.ToString());
+                    }
+                }
+                #endregion
+
+                #region Add Ignore prop list
                 var ignore = property.GetAttribute<IgnoreAttribute>();
                 if (ignore != null)
                 {
                     ignore.Name = property.Name;
-                    document.Add(ignore);
+                    doc.Ignored.Add(ignore);
+                }
+                #endregion
+
+                #region AccountOf set
+                var accountOf = property.GetAttribute<UserOfAttribute>();
+                if (accountOf != null)
+                {
+                    var value = property.GetAttribute<UserOfAttribute>();
+                    if (value != null)
+                    {
+                        doc.Account = value.ToString();
+                    }
+                }
+                #endregion
+
+                #region UserOf set
+                var userOf = property.GetAttribute<UserOfAttribute>();
+                if (userOf != null)
+                {
+                    var value = property.GetValue(model, null);
+                    if (value != null)
+                    {
+                        doc.User = value.ToString();
+                    }
                 }
                 #endregion
             }
 
-            return document;
+            return doc;
         }
 
-        private void RemoveIgnoredOrRefProperty(DocumentAttributes attr, ref Document document)
+        private void RemoveIgnoredOrRefProperty(ref Document document, DocumentAttributes attrValues)
         {
-            foreach (var prop in attr.Ignored)
+            foreach (var prop in attrValues.Ignored)
             {
                 document.Data.Remove(prop.Name);
             }
@@ -207,7 +201,7 @@ namespace Objectiks.Engine
                 {
                     string refPropertyName = item.GetTargetProperty();
 
-                    if (attr.Ignored.Count(i => i.Name == refPropertyName) > 0)
+                    if (attrValues.Ignored.Count(i => i.Name == refPropertyName) > 0)
                     {
                         document.Data.Remove(refPropertyName);
                     }
@@ -246,8 +240,7 @@ namespace Objectiks.Engine
                 throw new Exception("Document is null");
             }
 
-            var attr = GetDocumentAttributes(document, false);
-            var doc = GetDocument(document, ref attr, clearDocumentRefs);
+            var doc = GetDocument(document, clearDocumentRefs);
 
             int temporyCount = 0;
             DocumentPartition partition;
@@ -287,8 +280,7 @@ namespace Objectiks.Engine
                 throw new Exception("Document is null");
             }
 
-            var attr = GetDocumentAttributes(document, false);
-            var doc = GetDocument(document, ref attr, false);
+            var doc = GetDocument(document, false);
 
             if (doc.Exists)
             {

@@ -24,7 +24,7 @@ namespace Objectiks
         public string SqlProviderSchema { get; set; }
         public string SqlProviderSchemaSeperator { get; set; } = ".";
         public int SqlProviderPageLimit { get; set; } = 2;
-        public bool SupportSqlReaderPaging { get; set; } = true;
+        public bool SupportSqlDataReaderPaging { get; set; } = true;
         public string Extention { get; set; } = "*.json";
         public int BufferSize { get; set; } = 512;
 

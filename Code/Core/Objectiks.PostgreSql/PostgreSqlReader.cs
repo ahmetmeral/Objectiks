@@ -73,7 +73,7 @@ namespace Objectiks.PostgreSql
                     Rows = reader.ToObjectList();
                 }
 
-                if (Option.SupportSqlReaderPaging)
+                if (Option.SupportSqlDataReaderPaging)
                 {
                     NextPage();
                 }
@@ -96,7 +96,7 @@ namespace Objectiks.PostgreSql
 
         private string GetSelectSqlStatement()
         {
-            if (Option.SupportSqlReaderPaging)
+            if (Option.SupportSqlDataReaderPaging)
             {
                 return $"SELECT * FROM {Option.SqlProviderSchema}{Option.SqlProviderSchemaSeperator}{TypeOf} LIMIT {Limit} OFFSET {Skip}";
             }

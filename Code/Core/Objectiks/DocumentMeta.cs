@@ -205,9 +205,16 @@ namespace Objectiks
         private int CreateNextPartition()
         {
             var newPartition = Partitions.Next;
+
+            while (Partitions.ContainsKey(newPartition))
+            {
+                newPartition = newPartition + 1;
+            }
+
             Partitions.Add(newPartition, 0);
             Partitions.Next = newPartition + 1;
             Partitions.Current = newPartition;
+
             return newPartition;
         }
 
