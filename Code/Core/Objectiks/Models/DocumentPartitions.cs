@@ -10,10 +10,5 @@ namespace Objectiks.Models
     {
         public int Current { get; set; }
         public int Next { get; set; }
-
     }
-
-    
-
-   
 }

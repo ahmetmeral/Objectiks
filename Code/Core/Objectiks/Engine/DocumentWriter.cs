@@ -64,6 +64,7 @@ namespace Objectiks.Engine
             var cacheOf = Engine.Cache.CacheOfDocument(attrValues.TypeOf, attrValues.Primary);
 
             DocumentKey? documentKey = Meta.GetDocumentKeyFromCacheOf(cacheOf);
+            var exists = documentKey.HasValue && !String.IsNullOrEmpty(documentKey.Value.PrimaryOf);
 
             var document = new Document
             {
@@ -72,9 +73,9 @@ namespace Objectiks.Engine
                 AccountOf = attrValues.Account,
                 UserOf = attrValues.User,
                 Data = JObject.FromObject(model),
-                Partition = documentKey.HasValue && !String.IsNullOrEmpty(documentKey.Value.PrimaryOf) ? documentKey.Value.Partition : 0,
+                Partition = exists ? documentKey.Value.Partition : 0,
                 HasArray = false,
-                Exists = documentKey.HasValue && !String.IsNullOrEmpty(documentKey.Value.PrimaryOf)
+                Exists = exists
             };
 
             if (clearDocumentRefs)

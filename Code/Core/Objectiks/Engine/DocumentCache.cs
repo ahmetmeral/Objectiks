@@ -36,7 +36,7 @@ namespace Objectiks.Engine
 
         public virtual string CacheOfDocument(string typeOf, object primaryOf)
         {
-            return $"{Bucket}:objectiks:{DocumentDefaults.Documents}:{typeOf}:{primaryOf}".ToLowerInvariant();
+            return $"objectiks:{Bucket}:{DocumentDefaults.Documents}:{typeOf}:{primaryOf}".ToLowerInvariant();
         }
 
         public virtual string CacheOf(DocumentMeta meta)
@@ -46,7 +46,7 @@ namespace Objectiks.Engine
 
         public virtual string CacheOfMeta(string typeOf)
         {
-            return $"{Bucket}:objectiks:{DocumentDefaults.Meta}:{typeOf}".ToLowerInvariant();
+            return $"objectiks:{Bucket}:{DocumentDefaults.Meta}:{typeOf}".ToLowerInvariant();
         }
 
         protected virtual T CreateNotExistEntity<T>() where T : class

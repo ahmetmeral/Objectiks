@@ -39,14 +39,6 @@ namespace Objectiks.Integrations
         }
 
         [Test]
-        public void TestNewOption()
-        {
-            var repos = new ObjectiksOf();
-            var meta = repos.GetTypeMeta("pages");
-            var page = repos.TypeOf<Pages>().PrimaryOf(1).First();
-        }
-
-        [Test]
         public void DocumentSequence()
         {
             var repos = new ObjectiksOf();
@@ -57,27 +49,25 @@ namespace Objectiks.Integrations
             var guid_ = meta.GetNewSequenceId(typeof(Guid));
         }
 
-        [Test(Description = "Document Reader Test")]
-        public void DocumentReaderTest()
-        {
-            var repos = new ObjectiksOf();
-            var page = repos
-             .TypeOf<Pages>()
-             .PrimaryOf(1)
-             .First();
-        }
-
         [Test]
         public void DocumentWriterBulk()
         {
-            var pages = TestSetup.GeneratePages(5000);
+            var size = 5;
+            var pages = TestSetup.GeneratePages(size);
             var repos = new ObjectiksOf();
+            var countBefore = repos.Count("pages");
+
             using (var writer = repos.WriterOf<Pages>())
             {
                 writer.Add(pages);
                 writer.UseFormatting();
                 writer.SubmitChanges();
             }
+
+            var countAfter = repos.Count<Pages>();
+            var diff = countAfter - countBefore;
+
+            Assert.True(diff == size);
         }
 
         [Test]
@@ -94,7 +84,7 @@ namespace Objectiks.Integrations
             }
         }
 
-        [Test(Description = "Document Writer Test")]
+        [Test]
         public void DocumentWriter()
         {
             var repos = new ObjectiksOf();
@@ -151,8 +141,7 @@ namespace Objectiks.Integrations
             }
         }
 
-        [Order(4)]
-        [Test(Description = "Document Writer Merge")]
+        [Test]
         public void DocumentWriterMerge()
         {
             var repos = new ObjectiksOf(TestSetup.Options);
@@ -178,8 +167,7 @@ namespace Objectiks.Integrations
             var meta_end = repos.GetTypeMeta<Pages>();
         }
 
-        [Order(5)]
-        [Test(Description = "Document Reader Test")]
+        [Test]
         public void DocumentReader()
         {
             var repos = new ObjectiksOf(TestSetup.Options);
@@ -223,8 +211,7 @@ namespace Objectiks.Integrations
             Assert.Pass();
         }
 
-        [Order(6)]
-        [Test(Description = "Document Reader Dynamic Refs")]
+        [Test]
         public void DocumentReaderDynamicRef()
         {
             var repos = new ObjectiksOf(TestSetup.Options);
@@ -264,8 +251,7 @@ namespace Objectiks.Integrations
 
         }
 
-        [Order(100)]
-        [Test(Description = "Document Writer Delete")]
+        [Test]
         public void DocumentWriteDelete()
         {
             var repos = new ObjectiksOf(TestSetup.Options);
@@ -277,7 +263,7 @@ namespace Objectiks.Integrations
            .PrimaryOf(1)
            .First();
 
-            mergePage.Title = "Delete ile değiştireceğiz.";
+            mergePage.Title = "Delete";
 
             using (var writer = repos.WriterOf<Pages>())
             {

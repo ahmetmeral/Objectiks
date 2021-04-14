@@ -21,6 +21,7 @@ namespace Objectiks.PostgreSql
         {
             var schema = GetDocumentSchema(typeOf);
             var meta = new DocumentMeta(typeOf, schema, Provider, Option);
+           
             meta.Partitions.Add(0, 0);
 
             var refs = meta.GetRefs(false);
