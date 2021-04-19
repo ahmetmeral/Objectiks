@@ -5,6 +5,7 @@ using Objectiks.Integrations.Models;
 using Objectiks.Integrations.Option;
 using Objectiks.Integrations.Options;
 using Objectiks.Models;
+using Objectiks.PostgreSql;
 using System;
 using System.Data.SqlClient;
 using System.IO;
@@ -36,6 +37,53 @@ namespace Objectiks.Integrations
             var repos = new ObjectiksOf(conn);
             var meta = repos.GetTypeMeta<Pages>();
             var page = repos.TypeOf<Pages>().PrimaryOf(1).First();
+
+
+            using (var writer = repos.WriterOf<Pages>())
+            {
+              
+            }
+        }
+
+        [Test]
+        public void DocumentTransactionTest()
+        {
+            var size = 5;
+            var pages = TestSetup.GeneratePages(size);
+            var repos = new ObjectiksOf();
+
+            using (var trans = repos.BeginTransaction())
+            {
+                try
+                {
+                    using (var pageWriter = repos.WriterOf<Pages>())
+                    {
+                        pageWriter.Add(pages);
+
+                        pageWriter.SubmitChanges();
+                    }
+
+                    using (var categoryWriter = repos.WriterOf<Categories>())
+                    {
+                        categoryWriter.Add(new Categories
+                        {
+                            Name = "Transactions",
+                            Description = "test",
+                            Title = "Test"
+                        });
+
+                        categoryWriter.SubmitChanges();
+                    }
+
+                    trans.Commit();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                }
+            }
+
+
         }
 
         [Test]

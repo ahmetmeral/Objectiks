@@ -12,16 +12,19 @@ namespace Objectiks.PostgreSql
 {
     public class PostgreSqlEngine : DocumentEngine
     {
-        public PostgreSqlEngine(DocumentProvider documentProvider, DocumentOption options) : base(documentProvider, options)
+        public PostgreSqlEngine(DocumentProvider documentProvider, DocumentOption options)
+            : base(documentProvider, options)
         {
 
         }
+
+
 
         public override bool LoadDocumentType(string typeOf)
         {
             var schema = GetDocumentSchema(typeOf);
             var meta = new DocumentMeta(typeOf, schema, Provider, Option);
-           
+
             meta.Partitions.Add(0, 0);
 
             var refs = meta.GetRefs(false);
@@ -44,7 +47,7 @@ namespace Objectiks.PostgreSql
 
                         if (Option.SupportDocumentParser)
                         {
-                            ParseDocumentData(ref meta, ref document, new DocumentInfo());
+                            ParseDocumentData(ref meta, ref document, new DocumentStorage());
                         }
 
                         if (Option.SupportLoaderInRefs)
@@ -64,22 +67,25 @@ namespace Objectiks.PostgreSql
             return true;
         }
 
-        public override void BulkAppend(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None)
+        public override void BulkAppend(DocumentMeta meta, DocumentStorage info, List<Document> docs, Format format = Format.None)
         {
-            base.BulkAppend(meta, info, docs, format);
+          
         }
 
-        public override void BulkCreate(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None)
+        public override void BulkCreate(DocumentMeta meta, DocumentStorage info, List<Document> docs, Format format = Format.None)
         {
-            base.BulkCreate(meta, info, docs, format);
+            using (var writer = new PostgreSqlWriter(meta.TypeOf, Provider, Option, Logger))
+            {
+                writer.BulkCreate(docs);
+            }
         }
 
-        public override void BulkMerge(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None)
+        public override void BulkMerge(DocumentMeta meta, DocumentStorage info, List<Document> docs, Format format = Format.None)
         {
             base.BulkMerge(meta, info, docs, format);
         }
 
-        public override void BulkDelete(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None)
+        public override void BulkDelete(DocumentMeta meta, DocumentStorage info, List<Document> docs, Format format = Format.None)
         {
             base.BulkDelete(meta, info, docs, format);
         }

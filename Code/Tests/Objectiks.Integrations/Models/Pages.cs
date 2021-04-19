@@ -1,4 +1,5 @@
-﻿using Objectiks.Attributes;
+﻿using Newtonsoft.Json;
+using Objectiks.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -58,6 +58,11 @@ namespace Objectiks
             return new DocumentWriter<T>(Engine, typeOf);
         }
 
+        public DocumentTransaction BeginTransaction()
+        {
+            return Engine.BeginTransaction();
+        }
+
         public T First<T>(string typeOf, object primaryOf) where T : class
         {
             var query = new QueryOf(typeOf);
@@ -105,7 +110,6 @@ namespace Objectiks
         {
             return new DocumentReader<T>(Engine, GetTypeOfName<T>(), keyOf).ToList();
         }
-
 
         public bool NullReferenceEquals(dynamic obj)
         {

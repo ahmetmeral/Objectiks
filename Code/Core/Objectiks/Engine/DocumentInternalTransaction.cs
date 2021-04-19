@@ -10,14 +10,14 @@ using System.Threading;
 
 namespace Objectiks.Engine
 {
-    public class DocumentTransaction : IDisposable
+    public class DocumentInternalTransaction : IDisposable
     {
         static object LockObject = new object();
 
         private int LockedTryCount = 25;
         private static ConcurrentDictionary<string, bool> Locked = new System.Collections.Concurrent.ConcurrentDictionary<string, bool>();
 
-        private DocumentInfo Document = null;
+        private DocumentStorage Document = null;
         private int TryCount = 10;
 
         public string Tempory { get; private set; }
@@ -26,23 +26,23 @@ namespace Objectiks.Engine
         public bool IsBackup { get; private set; }
         public OperationType Operation { get; set; }
 
-        public DocumentTransaction(string path, OperationType operation, bool isBackup)
+        public DocumentInternalTransaction(string path, OperationType operation, bool isBackup)
         {
-            var document = new DocumentInfo("Stream", String.Empty, new FileInfo(path));
+            var document = new DocumentStorage("Stream", String.Empty, new FileInfo(path));
             Initialize(document, operation, isBackup);
         }
 
-        public DocumentTransaction(DocumentInfo document, OperationType operation, bool isBackup = true)
+        public DocumentInternalTransaction(DocumentStorage document, OperationType operation, bool isBackup = true)
         {
             Initialize(document, operation, isBackup);
         }
 
-        private void Initialize(DocumentInfo document, OperationType operation, bool isBackup = true)
+        private void Initialize(DocumentStorage document, OperationType operation, bool isBackup = true)
         {
             Document = document;
             Operation = operation;
             IsBackup = isBackup;
-            Target = document.FullName;
+            Target = document.Target;
 
             /*
             Operations : 

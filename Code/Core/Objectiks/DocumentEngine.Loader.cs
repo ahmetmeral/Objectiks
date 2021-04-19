@@ -44,7 +44,7 @@ namespace Objectiks
             var schema = GetDocumentSchema(typeOf);
             var meta = new DocumentMeta(typeOf, schema, Provider, Option);
             var refs = meta.GetRefs(false);
-            var files = new List<DocumentInfo>();
+            var files = new List<DocumentStorage>();
 
             #region Files
             var directoryInfo = new DirectoryInfo(meta.Directory);
@@ -58,7 +58,7 @@ namespace Objectiks
                 var parts = new List<int>();
                 foreach (var file in directoryFiles)
                 {
-                    var info = new DocumentInfo(meta.TypeOf, Provider?.BaseDirectory, file);
+                    var info = new DocumentStorage(meta.TypeOf, Provider?.BaseDirectory, file);
 
                     if (info.Partition > meta.Partitions.Current)
                     {
@@ -98,13 +98,13 @@ namespace Objectiks
             int bufferSize = Option.BufferSize;
             var serializer = new JsonSerializer();
 
-            foreach (DocumentInfo file in files)
+            foreach (DocumentStorage file in files)
             {
-                Logger?.Debug(DebugType.Engine, $"Read TypeOf: {file.TypeOfName} - File : {file.FullName}");
+                Logger?.Debug(DebugType.Engine, $"Read TypeOf: {file.TypeOfName} - File : {file.Target}");
 
                 try
                 {
-                    using (FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize))
+                    using (FileStream fs = new FileStream(file.Target, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize))
                     using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, true, bufferSize))
                     using (JsonReader reader = new JsonTextReader(sr))
                     {
@@ -143,7 +143,7 @@ namespace Objectiks
                 }
                 catch (Exception ex)
                 {
-                    Logger?.Fatal($"Exception Read TypeOf: {file.TypeOfName} File : {file.FullName}", ex);
+                    Logger?.Fatal($"Exception Read TypeOf: {file.TypeOfName} File : {file.Target}", ex);
                 }
             }
 

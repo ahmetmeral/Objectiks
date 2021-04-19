@@ -80,9 +80,9 @@ namespace Objectiks.Helper
         }
 
         //Append : Insert işlemleri için 
-        public void AppendRows<T>(DocumentInfo document, List<T> rows, bool backup, Formatting formatting = Formatting.None)
+        public void AppendRows<T>(DocumentStorage document, List<T> rows, bool backup, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentTransaction(document, OperationType.Append, backup))
+            using (var trans = new DocumentInternalTransaction(document, OperationType.Append, backup))
             {
                 try
                 {
@@ -132,9 +132,9 @@ namespace Objectiks.Helper
             }
         }
 
-        public void AppendRows(DocumentInfo document, List<JObject> rows, bool backup, Formatting formatting = Formatting.None)
+        public void AppendRows(DocumentStorage document, List<JObject> rows, bool backup, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentTransaction(document, OperationType.Append, backup))
+            using (var trans = new DocumentInternalTransaction(document, OperationType.Append, backup))
             {
                 try
                 {
@@ -184,9 +184,9 @@ namespace Objectiks.Helper
             }
         }
 
-        public void AppendRows(DocumentInfo document, bool backup, params string[] rows)
+        public void AppendRows(DocumentStorage document, bool backup, params string[] rows)
         {
-            using (var trans = new DocumentTransaction(document, OperationType.Append, backup))
+            using (var trans = new DocumentInternalTransaction(document, OperationType.Append, backup))
             {
                 try
                 {
@@ -240,9 +240,9 @@ namespace Objectiks.Helper
 
 
         //Update ve Merge işlemleri için
-        public void MergeRows(DocumentInfo document, List<JObject> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
+        public void MergeRows(DocumentStorage document, List<JObject> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentTransaction(document, OperationType.Merge, backup))
+            using (var trans = new DocumentInternalTransaction(document, OperationType.Merge, backup))
             {
                 try
                 {
@@ -306,14 +306,12 @@ namespace Objectiks.Helper
             }
         }
 
-        public void MergeRows<T>(DocumentInfo document, List<T> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
+        public void MergeRows<T>(DocumentStorage document, List<T> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentTransaction(document, OperationType.Merge, backup))
+            using (var trans = new DocumentInternalTransaction(document, OperationType.Merge, backup))
             {
                 try
                 {
-
-
                     using (FileStream fsTemp = new FileStream(trans.Tempory, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Write, BufferSize))
                     using (StreamWriter sw = new StreamWriter(fsTemp, Encoding.UTF8, BufferSize))
                     using (JsonTextWriter writer = new JsonTextWriter(sw))
@@ -380,9 +378,9 @@ namespace Objectiks.Helper
             }
         }
 
-        public void DeleteRows(DocumentInfo file, List<JObject> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
+        public void DeleteRows(DocumentStorage file, List<JObject> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentTransaction(file, OperationType.Delete, backup))
+            using (var trans = new DocumentInternalTransaction(file, OperationType.Delete, backup))
             {
                 try
                 {
@@ -450,9 +448,9 @@ namespace Objectiks.Helper
             }
         }
 
-        public void DeleteRows<T>(DocumentInfo document, List<T> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
+        public void DeleteRows<T>(DocumentStorage document, List<T> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentTransaction(document, OperationType.Delete, backup))
+            using (var trans = new DocumentInternalTransaction(document, OperationType.Delete, backup))
             {
                 try
                 {
@@ -522,9 +520,9 @@ namespace Objectiks.Helper
 
 
         //Ayrı bir dosya oluşturmak için.
-        public void CreateRows<T>(DocumentInfo document, List<T> rows, Formatting formatting = Formatting.None)
+        public void CreateRows<T>(DocumentStorage document, List<T> rows, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentTransaction(document, OperationType.Create, false))
+            using (var trans = new DocumentInternalTransaction(document, OperationType.Create, false))
             {
                 try
                 {
@@ -557,9 +555,9 @@ namespace Objectiks.Helper
             }
         }
 
-        public void CreateRows(DocumentInfo document, List<JObject> rows, Formatting formatting = Formatting.None)
+        public void CreateRows(DocumentStorage document, List<JObject> rows, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentTransaction(document, OperationType.Create, false))
+            using (var trans = new DocumentInternalTransaction(document, OperationType.Create, false))
             {
                 try
                 {

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Objectiks.PostgreSql
 {
-    public class PostgreSqlWriter
+    public class PostgreSqlWriter : IDisposable
     {
         public string TypeOf { get; private set; }
         private DocumentProvider Provider;
@@ -18,6 +18,16 @@ namespace Objectiks.PostgreSql
             Provider = provider;
             Option = option;
             Logger = logger;
+        }
+
+        public void BulkCreate(List<Document> docs)
+        {
+            var conn = new Npgsql.NpgsqlConnection(Provider.GetConnectionString());
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }

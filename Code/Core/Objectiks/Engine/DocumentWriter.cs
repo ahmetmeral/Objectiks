@@ -12,21 +12,25 @@ using System.Linq;
 using Objectiks.Models;
 using Newtonsoft.Json;
 using System.Reflection;
+using System.Data.Common;
+using System.Data;
+using Objectiks.Services;
 
 namespace Objectiks.Engine
 {
-    public class DocumentWriter<T> : IDisposable
+    public class DocumentWriter<T> : IDisposable, IDocumentWriter
     {
         private Task ExecuteTask;
         private ConcurrentQueue<DocumentQueue> Queue = new ConcurrentQueue<DocumentQueue>();
         private ConcurrentQueue<DocumentPartition> Partitions = new ConcurrentQueue<DocumentPartition>();
         private Format Formatting = Format.None;
-        private readonly string TypeOf = string.Empty;
         private readonly DocumentEngine Engine = null;
         //meta : should not be read-only 
         private DocumentMeta Meta = null;
         private bool IsPartialStore = false;
         private int? PartialStoreLimit = 0;
+
+        public string TypeOf { get; set; }
 
         public DocumentWriter() { }
 
@@ -41,6 +45,8 @@ namespace Objectiks.Engine
             {
                 PartialStoreLimit = Engine.Option.SupportPartialStorageLimit;
             }
+
+
         }
 
         private void ReOrderPartitionByOperation()
@@ -317,6 +323,37 @@ namespace Objectiks.Engine
             PartialStoreLimit = limit;
         }
 
+        private void Execute()
+        {
+            if (Queue.Count == 0) return;
+
+            try
+            {
+                Engine.Watcher?.Lock();
+
+                ReOrderPartitionByOperation();
+
+                while (Partitions.TryDequeue(out var partOf))
+                {
+                    var storage = Engine.Transaction.Ensure(Meta.TypeOf, partOf.Partition);
+
+                    var docs = Queue.Where(q => q.PartOf.Partition == partOf.Partition &&
+                    q.PartOf.Operation == partOf.Operation).Select(s => s.Document).ToList();
+
+                    Engine.SubmitChanges(Meta, storage, docs, partOf.Operation, Formatting);
+                }
+
+                Queue.Clear();
+                Partitions.Clear();
+
+                Engine.Watcher?.UnLock();
+            }
+            catch (IOException)
+            {
+                //oluşur ise rollbackler çalışır tekrar yüklemek mantıklı olur.
+            }
+        }
+
         public void SubmitChanges()
         {
             lock (Queue)
@@ -350,37 +387,6 @@ namespace Objectiks.Engine
             this.Wait();
             GC.SuppressFinalize(this);
 
-        }
-
-        private void Execute()
-        {
-            if (Queue.Count == 0) return;
-
-            try
-            {
-                Engine.Watcher?.Lock();
-
-                ReOrderPartitionByOperation();
-
-                while (Partitions.TryDequeue(out var partOf))
-                {
-                    var info = new DocumentInfo(Meta.TypeOf, Engine.Provider?.BaseDirectory, partOf.Partition);
-
-                    var docs = Queue.Where(q => q.PartOf.Partition == partOf.Partition &&
-                    q.PartOf.Operation == partOf.Operation).Select(s => s.Document).ToList();
-
-                    Engine.SubmitChanges(Meta, info, docs, partOf.Operation, Formatting);
-                }
-
-                Queue.Clear();
-                Partitions.Clear();
-
-                Engine.Watcher?.UnLock();
-            }
-            catch (IOException)
-            {
-                //oluşur ise rollbackler çalışır tekrar yüklemek mantıklı olur.
-            }
         }
     }
 }

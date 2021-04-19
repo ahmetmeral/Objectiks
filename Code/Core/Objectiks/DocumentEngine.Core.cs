@@ -26,6 +26,8 @@ namespace Objectiks
         public DocumentTypes TypeOf { get; set; }
         public bool FirstLoaded { get; set; }
 
+        internal DocumentTransaction Transaction { get; set; }
+
         public DocumentEngine() { }
 
         public DocumentEngine(DocumentProvider documentProvider, DocumentOption option)
@@ -133,7 +135,7 @@ namespace Objectiks
             document.Data = target;
         }
 
-        protected virtual void ParseDocumentData(ref DocumentMeta meta, ref Document document, DocumentInfo file)
+        protected virtual void ParseDocumentData(ref DocumentMeta meta, ref Document document, DocumentStorage file)
         {
             var parser = GetDocumentParser(meta.TypeOf);
 

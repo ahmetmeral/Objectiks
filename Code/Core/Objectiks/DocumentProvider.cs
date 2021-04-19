@@ -3,6 +3,7 @@ using Objectiks.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,7 +16,9 @@ namespace Objectiks
         public string BaseDirectory { get; private set; }
 
         internal IDbConnection Connection { get; private set; }
+        internal IDbTransaction Transaction { get; private set; }
         internal string ConnectionString { get; private set; }
+
 
         public DocumentProvider()
         {
@@ -64,5 +67,28 @@ namespace Objectiks
         {
             return Connection.ConnectionString;
         }
+
+        internal IDbTransaction BeginTransaction(IsolationLevel li)
+        {
+            Transaction = Connection.BeginTransaction(li);
+
+            return Transaction;
+        }
+
+        internal void EnsureTransaction(IDbTransaction transaction)
+        {
+            Transaction = transaction;
+        }
+
+        internal void CommitTransaction()
+        {
+            Transaction?.Commit();
+        }
+
+        internal void RollbackTransaction()
+        {
+            Transaction?.Rollback();
+        }
+
     }
 }

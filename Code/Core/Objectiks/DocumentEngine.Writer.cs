@@ -17,7 +17,7 @@ namespace Objectiks
 {
     public partial class DocumentEngine : IDocumentEngine
     {
-        public virtual void SubmitChanges(DocumentMeta meta, DocumentInfo info, List<Document> docs, OperationType operation, Format format)
+        public virtual void SubmitChanges(DocumentMeta meta, DocumentStorage storage, List<Document> docs, OperationType operation, Format format)
         {
             int count = docs.Count;
 
@@ -29,20 +29,22 @@ namespace Objectiks
                 {
                     if (operation == OperationType.Append)
                     {
-                        BulkAppend(meta, info, docs, format);
+                        BulkAppend(meta, storage, docs, format);
                     }
                     else if (operation == OperationType.Merge)
                     {
-                        BulkMerge(meta, info, docs, format);
+                        BulkMerge(meta, storage, docs, format);
                     }
                     else if (operation == OperationType.Create)
                     {
-                        BulkCreate(meta, info, docs, format);
+                        BulkCreate(meta, storage, docs, format);
                     }
                     else if (operation == OperationType.Delete)
                     {
-                        BulkDelete(meta, info, docs, format);
+                        BulkDelete(meta, storage, docs, format);
                     }
+
+                    Transaction.AddOperation(meta.TypeOf, docs, operation);
                 }
                 catch (Exception ex)
                 {
@@ -53,7 +55,7 @@ namespace Objectiks
             }
         }
 
-        protected virtual void OnChangeDocuments(DocumentMeta meta, DocumentInfo info, List<Document> docs, OperationType operation)
+        protected virtual void OnChangeDocuments(DocumentMeta meta, DocumentStorage storage, List<Document> docs, OperationType operation)
         {
             int count = docs.Count;
 
@@ -76,7 +78,7 @@ namespace Objectiks
 
                     if (Option.SupportDocumentParser)
                     {
-                        ParseDocumentData(ref meta, ref document, info);
+                        ParseDocumentData(ref meta, ref document, storage);
                     }
 
                     meta.SubmitChanges(document, operation);
@@ -96,44 +98,62 @@ namespace Objectiks
             Cache.Set(meta, meta.Cache.Expire);
         }
 
-        public virtual void BulkCreate(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None)
+        public virtual void BulkCreate(DocumentMeta meta, DocumentStorage storage, List<Document> docs, Format format = Format.None)
         {
             var formatting = format == Format.Indented ? Formatting.Indented : Formatting.None;
             var json = new JSONSerializer(Logger);
             var map = new DocumentMap(meta.Primary, meta.Primary);
-            json.CreateRows(info, docs.Select(d => d.Data).ToList(), formatting);
+            json.CreateRows(storage, docs.Select(d => d.Data).ToList(), formatting);
 
-            OnChangeDocuments(meta, info, docs, OperationType.Create);
+            OnChangeDocuments(meta, storage, docs, OperationType.Create);
         }
 
-        public virtual void BulkAppend(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None)
+        public virtual void BulkAppend(DocumentMeta meta, DocumentStorage storage, List<Document> docs, Format format = Format.None)
         {
             var formatting = format == Format.Indented ? Formatting.Indented : Formatting.None;
             var json = new JSONSerializer(Logger);
             var map = new DocumentMap(meta.Primary, meta.Primary);
-            json.AppendRows(info, docs.Select(d => d.Data).ToList(), true, formatting);
+            json.AppendRows(storage, docs.Select(d => d.Data).ToList(), true, formatting);
 
-            OnChangeDocuments(meta, info, docs, OperationType.Append);
+            OnChangeDocuments(meta, storage, docs, OperationType.Append);
         }
 
-        public virtual void BulkMerge(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None)
+        public virtual void BulkMerge(DocumentMeta meta, DocumentStorage storage, List<Document> docs, Format format = Format.None)
         {
             var formatting = format == Format.Indented ? Formatting.Indented : Formatting.None;
             var json = new JSONSerializer(Logger);
             var map = new DocumentMap(meta.Primary, meta.Primary);
-            json.MergeRows(info, docs.Select(d => d.Data).ToList(), map, true, formatting);
+            json.MergeRows(storage, docs.Select(d => d.Data).ToList(), map, true, formatting);
 
-            OnChangeDocuments(meta, info, docs, OperationType.Merge);
+            OnChangeDocuments(meta, storage, docs, OperationType.Merge);
         }
 
-        public virtual void BulkDelete(DocumentMeta meta, DocumentInfo info, List<Document> docs, Format format = Format.None)
+        public virtual void BulkDelete(DocumentMeta meta, DocumentStorage storage, List<Document> docs, Format format = Format.None)
         {
             var formatting = format == Format.Indented ? Formatting.Indented : Formatting.None;
             var json = new JSONSerializer(Logger);
             var map = new DocumentMap(meta.Primary, meta.Primary);
-            json.DeleteRows(info, docs.Select(d => d.Data).ToList(), map, true, formatting);
+            json.DeleteRows(storage, docs.Select(d => d.Data).ToList(), map, true, formatting);
 
-            OnChangeDocuments(meta, info, docs, OperationType.Delete);
+            OnChangeDocuments(meta, storage, docs, OperationType.Delete);
+        }
+
+
+        public DocumentTransaction BeginTransaction()
+        {
+            Transaction = new DocumentTransaction(this);
+
+            return Transaction;
+        }
+
+        public void RollbackTransaction()
+        {
+
+        }
+
+        public void CommitTransaction()
+        {
+
         }
     }
 }

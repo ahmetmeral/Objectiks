@@ -58,7 +58,7 @@ namespace Objectiks.Helper
 
         public static string Get(string path, int bufferSize = 128)
         {
-            using (var trans = new DocumentTransaction(path, OperationType.Read, false))
+            using (var trans = new DocumentInternalTransaction(path, OperationType.Read, false))
             {
                 try
                 {

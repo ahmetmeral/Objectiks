@@ -20,7 +20,10 @@ namespace Objectiks
 
             public static DocumentEngine Get(DocumentProvider documentProvider, DocumentOption option)
             {
-                Engines.TryGetValue(documentProvider.CacheBucket, out DocumentEngine engine);
+                if (Engines.TryGetValue(documentProvider.CacheBucket, out DocumentEngine engine))
+                {
+                    engine.Transaction = null;
+                }
 
                 if (engine == null)
                 {
