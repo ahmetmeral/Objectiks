@@ -4,12 +4,19 @@ using System.Text;
 
 namespace Objectiks.Models
 {
-    internal class DocumentTransactionContext
+    public class DocumentContext
     {
         public string TypeOf { get; set; }
-        public int Partition { get; set; }
+        public string Primary { get; set; }
         public OperationType Operation { get; set; }
         public DocumentStorage Storage { get; set; }
         public List<Document> Documents { get; set; }
+        public int Partition { get; set; }
+        public Format Formatting { get; set; } = Format.None;
+
+        public bool HasDocuments
+        {
+            get { return Documents != null && Documents.Count > 0; }
+        }
     }
 }

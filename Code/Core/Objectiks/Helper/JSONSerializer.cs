@@ -80,513 +80,456 @@ namespace Objectiks.Helper
         }
 
         //Append : Insert işlemleri için 
-        public void AppendRows<T>(DocumentStorage document, List<T> rows, bool backup, Formatting formatting = Formatting.None)
+        public void AppendRows<T>(DocumentStorage storage, List<T> rows, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentInternalTransaction(document, OperationType.Append, backup))
+            try
             {
-                try
+                using (var fs = new FileStream(storage.Target, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, BufferSize))
                 {
-                    using (var fs = new FileStream(trans.Target, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, BufferSize))
+                    SeekJsonArrayEndSquareBrackets(fs);
+
+                    int rCount = rows.Count;
+
+                    if (rCount == 1)
                     {
-                        SeekJsonArrayEndSquareBrackets(fs);
+                        var row = Encoding.UTF8.GetBytes($",{Serialize(rows[0], formatting)}]");
+                        fs.Write(row, 0, row.Length);
+                    }
+                    else
+                    {
+                        int arrayTagCloseIndex = rCount - 1;
 
-                        int rCount = rows.Count;
-
-                        if (rCount == 1)
+                        for (int i = 0; i < rCount; i++)
                         {
-                            var row = Encoding.UTF8.GetBytes($",{Serialize(rows[0], formatting)}]");
-                            fs.Write(row, 0, row.Length);
-                        }
-                        else
-                        {
-                            int arrayTagCloseIndex = rCount - 1;
-
-                            for (int i = 0; i < rCount; i++)
+                            if (i == arrayTagCloseIndex)
                             {
-                                if (i == arrayTagCloseIndex)
-                                {
-                                    var row = Encoding.UTF8.GetBytes($",{Serialize(rows[i], formatting)}]");
-                                    fs.Write(row, 0, row.Length);
-                                }
-                                else
-                                {
-                                    var row = Encoding.UTF8.GetBytes($",{Serialize(rows[i], formatting)}");
-                                    fs.Write(row, 0, row.Length);
-                                }
+                                var row = Encoding.UTF8.GetBytes($",{Serialize(rows[i], formatting)}]");
+                                fs.Write(row, 0, row.Length);
+                            }
+                            else
+                            {
+                                var row = Encoding.UTF8.GetBytes($",{Serialize(rows[i], formatting)}");
+                                fs.Write(row, 0, row.Length);
                             }
                         }
-
-                        fs.SetLength(fs.Position);
                     }
 
-                    trans.Commit();
+                    fs.SetLength(fs.Position);
                 }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
 
-                    Logger?.Fatal(ex);
+            }
+            catch (Exception ex)
+            {
 
-                    throw ex;
-                }
+                Logger?.Fatal(ex);
+
+                throw ex;
             }
         }
 
-        public void AppendRows(DocumentStorage document, List<JObject> rows, bool backup, Formatting formatting = Formatting.None)
+        public void AppendRows(DocumentStorage storage, List<JObject> rows, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentInternalTransaction(document, OperationType.Append, backup))
+            try
             {
-                try
+                using (var fs = new FileStream(storage.Target, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, BufferSize))
                 {
-                    using (var fs = new FileStream(trans.Target, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, BufferSize))
+                    SeekJsonArrayEndSquareBrackets(fs);
+
+                    int rCount = rows.Count;
+
+                    if (rCount == 1)
                     {
-                        SeekJsonArrayEndSquareBrackets(fs);
+                        var row = Encoding.UTF8.GetBytes($",{rows[0].ToString(formatting)}]");
+                        fs.Write(row, 0, row.Length);
+                    }
+                    else
+                    {
+                        int arrayTagCloseIndex = rCount - 1;
 
-                        int rCount = rows.Count;
-
-                        if (rCount == 1)
+                        for (int i = 0; i < rCount; i++)
                         {
-                            var row = Encoding.UTF8.GetBytes($",{rows[0].ToString(formatting)}]");
-                            fs.Write(row, 0, row.Length);
-                        }
-                        else
-                        {
-                            int arrayTagCloseIndex = rCount - 1;
-
-                            for (int i = 0; i < rCount; i++)
+                            if (i == arrayTagCloseIndex)
                             {
-                                if (i == arrayTagCloseIndex)
-                                {
-                                    var row = Encoding.UTF8.GetBytes($",{rows[i].ToString(formatting)}]");
-                                    fs.Write(row, 0, row.Length);
-                                }
-                                else
-                                {
-                                    var row = Encoding.UTF8.GetBytes($",{rows[i].ToString(formatting)}");
-                                    fs.Write(row, 0, row.Length);
-                                }
+                                var row = Encoding.UTF8.GetBytes($",{rows[i].ToString(formatting)}]");
+                                fs.Write(row, 0, row.Length);
+                            }
+                            else
+                            {
+                                var row = Encoding.UTF8.GetBytes($",{rows[i].ToString(formatting)}");
+                                fs.Write(row, 0, row.Length);
                             }
                         }
-
-                        fs.SetLength(fs.Position);
                     }
 
-                    trans.Commit();
+                    fs.SetLength(fs.Position);
                 }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
+            }
+            catch (Exception ex)
+            {
+                Logger?.Fatal(ex);
 
-                    Logger?.Fatal(ex);
-
-                    throw ex;
-                }
+                throw ex;
             }
         }
 
-        public void AppendRows(DocumentStorage document, bool backup, params string[] rows)
+        public void AppendRows(DocumentStorage storage, params string[] rows)
         {
-            using (var trans = new DocumentInternalTransaction(document, OperationType.Append, backup))
+            try
             {
-                try
+                using (var fs = new FileStream(storage.Target, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, BufferSize))
                 {
-                    using (var fs = new FileStream(trans.Target, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, BufferSize))
+                    SeekJsonArrayEndSquareBrackets(fs);
+
+                    int rCount = rows.Length;
+
+                    if (rCount == 1)
                     {
-                        SeekJsonArrayEndSquareBrackets(fs);
+                        var row = Encoding.UTF8.GetBytes($",{rows[0]}]");
+                        fs.Write(row, 0, row.Length);
+                        fs.SetLength(fs.Position); //Only needed if new content may be smaller than old
+                    }
+                    else
+                    {
+                        int arrayTagCloseIndex = rCount - 1;
 
-                        int rCount = rows.Length;
-
-                        if (rCount == 1)
+                        for (int i = 0; i < rCount; i++)
                         {
-                            var row = Encoding.UTF8.GetBytes($",{rows[0]}]");
-                            fs.Write(row, 0, row.Length);
-                            fs.SetLength(fs.Position); //Only needed if new content may be smaller than old
-                        }
-                        else
-                        {
-                            int arrayTagCloseIndex = rCount - 1;
-
-                            for (int i = 0; i < rCount; i++)
+                            if (i == arrayTagCloseIndex)
                             {
-                                if (i == arrayTagCloseIndex)
-                                {
-                                    var row = Encoding.UTF8.GetBytes($",{rows[i]}]");
-                                    fs.Write(row, 0, row.Length);
-                                }
-                                else
-                                {
-                                    var row = Encoding.UTF8.GetBytes($",{rows[i]}");
-                                    fs.Write(row, 0, row.Length);
-                                }
+                                var row = Encoding.UTF8.GetBytes($",{rows[i]}]");
+                                fs.Write(row, 0, row.Length);
+                            }
+                            else
+                            {
+                                var row = Encoding.UTF8.GetBytes($",{rows[i]}");
+                                fs.Write(row, 0, row.Length);
                             }
                         }
-
-                        fs.SetLength(fs.Position);
-
                     }
 
-                    trans.Commit();
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
+                    fs.SetLength(fs.Position);
 
-                    Logger?.Fatal(ex);
-
-                    throw ex;
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger?.Fatal(ex);
+
+                throw ex;
             }
         }
 
 
         //Update ve Merge işlemleri için
-        public void MergeRows(DocumentStorage document, List<JObject> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
+        public void MergeRows(DocumentStorage storage, List<JObject> rows, DocumentMap map, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentInternalTransaction(document, OperationType.Merge, backup))
+            try
             {
-                try
+                using (FileStream fsTemp = new FileStream(storage.Tempory, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Write, BufferSize))
+                using (StreamWriter sw = new StreamWriter(fsTemp, Encoding.UTF8, BufferSize))
+                using (JsonTextWriter writer = new JsonTextWriter(sw))
                 {
-                    using (FileStream fsTemp = new FileStream(trans.Tempory, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Write, BufferSize))
-                    using (StreamWriter sw = new StreamWriter(fsTemp, Encoding.UTF8, BufferSize))
-                    using (JsonTextWriter writer = new JsonTextWriter(sw))
+                    var match = 0;
+                    var count = rows.Count;
+
+                    writer.Formatting = formatting;
+                    writer.WriteStartArray();
+
+                    using (FileStream fsTarget = new FileStream(storage.Target, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize))
+                    using (StreamReader sr = new StreamReader(fsTarget, Encoding.UTF8, false, BufferSize))
+                    using (JsonReader reader = new JsonTextReader(sr))
                     {
-                        var match = 0;
-                        var count = rows.Count;
-
-                        writer.Formatting = formatting;
-                        writer.WriteStartArray();
-
-                        using (FileStream fsTarget = new FileStream(trans.Target, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize))
-                        using (StreamReader sr = new StreamReader(fsTarget, Encoding.UTF8, false, BufferSize))
-                        using (JsonReader reader = new JsonTextReader(sr))
+                        while (reader.Read())
                         {
-                            while (reader.Read())
+                            if (reader.TokenType == JsonToken.StartObject)
                             {
-                                if (reader.TokenType == JsonToken.StartObject)
+                                JObject readRow = JObject.Load(reader);
+
+                                if (match < count)
                                 {
-                                    JObject readRow = JObject.Load(reader);
+                                    var readId = readRow[map.Target].ToString();
 
-                                    if (match < count)
+                                    foreach (JObject row in rows)
                                     {
-                                        var readId = readRow[map.Target].ToString();
+                                        var id = row[map.Source].ToString();
 
-                                        foreach (JObject row in rows)
+                                        if (readId == id)
                                         {
-                                            var id = row[map.Source].ToString();
-
-                                            if (readId == id)
-                                            {
-                                                readRow.Merge(row);
-                                                match++;
-                                                break;
-                                            }
-
+                                            readRow.Merge(row);
+                                            match++;
+                                            break;
                                         }
-                                    }
 
+                                    }
+                                }
+
+                                readRow.WriteTo(writer);
+                            }
+                        }
+                    }
+
+                    writer.WriteEndArray();
+                    writer.Flush();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger?.Fatal(ex);
+
+                throw ex;
+            }
+        }
+
+        public void MergeRows<T>(DocumentStorage storage, List<T> rows, DocumentMap map, Formatting formatting = Formatting.None)
+        {
+            try
+            {
+                using (FileStream fsTemp = new FileStream(storage.Tempory, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Write, BufferSize))
+                using (StreamWriter sw = new StreamWriter(fsTemp, Encoding.UTF8, BufferSize))
+                using (JsonTextWriter writer = new JsonTextWriter(sw))
+                {
+                    var match = 0;
+                    var count = rows.Count;
+
+                    var settings = new JsonMergeSettings();
+                    settings.MergeArrayHandling = MergeArrayHandling.Replace;
+                    settings.PropertyNameComparison = StringComparison.OrdinalIgnoreCase;
+                    settings.MergeNullValueHandling = MergeNullValueHandling.Merge;
+
+                    writer.Formatting = formatting;
+                    writer.WriteStartArray();
+
+                    using (FileStream fsTarget = new FileStream(storage.Target, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize))
+                    using (StreamReader sr = new StreamReader(fsTarget, Encoding.UTF8, false, BufferSize))
+                    using (JsonReader reader = new JsonTextReader(sr))
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader.TokenType == JsonToken.StartObject)
+                            {
+                                JObject readRow = JObject.Load(reader);
+
+                                if (match < count)
+                                {
+                                    var readId = readRow[map.Target].ToString();
+
+                                    foreach (T row in rows)
+                                    {
+                                        JObject rowObject = JObject.FromObject(row);
+                                        var id = rowObject[map.Source].ToString();
+
+                                        if (readId == id)
+                                        {
+                                            readRow.Merge(rowObject, settings);
+                                            match++;
+                                            break;
+                                        }
+
+                                    }
+                                }
+
+                                readRow.WriteTo(writer);
+                            }
+                        }
+                    }
+
+                    writer.WriteEndArray();
+                    writer.Flush();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger?.Fatal(ex);
+
+                throw ex;
+            }
+        }
+
+        public void DeleteRows(DocumentStorage storage, List<JObject> rows, DocumentMap map, Formatting formatting = Formatting.None)
+        {
+            try
+            {
+                using (FileStream fsTemp = new FileStream(storage.Tempory, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Write, BufferSize))
+                using (StreamWriter sw = new StreamWriter(fsTemp, Encoding.UTF8, BufferSize))
+                using (JsonTextWriter writer = new JsonTextWriter(sw))
+                {
+                    var match = 0;
+                    var count = rows.Count;
+
+                    writer.Formatting = formatting;
+                    writer.WriteStartArray();
+
+                    using (FileStream fsTarget = new FileStream(storage.Target, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize))
+                    using (StreamReader sr = new StreamReader(fsTarget, Encoding.UTF8, false, BufferSize))
+                    using (JsonReader reader = new JsonTextReader(sr))
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader.TokenType == JsonToken.StartObject)
+                            {
+                                bool is_write = true;
+                                JObject readRow = JObject.Load(reader);
+
+                                if (match < count)
+                                {
+                                    var readId = readRow[map.Target].ToString();
+
+                                    foreach (JObject row in rows)
+                                    {
+                                        var id = row[map.Source].ToString();
+
+                                        if (readId == id)
+                                        {
+                                            is_write = false;
+                                            match++;
+                                            break;
+                                        }
+
+                                    }
+                                }
+
+                                if (is_write)
+                                {
                                     readRow.WriteTo(writer);
                                 }
                             }
                         }
-
-                        writer.WriteEndArray();
-                        writer.Flush();
                     }
 
-                    trans.Commit();
+                    writer.WriteEndArray();
+                    writer.Flush();
                 }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
+            }
+            catch (Exception ex)
+            {
+                Logger?.Fatal(ex);
 
-                    Logger?.Fatal(ex);
-
-                    throw ex;
-                }
+                throw ex;
             }
         }
 
-        public void MergeRows<T>(DocumentStorage document, List<T> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
+        public void DeleteRows<T>(DocumentStorage storage, List<T> rows, DocumentMap map, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentInternalTransaction(document, OperationType.Merge, backup))
+            try
             {
-                try
+                using (FileStream fsTemp = new FileStream(storage.Tempory, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Write, BufferSize))
+                using (StreamWriter sw = new StreamWriter(fsTemp, Encoding.UTF8, BufferSize))
+                using (JsonTextWriter writer = new JsonTextWriter(sw))
                 {
-                    using (FileStream fsTemp = new FileStream(trans.Tempory, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Write, BufferSize))
-                    using (StreamWriter sw = new StreamWriter(fsTemp, Encoding.UTF8, BufferSize))
-                    using (JsonTextWriter writer = new JsonTextWriter(sw))
+                    var match = 0;
+                    var count = rows.Count;
+
+                    writer.Formatting = formatting;
+                    writer.WriteStartArray();
+
+                    using (FileStream fsTarget = new FileStream(storage.Target, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize))
+                    using (StreamReader sr = new StreamReader(fsTarget, Encoding.UTF8, false, BufferSize))
+                    using (JsonReader reader = new JsonTextReader(sr))
                     {
-                        var match = 0;
-                        var count = rows.Count;
-
-                        var settings = new JsonMergeSettings();
-                        settings.MergeArrayHandling = MergeArrayHandling.Replace;
-                        settings.PropertyNameComparison = StringComparison.OrdinalIgnoreCase;
-                        settings.MergeNullValueHandling = MergeNullValueHandling.Merge;
-
-                        writer.Formatting = formatting;
-                        writer.WriteStartArray();
-
-                        using (FileStream fsTarget = new FileStream(trans.Target, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize))
-                        using (StreamReader sr = new StreamReader(fsTarget, Encoding.UTF8, false, BufferSize))
-                        using (JsonReader reader = new JsonTextReader(sr))
+                        while (reader.Read())
                         {
-                            while (reader.Read())
+                            if (reader.TokenType == JsonToken.StartObject)
                             {
-                                if (reader.TokenType == JsonToken.StartObject)
+                                bool is_write = true;
+                                JObject readRow = JObject.Load(reader);
+
+                                if (match < count)
                                 {
-                                    JObject readRow = JObject.Load(reader);
+                                    var readId = readRow[map.Target].ToString();
 
-                                    if (match < count)
+                                    foreach (T row in rows)
                                     {
-                                        var readId = readRow[map.Target].ToString();
+                                        JObject rowObject = JObject.FromObject(row);
+                                        var id = rowObject[map.Source].ToString();
 
-                                        foreach (T row in rows)
+                                        if (readId == id)
                                         {
-                                            JObject rowObject = JObject.FromObject(row);
-                                            var id = rowObject[map.Source].ToString();
-
-                                            if (readId == id)
-                                            {
-                                                readRow.Merge(rowObject, settings);
-                                                match++;
-                                                break;
-                                            }
-
+                                            is_write = false;
+                                            match++;
+                                            break;
                                         }
                                     }
+                                }
 
+                                if (is_write)
+                                {
                                     readRow.WriteTo(writer);
                                 }
                             }
                         }
-
-                        writer.WriteEndArray();
-                        writer.Flush();
                     }
 
-                    trans.Commit();
+                    writer.WriteEndArray();
+                    writer.Flush();
                 }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
 
-                    Logger?.Fatal(ex);
-
-                    throw ex;
-                }
             }
-        }
-
-        public void DeleteRows(DocumentStorage file, List<JObject> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
-        {
-            using (var trans = new DocumentInternalTransaction(file, OperationType.Delete, backup))
+            catch (Exception ex)
             {
-                try
-                {
-                    using (FileStream fsTemp = new FileStream(trans.Tempory, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Write, BufferSize))
-                    using (StreamWriter sw = new StreamWriter(fsTemp, Encoding.UTF8, BufferSize))
-                    using (JsonTextWriter writer = new JsonTextWriter(sw))
-                    {
-                        var match = 0;
-                        var count = rows.Count;
+                Logger?.Fatal(ex);
 
-                        writer.Formatting = formatting;
-                        writer.WriteStartArray();
-
-                        using (FileStream fsTarget = new FileStream(trans.Target, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize))
-                        using (StreamReader sr = new StreamReader(fsTarget, Encoding.UTF8, false, BufferSize))
-                        using (JsonReader reader = new JsonTextReader(sr))
-                        {
-                            while (reader.Read())
-                            {
-                                if (reader.TokenType == JsonToken.StartObject)
-                                {
-                                    bool is_write = true;
-                                    JObject readRow = JObject.Load(reader);
-
-                                    if (match < count)
-                                    {
-                                        var readId = readRow[map.Target].ToString();
-
-                                        foreach (JObject row in rows)
-                                        {
-                                            var id = row[map.Source].ToString();
-
-                                            if (readId == id)
-                                            {
-                                                is_write = false;
-                                                match++;
-                                                break;
-                                            }
-
-                                        }
-                                    }
-
-                                    if (is_write)
-                                    {
-                                        readRow.WriteTo(writer);
-                                    }
-                                }
-                            }
-                        }
-
-                        writer.WriteEndArray();
-                        writer.Flush();
-                    }
-
-                    trans.Commit();
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-
-                    Logger?.Fatal(ex);
-
-                    throw ex;
-                }
-            }
-        }
-
-        public void DeleteRows<T>(DocumentStorage document, List<T> rows, DocumentMap map, bool backup, Formatting formatting = Formatting.None)
-        {
-            using (var trans = new DocumentInternalTransaction(document, OperationType.Delete, backup))
-            {
-                try
-                {
-                    using (FileStream fsTemp = new FileStream(trans.Tempory, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Write, BufferSize))
-                    using (StreamWriter sw = new StreamWriter(fsTemp, Encoding.UTF8, BufferSize))
-                    using (JsonTextWriter writer = new JsonTextWriter(sw))
-                    {
-                        var match = 0;
-                        var count = rows.Count;
-
-                        writer.Formatting = formatting;
-                        writer.WriteStartArray();
-
-                        using (FileStream fsTarget = new FileStream(trans.Target, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize))
-                        using (StreamReader sr = new StreamReader(fsTarget, Encoding.UTF8, false, BufferSize))
-                        using (JsonReader reader = new JsonTextReader(sr))
-                        {
-                            while (reader.Read())
-                            {
-                                if (reader.TokenType == JsonToken.StartObject)
-                                {
-                                    bool is_write = true;
-                                    JObject readRow = JObject.Load(reader);
-
-                                    if (match < count)
-                                    {
-                                        var readId = readRow[map.Target].ToString();
-
-                                        foreach (T row in rows)
-                                        {
-                                            JObject rowObject = JObject.FromObject(row);
-                                            var id = rowObject[map.Source].ToString();
-
-                                            if (readId == id)
-                                            {
-                                                is_write = false;
-                                                match++;
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    if (is_write)
-                                    {
-                                        readRow.WriteTo(writer);
-                                    }
-                                }
-                            }
-                        }
-
-                        writer.WriteEndArray();
-                        writer.Flush();
-                    }
-
-                    trans.Commit();
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-
-                    Logger?.Fatal(ex);
-
-                    throw ex;
-                }
+                throw ex;
             }
         }
 
 
         //Ayrı bir dosya oluşturmak için.
-        public void CreateRows<T>(DocumentStorage document, List<T> rows, Formatting formatting = Formatting.None)
+        public void CreateRows<T>(DocumentStorage storage, List<T> rows, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentInternalTransaction(document, OperationType.Create, false))
+            try
             {
-                try
+                using (FileStream fsTarget = new FileStream(storage.Target, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write, BufferSize))
+                using (StreamWriter sw = new StreamWriter(fsTarget))
+                using (JsonTextWriter writer = new JsonTextWriter(sw))
                 {
-                    using (FileStream fsTarget = new FileStream(trans.Target, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write, BufferSize))
-                    using (StreamWriter sw = new StreamWriter(fsTarget))
-                    using (JsonTextWriter writer = new JsonTextWriter(sw))
+                    writer.Formatting = formatting;
+                    writer.WriteStartArray();
+
+                    foreach (T row in rows)
                     {
-                        writer.Formatting = formatting;
-                        writer.WriteStartArray();
-
-                        foreach (T row in rows)
-                        {
-                            JObject.FromObject(row).WriteTo(writer);
-                        }
-
-                        writer.WriteEndArray();
-                        writer.Flush();
+                        JObject.FromObject(row).WriteTo(writer);
                     }
 
-                    trans.Commit();
+                    writer.WriteEndArray();
+                    writer.Flush();
                 }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
 
-                    Logger?.Fatal(ex);
+            }
+            catch (Exception ex)
+            {
+                Logger?.Fatal(ex);
 
-                    throw ex;
-                }
+                throw ex;
             }
         }
 
-        public void CreateRows(DocumentStorage document, List<JObject> rows, Formatting formatting = Formatting.None)
+        public void CreateRows(DocumentStorage storage, List<JObject> rows, Formatting formatting = Formatting.None)
         {
-            using (var trans = new DocumentInternalTransaction(document, OperationType.Create, false))
+            try
             {
-                try
+                using (FileStream fsTarget = new FileStream(storage.Target, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write, BufferSize))
+                using (StreamWriter sw = new StreamWriter(fsTarget))
+                using (JsonTextWriter writer = new JsonTextWriter(sw))
                 {
-                    using (FileStream fsTarget = new FileStream(trans.Target, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write, BufferSize))
-                    using (StreamWriter sw = new StreamWriter(fsTarget))
-                    using (JsonTextWriter writer = new JsonTextWriter(sw))
+                    writer.Formatting = formatting;
+                    writer.WriteStartArray();
+
+                    foreach (JObject row in rows)
                     {
-                        writer.Formatting = formatting;
-                        writer.WriteStartArray();
-
-                        foreach (JObject row in rows)
-                        {
-                            row.WriteTo(writer);
-                        }
-
-                        writer.WriteEndArray();
-                        writer.Flush();
+                        row.WriteTo(writer);
                     }
 
-                    trans.Commit();
+                    writer.WriteEndArray();
+                    writer.Flush();
                 }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
 
-                    Logger?.Fatal(ex);
+            }
+            catch (Exception ex)
+            {
+                Logger?.Fatal(ex);
 
-                    throw ex;
-                }
+                throw ex;
             }
         }
     }

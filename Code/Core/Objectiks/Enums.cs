@@ -14,7 +14,8 @@ namespace Objectiks
         Reader,
         Writer,
         Query,
-        Repository
+        Repository,
+        Transaction
     }
 
     //important index.. use document writer..partition queue

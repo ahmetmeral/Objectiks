@@ -82,8 +82,6 @@ namespace Objectiks.Integrations
                     trans.Rollback();
                 }
             }
-
-
         }
 
         [Test]

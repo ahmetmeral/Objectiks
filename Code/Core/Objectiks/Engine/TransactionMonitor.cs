@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -15,11 +16,11 @@ namespace Objectiks.Engine
         public static bool Locked(int threadId, string name)
         {
             int check = 0;
-            bool locked = false;
+            bool locked = true;
 
             if (!Threads.ContainsKey(name))
             {
-                locked = Threads.TryAdd(name, threadId);
+                locked = !Threads.TryAdd(name, threadId);
             }
             else
             {
@@ -27,16 +28,18 @@ namespace Objectiks.Engine
                 {
                     while (true)
                     {
+                        check++;
+
                         if (Threads.ContainsKey(name))
                         {
                             if (Threads[name] != threadId)
                             {
-                                locked = false;
+                                locked = true;
                                 Thread.Sleep(3000);
                             }
                             else
                             {
-                                locked = true;
+                                locked = false;
 
                                 break;
                             }
@@ -44,8 +47,6 @@ namespace Objectiks.Engine
 
                         if (check > LockedTryCount)
                         {
-                            locked = false;
-
                             break;
                         }
                     }
@@ -60,6 +61,28 @@ namespace Objectiks.Engine
             Threads.TryRemove(name, out var locked);
 
             return locked > 0;
+        }
+
+        public static bool UnLocked(int threadId)
+        {
+            try
+            {
+                var keyValuePair = Threads.Where(t => t.Value == threadId).ToList();
+
+                if (keyValuePair.Count > 0)
+                {
+                    foreach (var item in keyValuePair)
+                    {
+                        Threads.Remove(item.Key, out int tid);
+                    }
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

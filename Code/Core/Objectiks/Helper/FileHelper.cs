@@ -58,29 +58,15 @@ namespace Objectiks.Helper
 
         public static string Get(string path, int bufferSize = 128)
         {
-            using (var trans = new DocumentInternalTransaction(path, OperationType.Read, false))
+            string contents = string.Empty;
+
+            using (var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, bufferSize))
+            using (var sr = new StreamReader(fs, Encoding.UTF8, false, bufferSize))
             {
-                try
-                {
-                    string contents = string.Empty;
-
-                    using (var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, bufferSize))
-                    using (var sr = new StreamReader(fs, Encoding.UTF8, false, bufferSize))
-                    {
-                        contents = sr.ReadToEnd();
-                    }
-
-                    trans.Commit();
-
-                    return contents;
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-
-                    throw ex;
-                }
+                contents = sr.ReadToEnd();
             }
+
+            return contents;
         }
     }
 }

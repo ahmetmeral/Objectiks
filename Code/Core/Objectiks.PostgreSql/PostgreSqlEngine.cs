@@ -18,8 +18,6 @@ namespace Objectiks.PostgreSql
 
         }
 
-
-
         public override bool LoadDocumentType(string typeOf)
         {
             var schema = GetDocumentSchema(typeOf);
@@ -67,27 +65,27 @@ namespace Objectiks.PostgreSql
             return true;
         }
 
-        public override void BulkAppend(DocumentMeta meta, DocumentStorage info, List<Document> docs, Format format = Format.None)
+        public override void BulkAppend(DocumentContext context)
         {
           
         }
 
-        public override void BulkCreate(DocumentMeta meta, DocumentStorage info, List<Document> docs, Format format = Format.None)
+        public override void BulkCreate(DocumentContext context)
         {
-            using (var writer = new PostgreSqlWriter(meta.TypeOf, Provider, Option, Logger))
-            {
-                writer.BulkCreate(docs);
-            }
+            //using (var writer = new PostgreSqlWriter(meta.TypeOf, Provider, Option, Logger))
+            //{
+            //    writer.BulkCreate(docs);
+            //}
         }
 
-        public override void BulkMerge(DocumentMeta meta, DocumentStorage info, List<Document> docs, Format format = Format.None)
+        public override void BulkMerge(DocumentContext context)
         {
-            base.BulkMerge(meta, info, docs, format);
+            
         }
 
-        public override void BulkDelete(DocumentMeta meta, DocumentStorage info, List<Document> docs, Format format = Format.None)
+        public override void BulkDelete(DocumentContext context)
         {
-            base.BulkDelete(meta, info, docs, format);
+            
         }
     }
 }

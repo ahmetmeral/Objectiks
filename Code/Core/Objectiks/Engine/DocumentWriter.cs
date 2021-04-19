@@ -333,20 +333,36 @@ namespace Objectiks.Engine
 
                 ReOrderPartitionByOperation();
 
+                if (Engine.Transaction == null)
+                {
+                    Engine.Transaction = new DocumentTransaction(Engine, true);
+                }
+
                 while (Partitions.TryDequeue(out var partOf))
                 {
-                    var storage = Engine.Transaction.Ensure(Meta.TypeOf, partOf.Partition);
+                    var context = new DocumentContext
+                    {
+                        TypeOf = Meta.TypeOf,
+                        Primary = Meta.Primary,
+                        Partition = partOf.Partition,
+                        Storage = Engine.Transaction.Ensure(Meta.TypeOf, partOf.Partition, true),
+                        Formatting = Formatting,
+                        Operation = partOf.Operation,
+                        Documents = Queue.Where(q => q.PartOf.Partition == partOf.Partition && q.PartOf.Operation == partOf.Operation).Select(s => s.Document).ToList()
+                    };
 
-                    var docs = Queue.Where(q => q.PartOf.Partition == partOf.Partition &&
-                    q.PartOf.Operation == partOf.Operation).Select(s => s.Document).ToList();
-
-                    Engine.SubmitChanges(Meta, storage, docs, partOf.Operation, Formatting);
+                    Engine.SubmitChanges(context);
                 }
 
                 Queue.Clear();
                 Partitions.Clear();
 
-                Engine.Watcher?.UnLock();
+                if (Engine.Transaction.IsInternalTransaction)
+                {
+                    Engine.Transaction.Commit();
+                    Engine.Transaction = null;
+                }
+
             }
             catch (IOException)
             {
@@ -386,7 +402,7 @@ namespace Objectiks.Engine
         {
             this.Wait();
             GC.SuppressFinalize(this);
-
+            Engine.Watcher?.UnLock();
         }
     }
 }

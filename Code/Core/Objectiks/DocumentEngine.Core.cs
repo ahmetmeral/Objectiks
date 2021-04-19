@@ -232,5 +232,11 @@ namespace Objectiks
             return list;
         }
 
+        internal virtual DocumentTransaction BeginTransaction()
+        {
+            Transaction = new DocumentTransaction(this, false);
+
+            return Transaction;
+        }
     }
 }
