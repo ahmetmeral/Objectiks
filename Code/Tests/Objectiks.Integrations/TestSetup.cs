@@ -38,7 +38,7 @@ namespace Objectiks.Integrations
             return new_id.Value;
         }
 
-        public static List<Pages> GeneratePages(int size)
+        public static List<Pages> GeneratePages(int size, bool auto_id = true)
         {
             var rows = new List<Pages>();
 
@@ -46,7 +46,7 @@ namespace Objectiks.Integrations
             {
                 rows.Add(new Pages
                 {
-                    Id = GenerateNewId(),
+                    Id = auto_id ? GenerateNewId() : 0,
                     Title = "Home Tr Page Yaptık..1 "
                 });
             }

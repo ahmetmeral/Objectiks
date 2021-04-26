@@ -29,11 +29,11 @@ namespace Objectiks.Services
         List<DocumentMeta> GetTypeMetaAll();
         DocumentMeta GetTypeMeta(string typeOf);
 
-        void SubmitChanges(DocumentContext context);
+        void SubmitChanges(DocumentContext context, DocumentTransaction transaction);
 
-        void BulkCreate(DocumentContext context);
-        void BulkAppend(DocumentContext context);
-        void BulkMerge(DocumentContext context);
-        void BulkDelete(DocumentContext context);
+        void BulkCreate(DocumentContext context, DocumentTransaction transaction);
+        void BulkAppend(DocumentContext context, DocumentTransaction transaction);
+        void BulkMerge(DocumentContext context, DocumentTransaction transaction);
+        void BulkDelete(DocumentContext context, DocumentTransaction transaction);
     }
 }

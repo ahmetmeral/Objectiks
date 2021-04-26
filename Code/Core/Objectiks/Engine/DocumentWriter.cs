@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Data.Common;
 using System.Data;
 using Objectiks.Services;
+using System.Threading;
 
 namespace Objectiks.Engine
 {
@@ -23,10 +24,12 @@ namespace Objectiks.Engine
         private Task ExecuteTask;
         private ConcurrentQueue<DocumentQueue> Queue = new ConcurrentQueue<DocumentQueue>();
         private ConcurrentQueue<DocumentPartition> Partitions = new ConcurrentQueue<DocumentPartition>();
+        private TransactionMonitor TransactionMonitor = new TransactionMonitor();
         private Format Formatting = Format.None;
-        private readonly DocumentEngine Engine = null;
+        private readonly DocumentEngine Engine;
+        private DocumentTransaction Transaction;
         //meta : should not be read-only 
-        private DocumentMeta Meta = null;
+        private DocumentMeta Meta;
         private bool IsPartialStore = false;
         private int? PartialStoreLimit = 0;
 
@@ -34,7 +37,7 @@ namespace Objectiks.Engine
 
         public DocumentWriter() { }
 
-        internal DocumentWriter(DocumentEngine engine, string typeOf)
+        internal DocumentWriter(DocumentEngine engine, string typeOf, DocumentTransaction transaction = null)
         {
             TypeOf = typeOf;
             Engine = engine;
@@ -46,7 +49,14 @@ namespace Objectiks.Engine
                 PartialStoreLimit = Engine.Option.SupportPartialStorageLimit;
             }
 
-
+            if (transaction == null)
+            {
+                Transaction = new DocumentTransaction(engine, true);
+            }
+            else
+            {
+                Transaction = transaction;
+            }
         }
 
         private void ReOrderPartitionByOperation()
@@ -66,27 +76,23 @@ namespace Objectiks.Engine
 
         private Document GetDocument(T model, bool clearDocumentRefs)
         {
-            var attrValues = GetDocumentAttributes(model);
-            var cacheOf = Engine.Cache.CacheOfDocument(attrValues.TypeOf, attrValues.Primary);
-
-            DocumentKey? documentKey = Meta.GetDocumentKeyFromCacheOf(cacheOf);
-            var exists = documentKey.HasValue && !String.IsNullOrEmpty(documentKey.Value.PrimaryOf);
+            var attr = GetDocumentAttributes(model);
 
             var document = new Document
             {
-                CacheOf = cacheOf,
-                PrimaryOf = attrValues.Primary,
-                AccountOf = attrValues.Account,
-                UserOf = attrValues.User,
+                CacheOf = attr.CacheOf,
+                PrimaryOf = attr.Primary,
+                AccountOf = attr.Account,
+                UserOf = attr.User,
                 Data = JObject.FromObject(model),
-                Partition = exists ? documentKey.Value.Partition : 0,
+                Partition = attr.Partition,
                 HasArray = false,
-                Exists = exists
+                Exists = attr.Exists
             };
 
             if (clearDocumentRefs)
             {
-                RemoveIgnoredOrRefProperty(ref document, attrValues);
+                RemoveIgnoredOrRefProperty(ref document, attr);
             }
 
             return document;
@@ -108,7 +114,6 @@ namespace Objectiks.Engine
             {
                 doc.TypeOf = typeOf.Name;
             }
-
 
             foreach (PropertyInfo property in properties)
             {
@@ -133,16 +138,16 @@ namespace Objectiks.Engine
 
                 if (primary != null)
                 {
-                    primary.Value = property.GetValue(model, null);
+                    var primaryValue = property.GetValue(model, null);
 
-                    if (primary.Value == null)
-                    {
-                        primary.Value = Meta.GetNewSequenceId(property.PropertyType);
-                    }
+                    var info = Engine.GetTypeOfDocumentInfo(TypeOf, primaryValue, property.PropertyType);
 
-                    doc.Primary = primary.Value.ToString();
+                    doc.Primary = info.PrimaryOf.ToString();
+                    doc.CacheOf = Engine.Cache.CacheOfDocument(doc.TypeOf, doc.Primary);
+                    doc.Partition = info.Partition;
+                    doc.Exists = info.Exists;
 
-                    property.SetValue(model, primary.Value);
+                    property.SetValue(model, info.PrimaryOf);
                 }
                 #endregion
 
@@ -230,18 +235,10 @@ namespace Objectiks.Engine
             }
         }
 
-        public void WatcherLock()
+        public void AddDocument(T document, bool clearDocumentRefs = true)
         {
-            Engine.Watcher?.Lock();
-        }
+            TransactionMonitor.EnterLock(TypeOf);
 
-        public void WatcherUnLock()
-        {
-            Engine.Watcher?.UnLock();
-        }
-
-        public void Add(T document, bool clearDocumentRefs = true)
-        {
             if (document == null)
             {
                 throw new Exception("Document is null");
@@ -270,13 +267,15 @@ namespace Objectiks.Engine
             }
 
             Enqueue(doc, partition);
+
+            TransactionMonitor.ExitLock(TypeOf);
         }
 
-        public void Add(List<T> documents, bool clearDocumentRefs = true)
+        public void AddDocuments(List<T> documents, bool clearDocumentRefs = true)
         {
             foreach (var item in documents)
             {
-                Add(item, clearDocumentRefs);
+                AddDocument(item, clearDocumentRefs);
             }
         }
 
@@ -314,13 +313,16 @@ namespace Objectiks.Engine
 
         public void UsePartialStore(int limit = 1)
         {
-            if (Queue.Count > 0)
+            if (Engine.Option.SupportPartialStorage)
             {
-                throw new Exception("Called before the Add function");
-            }
+                if (Queue.Count > 0)
+                {
+                    throw new Exception("Called before the Add function");
+                }
 
-            IsPartialStore = true;
-            PartialStoreLimit = limit;
+                IsPartialStore = true;
+                PartialStoreLimit = limit;
+            }
         }
 
         private void Execute()
@@ -333,10 +335,7 @@ namespace Objectiks.Engine
 
                 ReOrderPartitionByOperation();
 
-                if (Engine.Transaction == null)
-                {
-                    Engine.Transaction = new DocumentTransaction(Engine, true);
-                }
+                TransactionMonitor.EnterLock(TypeOf);
 
                 while (Partitions.TryDequeue(out var partOf))
                 {
@@ -345,28 +344,31 @@ namespace Objectiks.Engine
                         TypeOf = Meta.TypeOf,
                         Primary = Meta.Primary,
                         Partition = partOf.Partition,
-                        Storage = Engine.Transaction.Ensure(Meta.TypeOf, partOf.Partition, true),
-                        Formatting = Formatting,
                         Operation = partOf.Operation,
-                        Documents = Queue.Where(q => q.PartOf.Partition == partOf.Partition && q.PartOf.Operation == partOf.Operation).Select(s => s.Document).ToList()
+                        Storage = Transaction.GetTransactionStorage(Meta.TypeOf, partOf.Partition, true),
+                        Documents = Queue.Where(q => q.PartOf.Partition == partOf.Partition && q.PartOf.Operation == partOf.Operation).Select(s => s.Document).ToList(),
+                        Formatting = Formatting
                     };
 
-                    Engine.SubmitChanges(context);
+                    Engine.SubmitChanges(context, Transaction);
                 }
+
+                TransactionMonitor.ExitLock(TypeOf);
 
                 Queue.Clear();
                 Partitions.Clear();
 
-                if (Engine.Transaction.IsInternalTransaction)
+                if (Transaction.IsInternalTransaction)
                 {
-                    Engine.Transaction.Commit();
-                    Engine.Transaction = null;
+                    Transaction.Commit();
                 }
-
             }
             catch (IOException)
             {
-                //oluşur ise rollbackler çalışır tekrar yüklemek mantıklı olur.
+                if (Transaction.IsInternalTransaction)
+                {
+                    Transaction.Rollback();
+                }
             }
         }
 

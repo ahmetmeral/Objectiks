@@ -106,7 +106,7 @@ namespace Objectiks
 
         public virtual Document Read(string typeOf, object primaryOf)
         {
-            var document = Cache.GetOrCreate(typeOf, primaryOf, () =>
+            var document = Cache.GetOrCreateDocument(typeOf, primaryOf, () =>
             {
                 LoadDocumentType(typeOf);
 
@@ -114,6 +114,48 @@ namespace Objectiks
             });
 
             return document;
+        }
+
+        public virtual DocumentInfo GetTypeOfDocumentInfo(string typeOf, object primaryOf, Type primaryOfDataType)
+        {
+            var info = new DocumentInfo(typeOf);
+
+            var sequence = Cache.GetOrCreateSequence(typeOf, () =>
+            {
+                LoadDocumentType(typeOf);
+
+                return Cache.GetSequence(typeOf);
+            }).GetTypeOfSequence(primaryOfDataType, primaryOf);
+
+
+            if (sequence.IsNew)
+            {
+                info.PrimaryOf = sequence.Value;
+                info.Partition = 0;
+                info.Exists = false;
+            }
+            else
+            {
+                var readInfo = Cache.GetDocumentInfo(typeOf, sequence.Value);
+
+                if (readInfo.Exists)
+                {
+                    info.PrimaryOf = readInfo.PrimaryOf;
+                    info.Partition = readInfo.Partition;
+                    info.Exists = true;
+                }
+                else
+                {
+                    info.PrimaryOf = sequence.Value;
+                    info.Partition = 0;
+                    info.Exists = false;
+                }
+            }
+
+            Cache.Set(info);
+            Cache.Set(new DocumentSequence(typeOf, sequence.Value));
+
+            return info;
         }
 
         public virtual Document Read(QueryOf query, DocumentMeta meta = null)
@@ -293,7 +335,7 @@ namespace Objectiks
 
         public virtual DocumentMeta GetTypeMeta(string typeOf)
         {
-            var meta = Cache.GetOrCreate(typeOf, () =>
+            var meta = Cache.GetOrCreateMeta(typeOf, () =>
             {
                 LoadDocumentType(typeOf);
 
@@ -302,5 +344,7 @@ namespace Objectiks
 
             return meta;
         }
+
+
     }
 }

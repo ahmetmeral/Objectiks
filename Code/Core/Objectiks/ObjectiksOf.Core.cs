@@ -1,5 +1,6 @@
 ﻿using Objectiks.Engine;
 using Objectiks.Models;
+using Objectiks.Caching.Serializer;
 using Objectiks.Services;
 using System;
 using System.Collections.Concurrent;
@@ -20,16 +21,18 @@ namespace Objectiks
 
             public static DocumentEngine Get(DocumentProvider documentProvider, DocumentOption option)
             {
-                if (Engines.TryGetValue(documentProvider.CacheBucket, out DocumentEngine engine))
-                {
-                    engine.Transaction = null;
-                }
+                Engines.TryGetValue(documentProvider.CacheBucket, out DocumentEngine engine);
 
                 if (engine == null)
                 {
                     if (option == null)
                     {
                         option = GetOption(documentProvider);
+                    }
+
+                    if(option.Serializer == null)
+                    {
+                        option.Serializer = new DocumentBsonSerializer();
                     }
 
                     if (documentProvider.Connection == null)

@@ -48,14 +48,14 @@ namespace Objectiks
             return new DocumentReader<dynamic>(Engine, typeOf);
         }
 
-        public DocumentWriter<T> WriterOf<T>()
+        public DocumentWriter<T> WriterOf<T>(DocumentTransaction transaction = null)
         {
-            return new DocumentWriter<T>(Engine, GetTypeOfName<T>());
+            return new DocumentWriter<T>(Engine, GetTypeOfName<T>(), transaction);
         }
 
-        public DocumentWriter<T> WriterOf<T>(string typeOf)
+        public DocumentWriter<T> WriterOf<T>(string typeOf, DocumentTransaction transaction = null)
         {
-            return new DocumentWriter<T>(Engine, typeOf);
+            return new DocumentWriter<T>(Engine, typeOf, transaction);
         }
 
         public DocumentTransaction BeginTransaction()

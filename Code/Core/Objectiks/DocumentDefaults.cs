@@ -9,6 +9,8 @@ namespace Objectiks
         public const string Root = "Objectiks";
         public const string Manifest = "Objectiks.json";
         public const string Meta = "Meta";
+        public const string Sequence = "Sequence";
+        public const string Info = "Info";
         public const string Schemes = "Schemes";
         public const string Documents = "Documents";
         public const string Contents = "Contents";

@@ -7,11 +7,14 @@ namespace Objectiks.Attributes
     public class DocumentAttributes
     {
         public string TypeOf { get; set; }
+        public string CacheOf { get; set; }
         public string Primary { get; set; }
         public string Account { get; set; }
         public string User { get; set; }
         public List<string> KeyOfValues { get; set; }
         public List<IgnoreAttribute> Ignored { get; set; }
+        public int Partition { get; set; }
+        public bool Exists { get; set; }
 
         public DocumentAttributes()
         {

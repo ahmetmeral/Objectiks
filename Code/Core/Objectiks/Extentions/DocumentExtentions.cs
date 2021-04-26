@@ -4,6 +4,7 @@ using Newtonsoft.Json.Schema;
 using Objectiks.Attributes;
 using Objectiks.Engine;
 using Objectiks.Engine.Query;
+using Objectiks.Helper;
 using Objectiks.Models;
 using System;
 using System.Collections.Generic;
@@ -137,7 +138,7 @@ namespace Objectiks.Extentions
 
         public static T ConvertToType<T>(this object value) where T : class, new()
         {
-            var serializer = new DocumentSerializer();
+            var serializer = new JSONSerializer();
             var jsonData = serializer.Serialize(value);
 
             return serializer.Deserialize<T>(jsonData);

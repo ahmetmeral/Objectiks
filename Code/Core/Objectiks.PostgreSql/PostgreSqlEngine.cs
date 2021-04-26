@@ -65,12 +65,12 @@ namespace Objectiks.PostgreSql
             return true;
         }
 
-        public override void BulkAppend(DocumentContext context)
+        public override void BulkAppend(DocumentContext context, DocumentTransaction transaction)
         {
           
         }
 
-        public override void BulkCreate(DocumentContext context)
+        public override void BulkCreate(DocumentContext context, DocumentTransaction transaction)
         {
             //using (var writer = new PostgreSqlWriter(meta.TypeOf, Provider, Option, Logger))
             //{
@@ -78,12 +78,12 @@ namespace Objectiks.PostgreSql
             //}
         }
 
-        public override void BulkMerge(DocumentContext context)
+        public override void BulkMerge(DocumentContext context, DocumentTransaction transaction)
         {
             
         }
 
-        public override void BulkDelete(DocumentContext context)
+        public override void BulkDelete(DocumentContext context, DocumentTransaction transaction)
         {
             
         }

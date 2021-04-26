@@ -1,5 +1,6 @@
 ﻿using Npgsql;
 using NUnit.Framework;
+using Objectiks.Engine;
 using Objectiks.Engine.Query;
 using Objectiks.Integrations.Models;
 using Objectiks.Integrations.Option;
@@ -9,6 +10,7 @@ using Objectiks.PostgreSql;
 using System;
 using System.Data.SqlClient;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Objectiks.Integrations
 {
@@ -41,45 +43,105 @@ namespace Objectiks.Integrations
 
             using (var writer = repos.WriterOf<Pages>())
             {
-              
+
             }
+        }
+
+        [Test]
+        public void DocumentTransactionParalelTest()
+        {
+            var size = 5;
+            var pages = TestSetup.GeneratePages(size, false);
+            var repos = new ObjectiksOf();
+            var meta_before = repos.GetTypeMeta<Pages>();
+
+            var result = Parallel.ForEach(pages, page =>
+             {
+                 using (var trans = repos.BeginTransaction())
+                 {
+                     try
+                     {
+                         //var category = new Categories
+                         //{
+                         //    Name = "Transactions",
+                         //    Description = "test",
+                         //    Title = "Test"
+                         //};
+
+                         //using (var categoryWriter = repos.WriterOf<Categories>(trans))
+                         //{
+                         //    categoryWriter.UseFormatting();
+                         //    categoryWriter.AddDocument(category);
+                         //    categoryWriter.SubmitChanges();
+                         //}
+
+                         using (var pageWriter = repos.WriterOf<Pages>(trans))
+                         {
+                             pageWriter.UseFormatting();
+                             pageWriter.AddDocument(page);
+                             pageWriter.SubmitChanges();
+                         }
+
+                         trans.Commit();
+                     }
+                     catch (Exception ex)
+                     {
+                         trans.Rollback(ex);
+                     }
+                 }
+             });
+
+
+            while (!result.IsCompleted)
+            {
+
+            }
+
+            var meta_after = repos.GetTypeMeta<Pages>();
+            
         }
 
         [Test]
         public void DocumentTransactionTest()
         {
             var size = 5;
-            var pages = TestSetup.GeneratePages(size);
+            var pages = TestSetup.GeneratePages(size, false);
             var repos = new ObjectiksOf();
 
             using (var trans = repos.BeginTransaction())
             {
                 try
                 {
-                    using (var pageWriter = repos.WriterOf<Pages>())
-                    {
-                        pageWriter.Add(pages);
+                    //var category = new Categories
+                    //{
+                    //    Name = "Transactions",
+                    //    Description = "test",
+                    //    Title = "Test"
+                    //};
 
+                    //using (var categoryWriter = repos.WriterOf<Categories>(trans))
+                    //{
+                    //    categoryWriter.UseFormatting();
+                    //    categoryWriter.AddDocument(category);
+                    //    categoryWriter.SubmitChanges();
+                    //}
+
+                    using (var pageWriter = repos.WriterOf<Pages>(trans))
+                    {
+                        pageWriter.UseFormatting();
+                        pageWriter.UsePartialStore(1);
+                        pageWriter.AddDocuments(pages);
                         pageWriter.SubmitChanges();
                     }
 
-                    using (var categoryWriter = repos.WriterOf<Categories>())
-                    {
-                        categoryWriter.Add(new Categories
-                        {
-                            Name = "Transactions",
-                            Description = "test",
-                            Title = "Test"
-                        });
 
-                        categoryWriter.SubmitChanges();
-                    }
+                    //throw new Exception("opss");
 
                     trans.Commit();
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
+                    trans.Rollback(ex);
                 }
             }
         }
@@ -99,13 +161,13 @@ namespace Objectiks.Integrations
         public void DocumentWriterBulk()
         {
             var size = 5;
-            var pages = TestSetup.GeneratePages(size);
+            var pages = TestSetup.GeneratePages(size, false);
             var repos = new ObjectiksOf();
             var countBefore = repos.Count("pages");
 
             using (var writer = repos.WriterOf<Pages>())
             {
-                writer.Add(pages);
+                writer.AddDocuments(pages);
                 writer.UseFormatting();
                 writer.SubmitChanges();
             }
@@ -124,7 +186,7 @@ namespace Objectiks.Integrations
             using (var writer = repos.WriterOf<Pages>())
             {
                 writer.UsePartialStore(1000);
-                writer.Add(pages);
+                writer.AddDocuments(pages);
                 writer.UseFormatting();
                 writer.SubmitChanges();
             }
@@ -155,10 +217,10 @@ namespace Objectiks.Integrations
 
                 foreach (var page in pages)
                 {
-                    writer.Add(page);
+                    writer.AddDocument(page);
                 }
 
-                writer.Add(mergePage);
+                writer.AddDocument(mergePage);
 
                 writer.SubmitChanges();
             }
@@ -176,7 +238,7 @@ namespace Objectiks.Integrations
             using (var writer2 = repos.WriterOf<Pages>())
             {
                 writer2.UsePartialStore(2);
-                writer2.Add(removePages);
+                writer2.AddDocuments(removePages);
                 writer2.SubmitChanges();
             }
 
@@ -205,7 +267,7 @@ namespace Objectiks.Integrations
             {
                 writer.UseFormatting();
 
-                writer.Add(mergePage);
+                writer.AddDocument(mergePage);
 
                 writer.SubmitChanges();
             }

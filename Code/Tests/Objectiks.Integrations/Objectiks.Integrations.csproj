@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Objectiks.PostgreSql\Objectiks.PostgreSql.csproj" />
+    <ProjectReference Include="..\..\Core\Objectiks.StackExchange.Redis\Objectiks.StackExchange.Redis.csproj" />
     <ProjectReference Include="..\..\Core\Objectiks\Objectiks.csproj" />
   </ItemGroup>
 

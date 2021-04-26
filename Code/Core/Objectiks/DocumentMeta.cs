@@ -114,6 +114,55 @@ namespace Objectiks
             return Sequence;
         }
 
+        public object GetNewSequenceId(Type type, object currentValue)
+        {
+            if (currentValue == null)
+            {
+                return GetNewSequenceId(type);
+            }
+
+            TypeCode typeCode = Type.GetTypeCode(type);
+
+            if (typeCode == TypeCode.Int32)
+            {
+                int.TryParse(currentValue.ToString(), out int current);
+
+                if (current == 0)
+                {
+                    int seq = 0;
+                    Int32.TryParse(Sequence.ToString(), out seq);
+                    Sequence = Interlocked.Increment(ref seq);
+                    currentValue = Sequence;
+                }
+            }
+            else if (typeCode == TypeCode.Int64)
+            {
+                Int64.TryParse(currentValue.ToString(), out long current);
+
+                if (current == 0)
+                {
+                    long seq = 0;
+                    Int64.TryParse(Sequence.ToString(), out seq);
+                    Sequence = Interlocked.Increment(ref seq);
+                    currentValue = Sequence;
+                }
+            }
+            else if (typeCode == TypeCode.String || typeCode == TypeCode.Object)
+            {
+                if (String.IsNullOrWhiteSpace(currentValue.ToString()))
+                {
+                    Sequence = Guid.NewGuid();
+                    currentValue = Sequence;
+                }
+            }
+            else
+            {
+                throw new Exception($"Undefined sequence type {typeCode}");
+            }
+
+            return currentValue;
+        }
+
         public void RefsIndexBuild(bool supportLoaderRefsManipulation)
         {
             if (Refs != null)

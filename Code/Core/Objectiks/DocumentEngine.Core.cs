@@ -26,7 +26,7 @@ namespace Objectiks
         public DocumentTypes TypeOf { get; set; }
         public bool FirstLoaded { get; set; }
 
-        internal DocumentTransaction Transaction { get; set; }
+        private static object LockedObject = new object();
 
         public DocumentEngine() { }
 
@@ -34,7 +34,7 @@ namespace Objectiks
         {
             Option = option;
             Provider = documentProvider;
-            Cache = GetDocumentCache(option.CacheType, Provider.CacheBucket);
+            Cache = GetDocumentCache(option.CacheType, Provider.CacheBucket, option.Serializer);
             Logger = GetDocumentLogger(option.LoggerType);
             Watcher = GetDocumentWatcher(option.WatcherType);
             ParseOf = GetDocumentParsers(option.ParserOfTypes);
@@ -58,7 +58,7 @@ namespace Objectiks
             if (schema == null)
             {
                 var schema_file = new FileInfo(Path.Combine(Provider.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json"));
-                schema = new DocumentSerializer().Get<DocumentSchema>(schema_file.FullName);
+                schema = new JSONSerializer().Get<DocumentSchema>(schema_file.FullName);
             }
 
             if (schema == null)
@@ -195,9 +195,9 @@ namespace Objectiks
             return DocumentManifest.Get(path);
         }
 
-        protected virtual DocumentCache GetDocumentCache(Type type, string bucket = "DefaultBucket")
+        protected virtual DocumentCache GetDocumentCache(Type type, string bucket, IDocumentSerializer serializer)
         {
-            return (DocumentCache)Activator.CreateInstance(type, bucket);
+            return (DocumentCache)Activator.CreateInstance(type, bucket, serializer);
         }
 
         protected virtual DocumentWatcher GetDocumentWatcher(Type type)
@@ -234,9 +234,7 @@ namespace Objectiks
 
         internal virtual DocumentTransaction BeginTransaction()
         {
-            Transaction = new DocumentTransaction(this, false);
-
-            return Transaction;
+            return new DocumentTransaction(this, false);
         }
     }
 }

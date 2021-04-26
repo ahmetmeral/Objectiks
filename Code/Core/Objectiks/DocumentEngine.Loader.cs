@@ -95,12 +95,13 @@ namespace Objectiks
 
             Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} number of files : {files.Count}");
 
+            object lastSequence = null;
             int bufferSize = Option.BufferSize;
             var serializer = new JsonSerializer();
 
             foreach (DocumentStorage file in files)
             {
-                Logger?.Debug(DebugType.Engine, $"Read TypeOf: {file.TypeOfName} - File : {file.Target}");
+                Logger?.Debug(DebugType.Engine, $"Read TypeOf: {file.TypeOf} - File : {file.Target}");
 
                 try
                 {
@@ -136,6 +137,8 @@ namespace Objectiks
 
                                 Cache.Set(document, meta.Cache.Expire);
 
+                                lastSequence = document.PrimaryOf;
+
                                 document.Dispose();
                             }
                         }
@@ -143,11 +146,12 @@ namespace Objectiks
                 }
                 catch (Exception ex)
                 {
-                    Logger?.Fatal($"Exception Read TypeOf: {file.TypeOfName} File : {file.Target}", ex);
+                    Logger?.Fatal($"Exception Read TypeOf: {file.TypeOf} File : {file.Target}", ex);
                 }
             }
 
             Cache.Set(meta, meta.Cache.Expire);
+            Cache.Set(new DocumentSequence(typeOf, lastSequence));
 
             return true;
         }
@@ -182,7 +186,7 @@ namespace Objectiks
                 temporySchema.KeyOf = Option.KeyOf;
                 temporySchema.Primary = Option.Primary;
 
-                var schema = new DocumentSerializer().Serialize(temporySchema);
+                var schema = new JSONSerializer().Serialize(temporySchema);
 
                 File.WriteAllText(docSchema, schema, Encoding.UTF8);
 

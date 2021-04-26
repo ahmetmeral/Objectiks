@@ -78,15 +78,15 @@ namespace Objectiks.Engine
             }
         }
 
-        private bool FileLocked(string name)
+        private bool FileLocked(string typeOf)
         {
             int check = 0;
             bool locked = true;
 
-            if (!Locked.ContainsKey(name))
+            if (!Locked.ContainsKey(typeOf))
             {
                 locked = false;
-                Locked.TryAdd(name, true);
+                Locked.TryAdd(typeOf, true);
 
                 return locked;
             }
@@ -98,7 +98,7 @@ namespace Objectiks.Engine
                     {
                         check++;
 
-                        if (Locked.ContainsKey(name))
+                        if (Locked.ContainsKey(typeOf))
                         {
                             Thread.Sleep(3000);
                         }
@@ -119,7 +119,7 @@ namespace Objectiks.Engine
                         }
                     }
 
-                    Locked.TryAdd(name, true);
+                    Locked.TryAdd(typeOf, true);
 
                     locked = false;
 
@@ -128,9 +128,9 @@ namespace Objectiks.Engine
             }
         }
 
-        private bool FileUnlocked(string name)
+        private bool FileUnlocked(string typeOf)
         {
-            Locked.TryRemove(name, out var locked);
+            Locked.TryRemove(typeOf, out var locked);
 
             return locked;
         }

@@ -25,7 +25,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Github", ".Github", "{CE99
 		.github\workflows\DeployToNuget.yml = .github\workflows\DeployToNuget.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Objectiks.PostgreSql", "Code\Core\Objectiks.PostgreSql\Objectiks.PostgreSql.csproj", "{D58350B7-1CA4-4FD5-99DA-34DDFD857A3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Objectiks.PostgreSql", "Code\Core\Objectiks.PostgreSql\Objectiks.PostgreSql.csproj", "{D58350B7-1CA4-4FD5-99DA-34DDFD857A3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadWriteLockSlimDemo", "Code\Tests\ReadWriteLockSlimDemo\ReadWriteLockSlimDemo.csproj", "{6ADF8F43-6CD2-4840-A750-17663B0DA274}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Objectiks.StackExchange.Redis", "Code\Core\Objectiks.StackExchange.Redis\Objectiks.StackExchange.Redis.csproj", "{60CD2385-6F76-41A4-95BB-35359134968F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +57,14 @@ Global
 		{D58350B7-1CA4-4FD5-99DA-34DDFD857A3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D58350B7-1CA4-4FD5-99DA-34DDFD857A3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D58350B7-1CA4-4FD5-99DA-34DDFD857A3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ADF8F43-6CD2-4840-A750-17663B0DA274}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ADF8F43-6CD2-4840-A750-17663B0DA274}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ADF8F43-6CD2-4840-A750-17663B0DA274}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ADF8F43-6CD2-4840-A750-17663B0DA274}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60CD2385-6F76-41A4-95BB-35359134968F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60CD2385-6F76-41A4-95BB-35359134968F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60CD2385-6F76-41A4-95BB-35359134968F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60CD2385-6F76-41A4-95BB-35359134968F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,6 +75,8 @@ Global
 		{A6969037-A142-44CE-8D87-5BDA79B56355} = {24C2C85A-F1BA-4AC1-BEFE-8AC8D4BAE51E}
 		{FE990494-479B-4CAF-A2C1-DDB61E89BB2A} = {24C2C85A-F1BA-4AC1-BEFE-8AC8D4BAE51E}
 		{D58350B7-1CA4-4FD5-99DA-34DDFD857A3D} = {B984598E-8816-41EA-8E85-EE72E2B4A900}
+		{6ADF8F43-6CD2-4840-A750-17663B0DA274} = {24C2C85A-F1BA-4AC1-BEFE-8AC8D4BAE51E}
+		{60CD2385-6F76-41A4-95BB-35359134968F} = {B984598E-8816-41EA-8E85-EE72E2B4A900}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4ACF303-FBE3-4D6A-A43F-00ABED5D4F99}

@@ -1,4 +1,5 @@
-﻿using Objectiks.Models;
+﻿using Objectiks.Helper;
+using Objectiks.Models;
 using Objectiks.Services;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace Objectiks.Engine
         {
             try
             {
-                var manifest = new DocumentSerializer().Get<DocumentManifest>(path);
+                var manifest = new JSONSerializer().Get<DocumentManifest>(path);
 
                 if (manifest.TypeOf == null)
                 {

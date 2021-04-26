@@ -12,7 +12,7 @@ namespace Objectiks.Models
         private int TryCount = 10;
 
         public int Partition { get; set; }
-        public string TypeOfName { get; set; }
+        public string TypeOf { get; set; }
         public string BaseDirectory { get; set; }
         public string DirectoryName { get; set; }
         public string NameWithoutExtension { get; set; }
@@ -29,10 +29,10 @@ namespace Objectiks.Models
         public DocumentStorage(string typeOf, string baseDirectory, int partition = 0)
         {
             Partition = partition;
-            TypeOfName = typeOf;
+            TypeOf = typeOf;
             BaseDirectory = baseDirectory;
-            DirectoryName = Path.Combine(BaseDirectory, DocumentDefaults.Documents, TypeOfName);
-            Name = Partition > 0 ? $"{TypeOfName}.{Partition.ToString("0000")}.json" : $"{TypeOfName}.json";
+            DirectoryName = Path.Combine(BaseDirectory, DocumentDefaults.Documents, TypeOf);
+            Name = Partition > 0 ? $"{TypeOf}.{Partition.ToString("0000")}.json" : $"{TypeOf}.json";
             NameWithoutExtension = Path.GetFileNameWithoutExtension(Name);
             Target = Path.Combine(DirectoryName, Name);
             Exist = new FileInfo(Target).Exists;
@@ -40,7 +40,7 @@ namespace Objectiks.Models
 
         public DocumentStorage(string typeOf, string baseDirectory, FileInfo info)
         {
-            TypeOfName = typeOf;
+            TypeOf = typeOf;
             BaseDirectory = baseDirectory;
             DirectoryName = info.DirectoryName;
             Name = info.Name;
@@ -64,7 +64,7 @@ namespace Objectiks.Models
             WhileTry.Try(() =>
             {
                 return CreateTargetBackup();
-            }, TryCount, true, "Failed to create Target file backup");
+            }, TryCount, true, $"Failed to create Target file backup typeOf: {TypeOf}");
         }
 
         private void CheckDirectories()
@@ -94,9 +94,9 @@ namespace Objectiks.Models
                         File.Delete(Backup);
                     }
                     catch { }
-                }
 
-                File.Copy(Target, Backup);
+                    File.Copy(Target, Backup);
+                }
 
                 return true;
             }
@@ -198,10 +198,13 @@ namespace Objectiks.Models
 
         internal void Rollback()
         {
-            WhileTry.Try(() =>
+            if (File.Exists(Backup))
             {
-                return MoveBackupToTarget();
-            }, TryCount, true, "Rollback : Backup move to target fail..");
+                WhileTry.Try(() =>
+                {
+                    return MoveBackupToTarget();
+                }, TryCount, true, "Rollback : Backup move to target fail..");
+            }
         }
 
         internal void Commit()

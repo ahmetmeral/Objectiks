@@ -15,6 +15,18 @@ namespace Objectiks.Helper
         private int BufferSize = 128;
         private IDocumentLogger Logger = null;
 
+        public JSONSerializer(int? bufferSize = null)
+        {
+            if (bufferSize.HasValue)
+            {
+                BufferSize = bufferSize.Value;
+            }
+            else
+            {
+                BufferSize = 128;
+            }
+        }
+
         public JSONSerializer(IDocumentLogger documentLogger, int? bufferSize = null)
         {
             Logger = documentLogger;

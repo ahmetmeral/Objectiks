@@ -2,6 +2,7 @@
 using Objectiks.Engine;
 using Objectiks.Models;
 using Objectiks.Parsers;
+using Objectiks.Caching.Serializer;
 using Objectiks.Services;
 using System;
 using System.Collections.Concurrent;
@@ -44,6 +45,8 @@ namespace Objectiks
         public DocumentSchemes Schemes { get; set; } = new DocumentSchemes();
         public DocumentVars Vars { get; set; }
 
+        internal IDocumentSerializer Serializer { get; set; }
+
         internal Type CacheType { get; private set; } = typeof(DocumentInMemory);
         internal Type WatcherType { get; private set; }
         internal Type SqlEngineType { get; private set; }
@@ -65,6 +68,11 @@ namespace Objectiks
                 AddParserTypeOf<DocumentOneToManyParser>();
                 AddParserTypeOf<DocumentOneToOneFileParser>();
             }
+
+            if (Serializer == null)
+            {
+                Serializer = new DocumentBsonSerializer();
+            }
         }
 
         public void UseCacheTypeOf<T>() where T : IDocumentCache
@@ -78,9 +86,19 @@ namespace Objectiks
             WatcherType = typeof(T);
         }
 
-        public void UseDocumentLogger<T>() where T : IDocumentLogger
+        public void UseLogger<T>() where T : IDocumentLogger
         {
             LoggerType = typeof(T);
+        }
+
+        public void UseSerializer<T>() where T : IDocumentSerializer
+        {
+            Serializer = (IDocumentSerializer)Activator.CreateInstance(typeof(T));
+        }
+
+        public void UseSerializer(IDocumentSerializer serializer)
+        {
+            Serializer = serializer;
         }
 
         public void AddParserTypeOf<T>() where T : IParser

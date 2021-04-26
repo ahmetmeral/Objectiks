@@ -17,7 +17,7 @@ namespace Objectiks
 {
     public partial class DocumentEngine : IDocumentEngine
     {
-        public virtual void SubmitChanges(DocumentContext context)
+        public virtual void SubmitChanges(DocumentContext context, DocumentTransaction transaction)
         {
             if (context.HasDocuments)
             {
@@ -27,22 +27,22 @@ namespace Objectiks
                 {
                     if (context.Operation == OperationType.Append)
                     {
-                        BulkAppend(context);
+                        BulkAppend(context, transaction);
                     }
                     else if (context.Operation == OperationType.Merge)
                     {
-                        BulkMerge(context);
+                        BulkMerge(context, transaction);
                     }
                     else if (context.Operation == OperationType.Create)
                     {
-                        BulkCreate(context);
+                        BulkCreate(context, transaction);
                     }
                     else if (context.Operation == OperationType.Delete)
                     {
-                        BulkDelete(context);
+                        BulkDelete(context, transaction);
                     }
 
-                    Transaction.AddOperation(context);
+                    transaction.AddOperation(context);
                 }
                 catch (Exception ex)
                 {
@@ -92,25 +92,23 @@ namespace Objectiks
                     }
                 }
             }
-
-            Cache.Set(meta, meta.Cache.Expire);
         }
 
-        public virtual void BulkCreate(DocumentContext context)
+        public virtual void BulkCreate(DocumentContext context, DocumentTransaction transaction)
         {
             var formatting = context.Formatting == Format.Indented ? Formatting.Indented : Formatting.None;
             var json = new JSONSerializer(Logger);
             json.CreateRows(context.Storage, context.Documents.Select(d => d.Data).ToList(), formatting);
         }
 
-        public virtual void BulkAppend(DocumentContext context)
+        public virtual void BulkAppend(DocumentContext context, DocumentTransaction transaction)
         {
             var formatting = context.Formatting == Format.Indented ? Formatting.Indented : Formatting.None;
             var json = new JSONSerializer(Logger);
             json.AppendRows(context.Storage, context.Documents.Select(d => d.Data).ToList(), formatting);
         }
 
-        public virtual void BulkMerge(DocumentContext context)
+        public virtual void BulkMerge(DocumentContext context, DocumentTransaction transaction)
         {
             var formatting = context.Formatting == Format.Indented ? Formatting.Indented : Formatting.None;
             var json = new JSONSerializer(Logger);
@@ -118,7 +116,7 @@ namespace Objectiks
             json.MergeRows(context.Storage, context.Documents.Select(d => d.Data).ToList(), map, formatting);
         }
 
-        public virtual void BulkDelete(DocumentContext context)
+        public virtual void BulkDelete(DocumentContext context, DocumentTransaction transaction)
         {
             var formatting = context.Formatting == Format.Indented ? Formatting.Indented : Formatting.None;
             var json = new JSONSerializer(Logger);

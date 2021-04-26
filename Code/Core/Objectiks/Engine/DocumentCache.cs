@@ -9,17 +9,20 @@ namespace Objectiks.Engine
     public abstract class DocumentCache : IDocumentCache
     {
         public string Bucket { get; set; }
+        public IDocumentSerializer Serializer { get; set; }
 
-        public DocumentCache(string bucket)
+        public DocumentCache(string bucket, IDocumentSerializer serializer)
         {
             Bucket = bucket;
+            Serializer = serializer;
         }
 
         public abstract Document Get(string typeOf, object primaryOf);
 
         public abstract DocumentMeta Get(string typeOf);
-        public abstract Document GetOrCreate(string typeOf, object primaryOf, Func<Document> func);
-        public abstract DocumentMeta GetOrCreate(string typeOf, Func<DocumentMeta> func);
+        public abstract Document GetOrCreateDocument(string typeOf, object primaryOf, Func<Document> func);
+        public abstract DocumentMeta GetOrCreateMeta(string typeOf, Func<DocumentMeta> func);
+        public abstract DocumentSequence GetOrCreateSequence(string typeOf, Func<DocumentSequence> func);
         public abstract void Remove(string typeOf, object primaryOf);
         public abstract void Remove(string typeOf);
         public abstract void Remove(Document document);
@@ -27,7 +30,11 @@ namespace Objectiks.Engine
         public abstract void Reset();
         public abstract void Set(Document document, int expire);
         public abstract void Set(DocumentMeta meta, int expire);
-       
+        public abstract void Set(DocumentSequence sequence);
+        public abstract DocumentSequence GetSequence(string typeOf);
+        public abstract void Set(DocumentInfo info);
+        public abstract DocumentInfo GetDocumentInfo(string typeOf, object primaryOf);
+
 
         public virtual string CacheOf(Document doc)
         {
@@ -36,7 +43,7 @@ namespace Objectiks.Engine
 
         public virtual string CacheOfDocument(string typeOf, object primaryOf)
         {
-            return $"objectiks:{Bucket}:{DocumentDefaults.Documents}:{typeOf}:{primaryOf}".ToLowerInvariant();
+            return $"objectiks:{Bucket}:{typeOf}:{DocumentDefaults.Documents}:{primaryOf}".ToLowerInvariant();
         }
 
         public virtual string CacheOf(DocumentMeta meta)
@@ -46,12 +53,34 @@ namespace Objectiks.Engine
 
         public virtual string CacheOfMeta(string typeOf)
         {
-            return $"objectiks:{Bucket}:{DocumentDefaults.Meta}:{typeOf}".ToLowerInvariant();
+            return $"objectiks:{Bucket}:{typeOf}:{DocumentDefaults.Meta}".ToLowerInvariant();
+        }
+
+        public virtual string CacheOf(DocumentSequence sequence)
+        {
+            return CacheOfSequence(sequence.TypeOf);
+        }
+
+        public virtual string CacheOfSequence(string typeOf)
+        {
+            return $"objectiks:{Bucket}:{typeOf}:{DocumentDefaults.Sequence}".ToLowerInvariant();
+        }
+
+        public virtual string CacheOf(DocumentInfo info)
+        {
+            return CacheOfDocumentInfo(info.TypeOf, info.PrimaryOf);
+        }
+
+        public virtual string CacheOfDocumentInfo(string typeOf, object primaryOf)
+        {
+            return $"objectiks:{Bucket}:{typeOf}:{DocumentDefaults.Info}:{primaryOf.ToString()}".ToLowerInvariant();
         }
 
         protected virtual T CreateNotExistEntity<T>() where T : class
         {
             return (T)Activator.CreateInstance(typeof(T));
         }
+
+
     }
 }

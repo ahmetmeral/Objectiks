@@ -14,13 +14,14 @@ using System.Threading;
 
 namespace Objectiks.Caching
 {
+    //todo: if expire = -1 - NeverRemove 
     public class DocumentInMemory : DocumentCache
     {
         private IMemoryCache Cache;
         private static CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
-        public DocumentInMemory(string bucket)
-            : base(bucket)
+        public DocumentInMemory(string bucket, IDocumentSerializer serializer)
+            : base(bucket, serializer)
         {
             Cache = new MemoryCache(new MemoryCacheOptions { });
         }
@@ -33,7 +34,11 @@ namespace Objectiks.Caching
                 .SetAbsoluteExpiration(expiration);
             options.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
 
-            Cache.Set(CacheOf(document), DocumentSerializer.ToBson(document), options);
+            Cache.Set(CacheOf(document), Serializer.Serialize(document), options);
+
+            var info = new DocumentInfo(document);
+
+            Cache.Set(CacheOf(info), info);
         }
 
         public override void Set(DocumentMeta meta, int expire)
@@ -44,14 +49,46 @@ namespace Objectiks.Caching
                 .SetAbsoluteExpiration(expiration);
             options.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
 
-            Cache.Set(CacheOf(meta), DocumentSerializer.ToBson(meta), options);
+            Cache.Set(CacheOf(meta), Serializer.Serialize(meta), options);
+        }
+
+        public override void Set(DocumentSequence sequence)
+        {
+            var options = new MemoryCacheEntryOptions()
+                .SetPriority(CacheItemPriority.NeverRemove);
+            options.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
+
+            Cache.Set(CacheOf(sequence), Serializer.Serialize(sequence), options);
+        }
+
+        public override void Set(DocumentInfo info)
+        {
+            var options = new MemoryCacheEntryOptions()
+                .SetPriority(CacheItemPriority.NeverRemove);
+            options.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
+
+            Cache.Set(CacheOf(info), Serializer.Serialize(info), options);
+        }
+
+        public override DocumentInfo GetDocumentInfo(string typeOf, object primary)
+        {
+            if (Cache.TryGetValue(CacheOfDocumentInfo(typeOf, primary), out byte[] data))
+            {
+                var info = Serializer.Deserialize<DocumentInfo>(data);
+
+                info.Exists = true;
+
+                return info;
+            }
+
+            return CreateNotExistEntity<DocumentInfo>();
         }
 
         public override Document Get(string typeOf, object primary)
         {
             if (Cache.TryGetValue(CacheOfDocument(typeOf, primary), out byte[] data))
             {
-                var document = DocumentSerializer.FromBson<Document>(data);
+                var document = Serializer.Deserialize<Document>(data);
 
                 document.Exists = true;
 
@@ -65,7 +102,7 @@ namespace Objectiks.Caching
         {
             if (Cache.TryGetValue(CacheOfMeta(typeOf), out byte[] data))
             {
-                DocumentMeta meta = DocumentSerializer.FromBson<DocumentMeta>(data);
+                DocumentMeta meta = Serializer.Deserialize<DocumentMeta>(data);
 
                 meta.Exists = true;
 
@@ -75,7 +112,21 @@ namespace Objectiks.Caching
             return CreateNotExistEntity<DocumentMeta>();
         }
 
-        public override Document GetOrCreate(string typeOf, object primary, Func<Document> func)
+        public override DocumentSequence GetSequence(string typeOf)
+        {
+            if (Cache.TryGetValue(CacheOfSequence(typeOf), out byte[] data))
+            {
+                DocumentSequence sequence = Serializer.Deserialize<DocumentSequence>(data);
+
+                sequence.Exists = true;
+
+                return sequence;
+            }
+
+            return CreateNotExistEntity<DocumentSequence>();
+        }
+
+        public override Document GetOrCreateDocument(string typeOf, object primary, Func<Document> func)
         {
             Document document = Get(typeOf, primary);
 
@@ -87,7 +138,7 @@ namespace Objectiks.Caching
             return document;
         }
 
-        public override DocumentMeta GetOrCreate(string typeOf, Func<DocumentMeta> func)
+        public override DocumentMeta GetOrCreateMeta(string typeOf, Func<DocumentMeta> func)
         {
             DocumentMeta meta = Get(typeOf);
 
@@ -97,6 +148,18 @@ namespace Objectiks.Caching
             }
 
             return meta;
+        }
+
+        public override DocumentSequence GetOrCreateSequence(string typeOf, Func<DocumentSequence> func)
+        {
+            DocumentSequence sequence = GetSequence(typeOf);
+
+            if (!sequence.Exists)
+            {
+                sequence = func();
+            }
+
+            return sequence;
         }
 
         public override void Remove(string typeOf, object primary)
@@ -129,5 +192,7 @@ namespace Objectiks.Caching
 
             _resetCacheToken = new CancellationTokenSource();
         }
+
+
     }
 }

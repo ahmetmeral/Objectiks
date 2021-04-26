@@ -7,20 +7,40 @@ using System.Threading;
 
 namespace Objectiks.Engine
 {
-    internal class TransactionMonitor
+    //burası typeOf üzerinden çalışması gerekiyor.. ReadWriteSlim de bizim işimize yarayabilirz.
+    public class TransactionMonitor
     {
         static object LockObject = new object();
-        private static int LockedTryCount = 25;
-        private static ConcurrentDictionary<string, int> Threads = new ConcurrentDictionary<string, int>();
+        static int LockedTryCount = 25;
 
-        public static bool Locked(int threadId, string name)
+        private static ReaderWriterLockSlim readerWriterLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+        private static ConcurrentDictionary<string, bool> Locked = new ConcurrentDictionary<string, bool>();
+
+        public TransactionMonitor() { }
+
+        public void TryEnterLock(string typeOf, int millisecondsTimeout)
+        {
+
+        }
+
+        public void EnterLock(string typeOf)
+        {
+            readerWriterLock.EnterWriteLock();
+
+            Locked.TryAdd(typeOf, true);
+        }
+
+        public bool EnterLock_Old(string typeOf)
         {
             int check = 0;
             bool locked = true;
 
-            if (!Threads.ContainsKey(name))
+            if (!Locked.ContainsKey(typeOf))
             {
-                locked = !Threads.TryAdd(name, threadId);
+                locked = false;
+                Locked.TryAdd(typeOf, true);
+
+                return locked;
             }
             else
             {
@@ -30,19 +50,14 @@ namespace Objectiks.Engine
                     {
                         check++;
 
-                        if (Threads.ContainsKey(name))
+                        if (Locked.ContainsKey(typeOf))
                         {
-                            if (Threads[name] != threadId)
-                            {
-                                locked = true;
-                                Thread.Sleep(3000);
-                            }
-                            else
-                            {
-                                locked = false;
-
-                                break;
-                            }
+                            Thread.Sleep(3000);
+                        }
+                        else
+                        {
+                            Thread.Sleep(3000);
+                            break;
                         }
 
                         if (check > LockedTryCount)
@@ -50,39 +65,20 @@ namespace Objectiks.Engine
                             break;
                         }
                     }
+
+                    Locked.TryAdd(typeOf, true);
+
+                    locked = false;
+
+                    return locked;
                 }
             }
-
-            return locked;
         }
 
-        public static bool UnLocked(string name)
+        public void ExitLock(string typeOf)
         {
-            Threads.TryRemove(name, out var locked);
-
-            return locked > 0;
-        }
-
-        public static bool UnLocked(int threadId)
-        {
-            try
-            {
-                var keyValuePair = Threads.Where(t => t.Value == threadId).ToList();
-
-                if (keyValuePair.Count > 0)
-                {
-                    foreach (var item in keyValuePair)
-                    {
-                        Threads.Remove(item.Key, out int tid);
-                    }
-                }
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            Locked.TryRemove(typeOf, out var locked);
+            readerWriterLock.ExitWriteLock();
         }
     }
 }
