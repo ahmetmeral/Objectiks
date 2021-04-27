@@ -4,8 +4,7 @@ using System.Text;
 
 namespace Objectiks.Engine.Query
 {
-    public class PrimaryOfValues : List<string>
+    public class KeyOfList : List<string>
     {
-
     }
 }

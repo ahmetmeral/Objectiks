@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Objectiks.StackExchange.Redis
 {
-    public class RedisCacheClient
+    public class RedisClient
     {
         private readonly RedisConnection Connection;
         private readonly IDocumentSerializer Serializer;
@@ -17,13 +17,13 @@ namespace Objectiks.StackExchange.Redis
 
         public RedisDatabase Db0 => GetDatabase(0);
 
-        public RedisCacheClient(string connectionString, IDocumentSerializer serializer = null)
+        public RedisClient(string connectionString, IDocumentSerializer serializer = null)
             : this(new RedisConfiguration(connectionString), serializer)
         {
 
         }
 
-        public RedisCacheClient(RedisConfiguration configuration, IDocumentSerializer serializer = null)
+        public RedisClient(RedisConfiguration configuration, IDocumentSerializer serializer = null)
         {
             Configuration = configuration;
             Serializer = serializer ?? new DocumentBsonSerializer();

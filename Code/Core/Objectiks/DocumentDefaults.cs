@@ -30,6 +30,8 @@ namespace Objectiks
 
         public const string DocumentMetaKeyOfProperty = "KeyOf";
         public const string DocumentMetaPrimaryOfProperty = "PrimaryOf";
+        public const string DocumentMetaWorkOfProperty = "WorkOf";
+        public const string DocumentMetaUserOfProperty = "UserOf";
 
         public static class Errors
         {

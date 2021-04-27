@@ -95,7 +95,6 @@ namespace Objectiks
 
             Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} number of files : {files.Count}");
 
-            object lastSequence = null;
             int bufferSize = Option.BufferSize;
             var serializer = new JsonSerializer();
 
@@ -137,8 +136,6 @@ namespace Objectiks
 
                                 Cache.Set(document, meta.Cache.Expire);
 
-                                lastSequence = document.PrimaryOf;
-
                                 document.Dispose();
                             }
                         }
@@ -151,7 +148,7 @@ namespace Objectiks
             }
 
             Cache.Set(meta, meta.Cache.Expire);
-            Cache.Set(new DocumentSequence(typeOf, lastSequence));
+            Cache.Set(new DocumentSequence(typeOf, meta.Sequence));
 
             return true;
         }

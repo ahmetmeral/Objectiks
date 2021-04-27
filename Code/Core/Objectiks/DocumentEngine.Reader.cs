@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Linq.Dynamic.Core;
 using Objectiks.Helper;
+using System.Threading;
 
 namespace Objectiks
 {
@@ -118,44 +119,57 @@ namespace Objectiks
 
         public virtual DocumentInfo GetTypeOfDocumentInfo(string typeOf, object primaryOf, Type primaryOfDataType)
         {
-            var info = new DocumentInfo(typeOf);
-
-            var sequence = Cache.GetOrCreateSequence(typeOf, () =>
+            try
             {
-                LoadDocumentType(typeOf);
+                MonitorEnter(typeOf);
 
-                return Cache.GetSequence(typeOf);
-            }).GetTypeOfSequence(primaryOfDataType, primaryOf);
+                var info = new DocumentInfo(typeOf);
 
-
-            if (sequence.IsNew)
-            {
-                info.PrimaryOf = sequence.Value;
-                info.Partition = 0;
-                info.Exists = false;
-            }
-            else
-            {
-                var readInfo = Cache.GetDocumentInfo(typeOf, sequence.Value);
-
-                if (readInfo.Exists)
+                var sequence = Cache.GetOrCreateSequence(typeOf, () =>
                 {
-                    info.PrimaryOf = readInfo.PrimaryOf;
-                    info.Partition = readInfo.Partition;
-                    info.Exists = true;
-                }
-                else
+                    LoadDocumentType(typeOf);
+
+                    return Cache.GetSequence(typeOf);
+                }).GetTypeOfSequence(primaryOfDataType, primaryOf);
+
+
+                if (sequence.IsNew)
                 {
                     info.PrimaryOf = sequence.Value;
                     info.Partition = 0;
                     info.Exists = false;
                 }
+                else
+                {
+                    var readInfo = Cache.GetDocumentInfo(typeOf, sequence.Value);
+
+                    if (readInfo.Exists)
+                    {
+                        info.PrimaryOf = readInfo.PrimaryOf;
+                        info.Partition = readInfo.Partition;
+                        info.Exists = true;
+                    }
+                    else
+                    {
+                        info.PrimaryOf = sequence.Value;
+                        info.Partition = 0;
+                        info.Exists = false;
+                    }
+                }
+
+                Cache.Set(info);
+                Cache.Set(new DocumentSequence(typeOf, sequence.Value));
+
+                MonitorExit(typeOf);
+
+                return info;
             }
+            catch (Exception ex)
+            {
+                MonitorExit(typeOf);
 
-            Cache.Set(info);
-            Cache.Set(new DocumentSequence(typeOf, sequence.Value));
-
-            return info;
+                throw ex;
+            }
         }
 
         public virtual Document Read(QueryOf query, DocumentMeta meta = null)
@@ -345,6 +359,17 @@ namespace Objectiks
             return meta;
         }
 
+        private void MonitorEnter(string typeOf)
+        {
+            Monitor.Enter(typeOf.ToLowerInvariant());
+        }
 
+        private void MonitorExit(string typeOf)
+        {
+            if (Monitor.IsEntered(typeOf.ToLowerInvariant()))
+            {
+                Monitor.Exit(typeOf.ToLowerInvariant());
+            }
+        }
     }
 }

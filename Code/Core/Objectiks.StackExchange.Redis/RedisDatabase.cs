@@ -12,6 +12,7 @@ namespace Objectiks.StackExchange.Redis
         public int DatabaseNumber { get; private set; }
         public IDocumentSerializer Serializer { get; private set; }
         public RedisConnection Connection { get; private set; }
+
         public IDatabase Database
         {
             get
@@ -41,6 +42,20 @@ namespace Objectiks.StackExchange.Redis
             return Database.StringSetAsync(key, bytes, null, when, flag);
         }
 
+        public bool Set<T>(RedisKey key, T value, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            var bytes = Serializer.Serialize(value);
+
+            return Database.StringSet(key, bytes, TimeSpan.FromMinutes(expiry), when, flag);
+        }
+
+        public Task<bool> SetAsync<T>(RedisKey key, T value, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            var bytes = Serializer.Serialize(value);
+
+            return Database.StringSetAsync(key, bytes, TimeSpan.FromMinutes(expiry), when, flag);
+        }
+
         public T Get<T>(RedisKey key, CommandFlags flags = CommandFlags.None)
         {
             var bytes = Database.StringGet(key, flags);
@@ -63,6 +78,16 @@ namespace Objectiks.StackExchange.Redis
             }
 
             return Serializer.Deserialize<T>(bytes);
+        }
+
+        public bool Remove(string key, CommandFlags flags = CommandFlags.None)
+        {
+            return Database.KeyDelete(key);
+        }
+
+        public Task<bool> RemoveAsync(string key, CommandFlags flags = CommandFlags.None)
+        {
+            return Database.KeyDeleteAsync(key, flags);
         }
     }
 }

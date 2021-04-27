@@ -39,9 +39,9 @@ namespace Objectiks.Engine
                     manifest.KeyOf = new DocumentKeyOfNames();
                 }
 
-                if (manifest.Cache == null)
+                if (manifest.CacheInfo == null)
                 {
-                    manifest.Cache = new DocumentCacheInfo
+                    manifest.CacheInfo = new DocumentCacheInfo
                     {
                         Expire = DocumentDefaults.CacheExpire
                     };
@@ -49,7 +49,7 @@ namespace Objectiks.Engine
 
                 if (manifest.SupportDocumentWatcher)
                 {
-                    manifest.UseWatcher<DocumentWatcher>();
+                    manifest.UseDocumentWatcher<DocumentWatcher>();
                 }
 
                 return manifest;

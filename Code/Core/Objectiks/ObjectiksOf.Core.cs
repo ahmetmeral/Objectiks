@@ -9,6 +9,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Objectiks.Caching;
 
 namespace Objectiks
 {
@@ -30,9 +31,9 @@ namespace Objectiks
                         option = GetOption(documentProvider);
                     }
 
-                    if(option.Serializer == null)
+                    if (option.CacheInstance == null)
                     {
-                        option.Serializer = new DocumentBsonSerializer();
+                        option.CacheInstance = new DocumentInMemory(option.Name, new DocumentBsonSerializer());
                     }
 
                     if (documentProvider.Connection == null)
@@ -41,9 +42,9 @@ namespace Objectiks
                     }
                     else
                     {
-                        if (option.SqlEngineType != null)
+                        if (option.EngineProvider != null)
                         {
-                            engine = (DocumentEngine)Activator.CreateInstance(option.SqlEngineType, documentProvider, option);
+                            engine = (DocumentEngine)Activator.CreateInstance(option.EngineProvider, documentProvider, option);
                         }
                         else
                         {

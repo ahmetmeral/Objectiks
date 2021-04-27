@@ -18,15 +18,13 @@ namespace Objectiks
     public partial class DocumentEngine : IDocumentEngine
     {
         public DocumentOption Option { get; private set; }
-        public IDocumentLogger Logger { get; private set; }
         public DocumentProvider Provider { get; internal set; }
+        public IDocumentLogger Logger { get; private set; }
         public IDocumentCache Cache { get; private set; }
         public IDocumentWatcher Watcher { get; private set; }
         public List<IParser> ParseOf { get; private set; }
         public DocumentTypes TypeOf { get; set; }
         public bool FirstLoaded { get; set; }
-
-        private static object LockedObject = new object();
 
         public DocumentEngine() { }
 
@@ -34,9 +32,9 @@ namespace Objectiks
         {
             Option = option;
             Provider = documentProvider;
-            Cache = GetDocumentCache(option.CacheType, Provider.CacheBucket, option.Serializer);
-            Logger = GetDocumentLogger(option.LoggerType);
-            Watcher = GetDocumentWatcher(option.WatcherType);
+            Cache = option.CacheInstance;
+            Logger = option.DocumentLogger;
+            Watcher = option.DocumentWatcher;
             ParseOf = GetDocumentParsers(option.ParserOfTypes);
             TypeOf = new DocumentTypes();
 
@@ -64,14 +62,14 @@ namespace Objectiks
             if (schema == null)
             {
                 schema = DocumentSchema.Default();
-                schema.Cache = Option.Cache;
+                schema.Cache = Option.CacheInfo;
 
                 Logger?.Debug(DebugType.Engine, $"TypeOf: {typeOf} GetDocumentSchema Schema is null");
             }
 
             if (schema.Cache == null)
             {
-                schema.Cache = Option.Cache;
+                schema.Cache = Option.CacheInfo;
             }
 
             if (String.IsNullOrEmpty(schema.ParseOf))
@@ -117,7 +115,7 @@ namespace Objectiks
 
             if (!String.IsNullOrEmpty(meta.Account) && target.ContainsKey(meta.Account))
             {
-                document.AccountOf = target[meta.Account].AsString();
+                document.WorkOf = target[meta.Account].AsString();
             }
 
             if (!String.IsNullOrEmpty(meta.User) && target.ContainsKey(meta.User))
@@ -193,31 +191,6 @@ namespace Objectiks
             var path = Path.Combine(baseDirectory, DocumentDefaults.Manifest);
 
             return DocumentManifest.Get(path);
-        }
-
-        protected virtual DocumentCache GetDocumentCache(Type type, string bucket, IDocumentSerializer serializer)
-        {
-            return (DocumentCache)Activator.CreateInstance(type, bucket, serializer);
-        }
-
-        protected virtual DocumentWatcher GetDocumentWatcher(Type type)
-        {
-            if (type == null)
-            {
-                return null;
-            }
-
-            return (DocumentWatcher)Activator.CreateInstance(type);
-        }
-
-        protected virtual IDocumentLogger GetDocumentLogger(Type type)
-        {
-            if (type == null)
-            {
-                return null;
-            }
-
-            return (IDocumentLogger)Activator.CreateInstance(type);
         }
 
         protected virtual List<IParser> GetDocumentParsers(List<Type> parseOfList)

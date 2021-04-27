@@ -33,7 +33,7 @@ namespace Objectik.Test.Web.Providers
             BufferSize = 512;
 
             RegisterDefaultTypeOrParser();
-            UseWatcher<DocumentWatcher>();
+            UseDocumentWatcher<DocumentWatcher>();
         }
     }
 }

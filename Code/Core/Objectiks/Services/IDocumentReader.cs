@@ -12,6 +12,8 @@ namespace Objectiks.Services
         IDocumentReader<T> TypeOf(string typeOf);
         IDocumentReader<T> TypeOf(string typeOf, object primaryOf);
         IDocumentReader<T> PrimaryOf(object primaryOf);
+        IDocumentReader<T> WorkOf(object workOf);
+        IDocumentReader<T> UserOf(object userOf);
         IDocumentReader<T> KeyOf(object keyOf);
         IDocumentReader<T> Any();
 

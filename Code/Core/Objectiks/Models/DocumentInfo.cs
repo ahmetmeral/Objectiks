@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,6 +10,8 @@ namespace Objectiks.Models
         public string TypeOf { get; set; }
         public object PrimaryOf { get; set; }
         public int Partition { get; set; }
+
+        [JsonIgnore]
         public bool Exists { get; set; }
 
         public DocumentInfo() { }

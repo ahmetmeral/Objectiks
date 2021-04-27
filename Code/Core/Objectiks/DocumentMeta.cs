@@ -9,6 +9,7 @@ using System.Threading;
 using Objectiks.Extentions;
 using System.IO;
 using Objectiks.Services;
+using Newtonsoft.Json;
 
 namespace Objectiks
 {
@@ -31,6 +32,8 @@ namespace Objectiks
         public DocumentCacheInfo Cache { get; set; }
         public DocumentPartitions Partitions { get; set; }
         public string Directory { get; set; }
+
+        [JsonIgnore]
         public bool Exists { get; set; }
 
 
@@ -279,7 +282,7 @@ namespace Objectiks
                 AddKeys(
                     new DocumentKey(
                     document.PrimaryOf,
-                    document.AccountOf,
+                    document.WorkOf,
                     document.UserOf,
                     document.CacheOf,
                     document.KeyOf,
@@ -295,7 +298,7 @@ namespace Objectiks
                 UpdateKeys(
                     new DocumentKey(
                     document.PrimaryOf,
-                    document.AccountOf,
+                    document.WorkOf,
                     document.UserOf,
                     document.CacheOf,
                     document.KeyOf,

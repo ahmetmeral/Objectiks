@@ -7,9 +7,9 @@ using System.Text;
 
 namespace Objectiks.Integrations.Options
 {
-    public class PostgreSqlProviderOption : DocumentOption
+    public class PostgreEngineProviderOption : DocumentOption
     {
-        public PostgreSqlProviderOption() : base()
+        public PostgreEngineProviderOption() : base()
         {
             var page = new DocumentSchema
             {
@@ -30,7 +30,7 @@ namespace Objectiks.Integrations.Options
 
             RegisterDefaultTypeOrParser();
 
-            UseSqlEngine<PostgreSqlEngine>();
+            UseEngineProvider<PostgreSqlEngine>();
         }
     }
 }

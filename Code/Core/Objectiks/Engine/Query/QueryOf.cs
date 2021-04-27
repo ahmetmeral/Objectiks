@@ -20,11 +20,14 @@ namespace Objectiks.Engine.Query
         }
     }
 
+    //todo:WorkOf or UserOf query builder check..
     public class QueryOf
     {
         public string TypeOf { get; internal set; }
-        public PrimaryOfValues PrimaryOfList { get; internal set; }
-        public KeyOfValues KeyOfList { get; internal set; }
+        public PrimaryOfList PrimaryOfList { get; internal set; }
+        public WorkOfList WorkOfList { get; internal set; }
+        public UserOfList UserOfList { get; internal set; }
+        public KeyOfList KeyOfList { get; internal set; }
         public DocumentRefs RefList { get; internal set; }
         public int Skip { get; internal set; }
         public int Take { get; internal set; }
@@ -75,8 +78,10 @@ namespace Objectiks.Engine.Query
 
         private void Initialize(string typeOf, params object[] primaryOf)
         {
-            PrimaryOfList = new PrimaryOfValues();
-            KeyOfList = new KeyOfValues();
+            PrimaryOfList = new PrimaryOfList();
+            WorkOfList = new WorkOfList();
+            UserOfList = new UserOfList();
+            KeyOfList = new KeyOfList();
             RefList = new DocumentRefs();
             WhereByAndList = new WhereBy();
             ValueByList = new ValueBy();
@@ -107,6 +112,46 @@ namespace Objectiks.Engine.Query
                 {
                     PrimaryOfList.Add(key.ToString());
                     ContainsBy(DocumentDefaults.DocumentMetaPrimaryOfProperty, key);
+                }
+            }
+        }
+
+        public void WorkOf(List<object> workOf)
+        {
+            WorkOf(workOf.ToArray());
+        }
+
+        public void WorkOf(params object[] workOf)
+        {
+            foreach (var key in workOf)
+            {
+                if (key == null)
+                    continue;
+
+                if (!WorkOfList.Contains(key.ToString()))
+                {
+                    WorkOfList.Add(key.ToString());
+                    ContainsBy(DocumentDefaults.DocumentMetaWorkOfProperty, key);
+                }
+            }
+        }
+
+        public void UserOf(List<object> userOf)
+        {
+            UserOf(userOf.ToArray());
+        }
+
+        public void UserOf(params object[] userOf)
+        {
+            foreach (var key in userOf)
+            {
+                if (key == null)
+                    continue;
+
+                if (!UserOfList.Contains(key.ToString()))
+                {
+                    UserOfList.Add(key.ToString());
+                    ContainsBy(DocumentDefaults.DocumentMetaUserOfProperty, key);
                 }
             }
         }

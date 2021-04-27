@@ -41,16 +41,15 @@ namespace Objectiks
         public bool SupportLoaderPaging { get; set; } = false;
         public bool SupportDocumentWriter { get; set; } = true;
 
-        public DocumentCacheInfo Cache { get; set; } = new DocumentCacheInfo { Expire = 10000 };
+        public DocumentCacheInfo CacheInfo { get; set; } = new DocumentCacheInfo { Expire = 10000 };
         public DocumentSchemes Schemes { get; set; } = new DocumentSchemes();
         public DocumentVars Vars { get; set; }
 
-        internal IDocumentSerializer Serializer { get; set; }
+        internal IDocumentCache CacheInstance { get; set; }
+        internal IDocumentWatcher DocumentWatcher { get; set; }
+        internal IDocumentLogger DocumentLogger { get; set; }
 
-        internal Type CacheType { get; private set; } = typeof(DocumentInMemory);
-        internal Type WatcherType { get; private set; }
-        internal Type SqlEngineType { get; private set; }
-        internal Type LoggerType { get; private set; }
+        internal Type EngineProvider { get; private set; }
         internal List<Type> ParserOfTypes { get; private set; }
 
         public DocumentOption()
@@ -69,36 +68,31 @@ namespace Objectiks
                 AddParserTypeOf<DocumentOneToOneFileParser>();
             }
 
-            if (Serializer == null)
+            if (CacheInstance == null)
             {
-                Serializer = new DocumentBsonSerializer();
+                CacheInstance = new DocumentInMemory(Name, new DocumentBsonSerializer());
             }
         }
 
-        public void UseCacheTypeOf<T>() where T : IDocumentCache
+        public void UseCacheProvider(DocumentCache documentCache)
         {
-            CacheType = typeof(T);
+            CacheInstance = documentCache;
         }
 
-        public void UseWatcher<T>() where T : IDocumentWatcher
+        public void UseEngineProvider<T>() where T : IDocumentEngine
+        {
+            EngineProvider = typeof(T);
+        }
+
+        public void UseDocumentWatcher<T>() where T : IDocumentWatcher
         {
             SupportDocumentWatcher = true;
-            WatcherType = typeof(T);
+            DocumentWatcher = (DocumentWatcher)Activator.CreateInstance(typeof(T));
         }
 
-        public void UseLogger<T>() where T : IDocumentLogger
+        public void UseDocumentLogger<T>() where T : IDocumentLogger
         {
-            LoggerType = typeof(T);
-        }
-
-        public void UseSerializer<T>() where T : IDocumentSerializer
-        {
-            Serializer = (IDocumentSerializer)Activator.CreateInstance(typeof(T));
-        }
-
-        public void UseSerializer(IDocumentSerializer serializer)
-        {
-            Serializer = serializer;
+            DocumentLogger = (IDocumentLogger)Activator.CreateInstance(typeof(T));
         }
 
         public void AddParserTypeOf<T>() where T : IParser
@@ -106,16 +100,9 @@ namespace Objectiks
             ParserOfTypes.Add(typeof(T));
         }
 
-        public void UseSqlEngine<T>() where T : IDocumentEngine
-        {
-            SqlEngineType = typeof(T);
-        }
-
         public void ClearParserOf()
         {
             ParserOfTypes?.Clear();
         }
     }
-
-
 }

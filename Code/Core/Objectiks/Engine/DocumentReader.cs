@@ -54,6 +54,20 @@ namespace Objectiks.Engine
             return this;
         }
 
+        public IDocumentReader<T> WorkOf(object workOf)
+        {
+            Query.WorkOf(workOf);
+
+            return this;
+        }
+
+        public IDocumentReader<T> UserOf(object userOf)
+        {
+            Query.UserOf(userOf);
+
+            return this;
+        }
+
         public IDocumentReader<T> KeyOf(object keyOf)
         {
             Query.KeyOf(keyOf.ToString());

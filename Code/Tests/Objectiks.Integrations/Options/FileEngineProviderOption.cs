@@ -6,9 +6,9 @@ using System.Text;
 
 namespace Objectiks.Integrations.Option
 {
-    public class FileProviderOption : DocumentOption
+    public class FileEngineProviderOption : DocumentOption
     {
-        public FileProviderOption() : base()
+        public FileEngineProviderOption() : base()
         {
             var page = new DocumentSchema
             {
@@ -34,7 +34,7 @@ namespace Objectiks.Integrations.Option
             SupportPartialStorage = false;
 
             RegisterDefaultTypeOrParser();
-            UseWatcher<DocumentWatcher>();
+            UseDocumentWatcher<DocumentWatcher>();
         }
     }
 }

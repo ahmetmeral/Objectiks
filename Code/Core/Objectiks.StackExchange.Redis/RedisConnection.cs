@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Objectiks.StackExchange.Redis
@@ -9,49 +10,62 @@ namespace Objectiks.StackExchange.Redis
     public class RedisConnection
     {
         private readonly RedisConfiguration Configuration;
-        private readonly ConcurrentBag<Lazy<RedisConnectionState>> States;
+        private readonly ConcurrentBag<Lazy<RedisConnectionPool>> Pool;
 
         public RedisConnection(RedisConfiguration redisConfiguration)
         {
             Configuration = redisConfiguration;
-            States = new ConcurrentBag<Lazy<RedisConnectionState>>();
+            Pool = new ConcurrentBag<Lazy<RedisConnectionPool>>();
+
+            EmitConnections();
         }
 
         public IConnectionMultiplexer GetConnection()
         {
-            return ConnectionMultiplexer.Connect(Configuration.GetConfiguration());
-        }
-    }
+            var isValueCreatedCount = Pool.Count(lazy => lazy.IsValueCreated);
 
-    public class RedisConnectionState : IDisposable
-    {
-        public IConnectionMultiplexer Connection { get; set; }
+            if (isValueCreatedCount == this.Pool.Count)
+            {
+                return Pool.OrderBy(x => x.Value.TotalOutstanding()).First().Value.Connection;
+            }
 
+            foreach (var item in Pool)
+            {
+                if (!item.IsValueCreated)
+                {
+                    return item.Value.Connection;
+                }
 
-        public RedisConnectionState(IConnectionMultiplexer multiplexer)
-        {
-            Connection = multiplexer ?? throw new ArgumentNullException(nameof(multiplexer));
-            Connection.ConnectionFailed += ConnectionFailed;
-            Connection.ConnectionRestored += ConnectionRestored;
-        }
+                if (item.Value.TotalOutstanding() == 0)
+                {
+                    return item.Value.Connection;
+                }
+            }
 
-        public bool IsConnected() => !Connection.IsConnecting;
-
-        private void ConnectionFailed(object sender, ConnectionFailedEventArgs e)
-        {
-
-        }
-
-        private void ConnectionRestored(object sender, ConnectionFailedEventArgs e)
-        {
-
+            return this.Pool.First().Value.Connection;
         }
 
-        public void Dispose()
+        private void EmitConnection()
         {
-            Connection.ConnectionFailed -= ConnectionFailed;
-            Connection.ConnectionRestored -= ConnectionRestored;
-            Connection.Dispose();
+            Pool.Add(new Lazy<RedisConnectionPool>(() =>
+            {
+                var multiplexer = ConnectionMultiplexer.Connect(Configuration.GetOptions());
+
+                return new RedisConnectionPool(multiplexer);
+            }));
+        }
+
+        private void EmitConnections()
+        {
+            if (Pool.Count >= Configuration.PoolSize)
+            {
+                return;
+            }
+
+            for (int i = 0; i < Configuration.PoolSize; i++)
+            {
+                EmitConnection();
+            }
         }
     }
 }

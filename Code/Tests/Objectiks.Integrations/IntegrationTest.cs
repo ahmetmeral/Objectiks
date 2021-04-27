@@ -19,8 +19,8 @@ namespace Objectiks.Integrations
         [SetUp]
         public void Setup()
         {
-            ObjectiksOf.Core.Map(typeof(DocumentProvider), new FileProviderOption());
-            ObjectiksOf.Core.Map(typeof(NpgsqlConnection), new PostgreSqlProviderOption());
+            ObjectiksOf.Core.Map(typeof(DocumentProvider), new FileEngineProviderOption());
+            ObjectiksOf.Core.Map(typeof(NpgsqlConnection), new PostgreEngineProviderOption());
         }
 
 

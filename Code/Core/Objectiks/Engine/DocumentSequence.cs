@@ -1,4 +1,5 @@
-﻿using Objectiks.Models;
+﻿using Newtonsoft.Json;
+using Objectiks.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,6 +18,8 @@ namespace Objectiks.Engine
         public string TypeOf { get; set; }
         public object Sequence { get; set; }
         public DateTime UpdatedAt { get; set; }
+
+        [JsonIgnore]
         public bool Exists { get; set; }
 
         public DocumentSequence(string typeOf, object sequence)

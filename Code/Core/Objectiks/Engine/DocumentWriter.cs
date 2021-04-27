@@ -82,7 +82,7 @@ namespace Objectiks.Engine
             {
                 CacheOf = attr.CacheOf,
                 PrimaryOf = attr.Primary,
-                AccountOf = attr.Account,
+                WorkOf = attr.Account,
                 UserOf = attr.User,
                 Data = JObject.FromObject(model),
                 Partition = attr.Partition,
@@ -237,8 +237,6 @@ namespace Objectiks.Engine
 
         public void AddDocument(T document, bool clearDocumentRefs = true)
         {
-            TransactionMonitor.EnterLock(TypeOf);
-
             if (document == null)
             {
                 throw new Exception("Document is null");
@@ -267,8 +265,6 @@ namespace Objectiks.Engine
             }
 
             Enqueue(doc, partition);
-
-            TransactionMonitor.ExitLock(TypeOf);
         }
 
         public void AddDocuments(List<T> documents, bool clearDocumentRefs = true)
@@ -325,6 +321,19 @@ namespace Objectiks.Engine
             }
         }
 
+        private void MonitorEnter()
+        {
+            Monitor.Enter(TypeOf.ToLowerInvariant());
+        }
+
+        private void MonitorExit()
+        {
+            if (Monitor.IsEntered(TypeOf.ToLowerInvariant()))
+            {
+                Monitor.Exit(TypeOf.ToLowerInvariant());
+            }
+        }
+
         private void Execute()
         {
             if (Queue.Count == 0) return;
@@ -335,7 +344,7 @@ namespace Objectiks.Engine
 
                 ReOrderPartitionByOperation();
 
-                TransactionMonitor.EnterLock(TypeOf);
+                MonitorEnter();
 
                 while (Partitions.TryDequeue(out var partOf))
                 {
@@ -353,7 +362,7 @@ namespace Objectiks.Engine
                     Engine.SubmitChanges(context, Transaction);
                 }
 
-                TransactionMonitor.ExitLock(TypeOf);
+                MonitorExit();
 
                 Queue.Clear();
                 Partitions.Clear();
@@ -403,6 +412,7 @@ namespace Objectiks.Engine
         public void Dispose()
         {
             this.Wait();
+            this.MonitorExit();
             GC.SuppressFinalize(this);
             Engine.Watcher?.UnLock();
         }

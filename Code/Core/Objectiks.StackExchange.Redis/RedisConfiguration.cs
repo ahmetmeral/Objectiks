@@ -9,6 +9,11 @@ namespace Objectiks.StackExchange.Redis
     {
         private ConfigurationOptions Options;
         public string ConnectionString { get; set; }
+        public int Database { get; set; } = 0;
+        public int PoolSize { get; set; } = 5;
+        public int ConnectionTimeout { get; set; } = 5000;
+        public int SyncTimeout { get; set; } = 5000;
+        public RedisHost[] Hosts { get; set; }
 
 
         public RedisConfiguration() { }
@@ -18,9 +23,25 @@ namespace Objectiks.StackExchange.Redis
             ConnectionString = connectionString;
         }
 
-        public ConfigurationOptions GetConfiguration()
+        public ConfigurationOptions GetOptions()
         {
-            Options = ConfigurationOptions.Parse(ConnectionString);
+            if (!String.IsNullOrEmpty(ConnectionString))
+            {
+                Options = ConfigurationOptions.Parse(ConnectionString);
+            }
+            else
+            {
+                Options = new ConfigurationOptions
+                {
+                    ConnectTimeout = ConnectionTimeout,
+                    SyncTimeout = SyncTimeout
+                };
+
+                foreach (var redis in Hosts)
+                {
+                    Options.EndPoints.Add(redis.Host, redis.Port);
+                }
+            }
 
             return Options;
         }
