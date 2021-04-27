@@ -134,5 +134,16 @@ namespace Objectiks
 
             return attr.Name;
         }
+
+        public void Flush()
+        {
+            Engine.Cache.Flush();
+        }
+
+        public void Reload()
+        {
+            Engine.FirstLoaded = false;
+            Engine.FirstLoadAllDocumentType();
+        }
     }
 }

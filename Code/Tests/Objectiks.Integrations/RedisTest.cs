@@ -36,6 +36,33 @@ namespace Objectiks.Integrations
         }
 
         [Test]
+        public void WriterTest()
+        {
+            var size = 2;
+            var pages = TestSetup.GeneratePages(size, false);
+            var repos = new ObjectiksOf();
+            
+            var meta_before = repos.GetTypeMeta<Pages>();
+
+            using (var writer = repos.WriterOf<Pages>())
+            {
+                writer.UseFormatting();
+
+                foreach (var page in pages)
+                {
+                    writer.AddDocument(page);
+                }
+
+                writer.SubmitChanges();
+            }
+
+            var meta_after = repos.GetTypeMeta<Pages>();
+
+            repos.Flush();
+            repos.Reload();
+        }
+
+        [Test]
         public void DocumentTransactionParalelTest()
         {
             var size = 5;

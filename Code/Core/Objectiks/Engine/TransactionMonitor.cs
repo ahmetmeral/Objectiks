@@ -13,24 +13,11 @@ namespace Objectiks.Engine
         static object LockObject = new object();
         static int LockedTryCount = 25;
 
-        private static ReaderWriterLockSlim readerWriterLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         private static ConcurrentDictionary<string, bool> Locked = new ConcurrentDictionary<string, bool>();
 
         public TransactionMonitor() { }
 
-        public void TryEnterLock(string typeOf, int millisecondsTimeout)
-        {
-
-        }
-
-        public void EnterLock(string typeOf)
-        {
-            readerWriterLock.EnterWriteLock();
-
-            Locked.TryAdd(typeOf, true);
-        }
-
-        public bool EnterLock_Old(string typeOf)
+        public static bool EnterLock(string typeOf)
         {
             int check = 0;
             bool locked = true;
@@ -75,10 +62,9 @@ namespace Objectiks.Engine
             }
         }
 
-        public void ExitLock(string typeOf)
+        public static void ExitLock(string typeOf)
         {
             Locked.TryRemove(typeOf, out var locked);
-            readerWriterLock.ExitWriteLock();
         }
     }
 }

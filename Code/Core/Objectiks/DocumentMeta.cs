@@ -18,7 +18,7 @@ namespace Objectiks
         public string TypeOf { get; set; }
         public string ParseOf { get; set; }
         public string Primary { get; set; }
-        public string Account { get; set; }
+        public string Workspace { get; set; }
         public string User { get; set; }
         public object Sequence { get; set; } = 0;
         public long TotalRecords { get; set; }
@@ -291,6 +291,7 @@ namespace Objectiks
 
                 TotalRecords++;
                 Partitions[document.Partition]++;
+
                 UpdateSequence(document.PrimaryOf);
             }
             else if (operation == OperationType.Merge)
@@ -310,7 +311,6 @@ namespace Objectiks
                 TotalRecords--;
                 Partitions[document.Partition]--;
                 RemoveKeys(document.PrimaryOf);
-                //todo:remove cache..
             }
 
             return document.PrimaryOf;

@@ -4,6 +4,7 @@ using Objectiks.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Objectiks.StackExchange.Redis
 {
@@ -53,17 +54,44 @@ namespace Objectiks.StackExchange.Redis
 
         public override Document Get(string typeOf, object primaryOf)
         {
-            return Database.Get<Document>(CacheOfDocument(typeOf, primaryOf));
+            var document = Database.Get<Document>(CacheOfDocument(typeOf, primaryOf));
+
+            if (document != null)
+            {
+                document.Exists = true;
+
+                return document;
+            }
+
+            return CreateNotExistEntity<Document>();
         }
 
         public override DocumentMeta Get(string typeOf)
         {
-            return Database.Get<DocumentMeta>(CacheOfMeta(typeOf));
+            var meta = Database.Get<DocumentMeta>(CacheOfMeta(typeOf));
+
+            if (meta != null)
+            {
+                meta.Exists = true;
+
+                return meta;
+            }
+
+            return CreateNotExistEntity<DocumentMeta>();
         }
 
         public override DocumentInfo GetDocumentInfo(string typeOf, object primaryOf)
         {
-            return Database.Get<DocumentInfo>(CacheOfDocumentInfo(typeOf, primaryOf));
+            var info = Database.Get<DocumentInfo>(CacheOfDocumentInfo(typeOf, primaryOf));
+
+            if (info != null)
+            {
+                info.Exists = true;
+
+                return info;
+            }
+
+            return CreateNotExistEntity<DocumentInfo>();
         }
 
         public override Document GetOrCreateDocument(string typeOf, object primaryOf, Func<Document> func)
@@ -127,11 +155,21 @@ namespace Objectiks.StackExchange.Redis
             Database.Remove(CacheOf(meta));
         }
 
-        public override void Reset()
+        public override void Flush()
         {
+            var endPoints = Client.GetDatabase(0).Database.Multiplexer.GetEndPoints();
 
+            var tasks = new List<Task>(endPoints.Length);
+
+            for (var i = 0; i < endPoints.Length; i++)
+            {
+                var server = Client.GetDatabase(0).Database.Multiplexer.GetServer(endPoints[i]);
+
+                if (!server.IsReplica)
+                    tasks.Add(server.FlushDatabaseAsync(Database.Number));
+            }
+
+             Task.WhenAll(tasks);
         }
-
-
     }
 }

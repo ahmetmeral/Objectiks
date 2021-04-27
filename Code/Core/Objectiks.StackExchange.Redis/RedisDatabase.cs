@@ -9,15 +9,15 @@ namespace Objectiks.StackExchange.Redis
 {
     public class RedisDatabase
     {
-        public int DatabaseNumber { get; private set; }
+        public int Number { get; private set; }
         public IDocumentSerializer Serializer { get; private set; }
         public RedisConnection Connection { get; private set; }
 
-        public IDatabase Database
+        internal IDatabase Database
         {
             get
             {
-                return Connection.GetConnection().GetDatabase(DatabaseNumber);
+                return Connection.GetConnection().GetDatabase(Number);
             }
         }
 
@@ -25,7 +25,7 @@ namespace Objectiks.StackExchange.Redis
         {
             Connection = connection;
             Serializer = serializer;
-            DatabaseNumber = databaseNumber;
+            Number = databaseNumber;
         }
 
         public bool Set<T>(RedisKey key, T value, When when = When.Always, CommandFlags flag = CommandFlags.None)

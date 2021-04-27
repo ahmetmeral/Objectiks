@@ -25,7 +25,7 @@ namespace Objectiks.Services
         void Remove(string typeOf);
         void Remove(Document document);
         void Remove(DocumentMeta meta);
-        void Reset();
+        void Flush();
         string CacheOf(Document document);
         string CacheOfDocument(string typeOf, object primaryOf);
         string CacheOf(DocumentMeta meta);

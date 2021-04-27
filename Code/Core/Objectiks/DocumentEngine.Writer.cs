@@ -25,6 +25,8 @@ namespace Objectiks
 
                 try
                 {
+                    Watcher?.Lock();
+
                     if (context.Operation == OperationType.Append)
                     {
                         BulkAppend(context, transaction);
@@ -43,6 +45,8 @@ namespace Objectiks
                     }
 
                     transaction.AddOperation(context);
+
+                    Watcher?.UnLock();
                 }
                 catch (Exception ex)
                 {

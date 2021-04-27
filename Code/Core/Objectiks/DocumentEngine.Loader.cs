@@ -58,21 +58,21 @@ namespace Objectiks
                 var parts = new List<int>();
                 foreach (var file in directoryFiles)
                 {
-                    var info = new DocumentStorage(meta.TypeOf, Provider?.BaseDirectory, file);
+                    var storage = new DocumentStorage(meta.TypeOf, Provider?.BaseDirectory, file);
 
-                    if (info.Partition > meta.Partitions.Current)
+                    if (storage.Partition > meta.Partitions.Current)
                     {
-                        meta.Partitions.Current = info.Partition;
+                        meta.Partitions.Current = storage.Partition;
                     }
 
-                    if (!parts.Contains(info.Partition))
+                    if (!parts.Contains(storage.Partition))
                     {
-                        parts.Add(info.Partition);
+                        parts.Add(storage.Partition);
                     }
 
                     meta.DiskSize += file.Length;
 
-                    files.Add(info);
+                    files.Add(storage);
                 }
 
                 parts = parts.OrderBy(p => p).ToList();

@@ -113,9 +113,9 @@ namespace Objectiks
             document.KeyOf = target.ToKeyOfValues(meta.TypeOf, meta.KeyOfNames, meta.Primary);
             document.Partition = partition;
 
-            if (!String.IsNullOrEmpty(meta.Account) && target.ContainsKey(meta.Account))
+            if (!String.IsNullOrEmpty(meta.Workspace) && target.ContainsKey(meta.Workspace))
             {
-                document.WorkOf = target[meta.Account].AsString();
+                document.WorkOf = target[meta.Workspace].AsString();
             }
 
             if (!String.IsNullOrEmpty(meta.User) && target.ContainsKey(meta.User))

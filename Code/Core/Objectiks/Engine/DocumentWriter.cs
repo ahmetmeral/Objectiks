@@ -39,6 +39,8 @@ namespace Objectiks.Engine
 
         internal DocumentWriter(DocumentEngine engine, string typeOf, DocumentTransaction transaction = null)
         {
+            Ensure.NotNullOrEmpty(typeOf, "TypeOf is empty");
+
             TypeOf = typeOf;
             Engine = engine;
             Meta = engine.GetTypeMeta(typeOf);
@@ -57,6 +59,7 @@ namespace Objectiks.Engine
             {
                 Transaction = transaction;
             }
+
         }
 
         private void ReOrderPartitionByOperation()
@@ -80,6 +83,7 @@ namespace Objectiks.Engine
 
             var document = new Document
             {
+                TypeOf = attr.TypeOf,
                 CacheOf = attr.CacheOf,
                 PrimaryOf = attr.Primary,
                 WorkOf = attr.Account,
@@ -94,6 +98,8 @@ namespace Objectiks.Engine
             {
                 RemoveIgnoredOrRefProperty(ref document, attr);
             }
+
+            Ensure.NotNullOrEmpty(document.TypeOf, "Document typeOf is empty");
 
             return document;
         }
@@ -113,6 +119,11 @@ namespace Objectiks.Engine
             else
             {
                 doc.TypeOf = typeOf.Name;
+
+                if (String.IsNullOrWhiteSpace(doc.TypeOf))
+                {
+                    doc.TypeOf = type.Name;
+                }
             }
 
             foreach (PropertyInfo property in properties)
@@ -140,7 +151,11 @@ namespace Objectiks.Engine
                 {
                     var primaryValue = property.GetValue(model, null);
 
-                    var info = Engine.GetTypeOfDocumentInfo(TypeOf, primaryValue, property.PropertyType);
+                    Transaction.EnterTypeOfLock(doc.TypeOf);
+
+                    var info = Engine.GetTypeOfDocumentInfo(doc.TypeOf, primaryValue, property.PropertyType);
+
+                    Transaction.ExitTypeOfLock(doc.TypeOf);
 
                     doc.Primary = info.PrimaryOf.ToString();
                     doc.CacheOf = Engine.Cache.CacheOfDocument(doc.TypeOf, doc.Primary);
@@ -321,30 +336,13 @@ namespace Objectiks.Engine
             }
         }
 
-        private void MonitorEnter()
-        {
-            Monitor.Enter(TypeOf.ToLowerInvariant());
-        }
-
-        private void MonitorExit()
-        {
-            if (Monitor.IsEntered(TypeOf.ToLowerInvariant()))
-            {
-                Monitor.Exit(TypeOf.ToLowerInvariant());
-            }
-        }
-
         private void Execute()
         {
             if (Queue.Count == 0) return;
 
             try
             {
-                Engine.Watcher?.Lock();
-
                 ReOrderPartitionByOperation();
-
-                MonitorEnter();
 
                 while (Partitions.TryDequeue(out var partOf))
                 {
@@ -361,8 +359,6 @@ namespace Objectiks.Engine
 
                     Engine.SubmitChanges(context, Transaction);
                 }
-
-                MonitorExit();
 
                 Queue.Clear();
                 Partitions.Clear();
@@ -412,7 +408,6 @@ namespace Objectiks.Engine
         public void Dispose()
         {
             this.Wait();
-            this.MonitorExit();
             GC.SuppressFinalize(this);
             Engine.Watcher?.UnLock();
         }

@@ -121,7 +121,7 @@ namespace Objectiks
         {
             try
             {
-                MonitorEnter(typeOf);
+                Ensure.NotNullOrEmpty(typeOf, "Document info typeOf is empty");
 
                 var info = new DocumentInfo(typeOf);
 
@@ -130,6 +130,7 @@ namespace Objectiks
                     LoadDocumentType(typeOf);
 
                     return Cache.GetSequence(typeOf);
+
                 }).GetTypeOfSequence(primaryOfDataType, primaryOf);
 
 
@@ -160,14 +161,10 @@ namespace Objectiks
                 Cache.Set(info);
                 Cache.Set(new DocumentSequence(typeOf, sequence.Value));
 
-                MonitorExit(typeOf);
-
                 return info;
             }
             catch (Exception ex)
             {
-                MonitorExit(typeOf);
-
                 throw ex;
             }
         }

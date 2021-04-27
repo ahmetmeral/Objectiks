@@ -31,15 +31,17 @@ namespace Objectiks.Integrations.Options
             BufferSize = 512;
             TypeOf = new DocumentTypes("Pages", "Categories");
             Schemes = new DocumentSchemes(page, category);
-            SupportLoaderInRefs = true;
+            SupportLoaderInRefs = false;
             SupportPartialStorage = false;
+
 
             //var cacheConfig = new RedisConfiguration("localhost:6379");
             var cacheConfig = new RedisConfiguration
             {
                 Hosts = new RedisHost[] { new RedisHost() },
                 ConnectionTimeout = 20000,
-                SyncTimeout = 20000
+                SyncTimeout = 20000,
+                AllowAdmin = true
             };
 
             var cacheProvider = new RedisDocumentCache(Name, cacheConfig, new DocumentJsonSerializer());

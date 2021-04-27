@@ -29,7 +29,7 @@ namespace Objectiks.Engine
         public abstract void Remove(string typeOf);
         public abstract void Remove(Document document);
         public abstract void Remove(DocumentMeta meta);
-        public abstract void Reset();
+        public abstract void Flush();
         public abstract void Set(Document document, int expire);
         public abstract void Set(DocumentMeta meta, int expire);
         public abstract void Set(DocumentSequence sequence);

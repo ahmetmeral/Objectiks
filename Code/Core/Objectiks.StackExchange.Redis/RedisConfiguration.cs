@@ -13,6 +13,7 @@ namespace Objectiks.StackExchange.Redis
         public int PoolSize { get; set; } = 5;
         public int ConnectionTimeout { get; set; } = 5000;
         public int SyncTimeout { get; set; } = 5000;
+        public bool AllowAdmin { get; set; } = false;
         public RedisHost[] Hosts { get; set; }
 
 
@@ -34,7 +35,8 @@ namespace Objectiks.StackExchange.Redis
                 Options = new ConfigurationOptions
                 {
                     ConnectTimeout = ConnectionTimeout,
-                    SyncTimeout = SyncTimeout
+                    SyncTimeout = SyncTimeout,
+                    AllowAdmin = AllowAdmin
                 };
 
                 foreach (var redis in Hosts)

@@ -19,8 +19,6 @@ namespace Objectiks
         internal ConcurrentDictionary<string, List<DocumentContext>> TypeOf { get; set; }
         internal List<DocumentStorage> Storages { get; set; }
         internal bool IsInternalTransaction { get; set; }
-       
-
 
         internal DocumentTransaction(DocumentEngine engine, bool isInternalTransaction)
         {
@@ -40,9 +38,7 @@ namespace Objectiks
             {
                 storage = new DocumentStorage(typeOf, Engine.Provider.BaseDirectory, partition);
 
-                //var isLocked = TransactionMonitor.LockedOld(ThreadId, storage.NameWithoutExtension);
-
-                //if (isLocked) { throw new Exception("Failed to lock document.."); }
+                EnterTypeOfLock(typeOf);
 
                 if (isBeginOperation)
                 {
@@ -67,15 +63,14 @@ namespace Objectiks
 
         internal void EnterTypeOfLock(string typeOf)
         {
-            Monitor.Enter(typeOf.ToLowerInvariant());
+            var isEnterLocked = TransactionMonitor.EnterLock(typeOf.ToLowerInvariant());
+
+            if (isEnterLocked) { throw new Exception("Failed to lock document.."); }
         }
 
         internal void ExitTypeOfLock(string typeOf)
         {
-            if (Monitor.IsEntered(typeOf))
-            {
-                Monitor.Exit(typeOf.ToLowerInvariant());
-            }
+            TransactionMonitor.ExitLock(typeOf.ToLowerInvariant());
         }
 
         internal void ExitAllTypeOfLock()
@@ -115,9 +110,13 @@ namespace Objectiks
 
                     Engine.Cache.Set(meta, meta.Cache.Expire);
                 }
+
+                ExitAllTypeOfLock();
             }
             catch (Exception ex)
             {
+                ExitAllTypeOfLock();
+
                 Engine.Logger?.Error(ex);
 
                 throw ex;
@@ -140,9 +139,13 @@ namespace Objectiks
                 {
                     DbTransaction.Rollback();
                 }
+
+                ExitAllTypeOfLock();
             }
             catch (Exception ex)
             {
+                ExitAllTypeOfLock();
+
                 Engine.Logger?.Error(ex);
 
                 throw ex;

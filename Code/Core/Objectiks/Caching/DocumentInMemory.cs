@@ -182,7 +182,7 @@ namespace Objectiks.Caching
             Cache.Remove(CacheOf(meta));
         }
 
-        public override void Reset()
+        public override void Flush()
         {
             if (_resetCacheToken != null && !_resetCacheToken.IsCancellationRequested && _resetCacheToken.Token.CanBeCanceled)
             {
