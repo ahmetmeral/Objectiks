@@ -19,6 +19,7 @@ namespace Objectiks
         {
             private static DocumentEngines Engines = new DocumentEngines();
             private static DocumentOptions Options = new DocumentOptions();
+            private static DocumentMonitor Monitor = new DocumentMonitor();
 
             public static DocumentEngine Get(DocumentProvider documentProvider, DocumentOption option)
             {
@@ -108,6 +109,16 @@ namespace Objectiks
                 }
 
                 return setting;
+            }
+
+            internal static DocumentTransaction GetTransaction(DocumentEngine engine, bool create, bool isInternal)
+            {
+                return Monitor.GetTransaction(engine, create, isInternal);
+            }
+
+            internal static void ReleaseTransaction(DocumentTransaction transaction)
+            {
+                Monitor.ReleaseTransaction(transaction);
             }
         }
     }

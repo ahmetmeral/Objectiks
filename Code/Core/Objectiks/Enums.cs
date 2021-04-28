@@ -4,6 +4,20 @@ using System.Text;
 
 namespace Objectiks
 {
+    public enum TransactionLockMode
+    {
+        Read,
+        Write
+    }
+
+    public enum TransactionState
+    {
+        Active,
+        Committed,
+        Aborted,
+        Disposed
+    }
+
     public enum DebugType
     {
         None,

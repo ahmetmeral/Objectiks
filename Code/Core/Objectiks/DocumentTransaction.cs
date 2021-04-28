@@ -13,23 +13,43 @@ namespace Objectiks
     public class DocumentTransaction : IDisposable
     {
         private DocumentEngine Engine;
+        private readonly DocumentMonitor Monitor;
+        private readonly int _ThreadId = Environment.CurrentManagedThreadId;
 
-        internal int ThreadId { get; set; }
         internal DbTransaction DbTransaction { get; set; }
         internal ConcurrentDictionary<string, List<DocumentContext>> TypeOf { get; set; }
         internal List<DocumentStorage> Storages { get; set; }
         internal bool IsInternalTransaction { get; set; }
 
-        internal DocumentTransaction(DocumentEngine engine, bool isInternalTransaction)
+        public uint TransactionId
         {
-            Engine = engine;
-            ThreadId = Environment.CurrentManagedThreadId;
-            TypeOf = new ConcurrentDictionary<string, List<DocumentContext>>();
-            Storages = new List<DocumentStorage>();
-            IsInternalTransaction = isInternalTransaction;
+            get; set;
         }
 
-        internal DocumentStorage GetTransactionStorage(string typeOf, int partition, bool isBeginOperation)
+        public int ThreadId
+        {
+            get { return _ThreadId; }
+        }
+
+        internal DocumentTransaction(uint transactionId, DocumentEngine engine, DocumentMonitor monitor, bool isInternal)
+        {
+            TransactionId = transactionId;
+            Engine = engine;
+            Monitor = monitor;
+            Storages = new List<DocumentStorage>();
+            TypeOf = new ConcurrentDictionary<string, List<DocumentContext>>();
+            IsInternalTransaction = isInternal;
+        }
+
+        //internal DocumentTransaction(DocumentEngine engine, bool isInternalTransaction)
+        //{
+        //    Engine = engine;
+        //    TypeOf = new ConcurrentDictionary<string, List<DocumentContext>>();
+        //    Storages = new List<DocumentStorage>();
+        //    IsInternalTransaction = isInternalTransaction;
+        //}
+
+        internal DocumentStorage GetTransactionalStorage(string typeOf, int partition, bool isBeginOperation)
         {
             var storage = Storages.Where(s => s.TypeOf == typeOf && s.Partition == partition)
                 .FirstOrDefault();
@@ -37,8 +57,6 @@ namespace Objectiks
             if (storage == null)
             {
                 storage = new DocumentStorage(typeOf, Engine.Provider.BaseDirectory, partition);
-
-                EnterTypeOfLock(typeOf);
 
                 if (isBeginOperation)
                 {
@@ -63,29 +81,38 @@ namespace Objectiks
 
         internal void EnterTypeOfLock(string typeOf)
         {
-            var isEnterLocked = TransactionMonitor.EnterLock(typeOf.ToLowerInvariant());
-
-            if (isEnterLocked) { throw new Exception("Failed to lock document.."); }
+            Monitor.EnterLock(typeOf);
         }
 
         internal void ExitTypeOfLock(string typeOf)
         {
-            TransactionMonitor.ExitLock(typeOf.ToLowerInvariant());
+            Monitor.ExitLock(typeOf);
         }
 
         internal void ExitAllTypeOfLock()
         {
-            foreach (var item in TypeOf)
+            foreach (var item in TypeOf.Keys)
             {
-                ExitTypeOfLock(item.Key);
+                ExitTypeOfLock(item);
             }
         }
-
 
         public void Commit()
         {
             try
             {
+                foreach (var item in TypeOf)
+                {
+                    var meta = Engine.GetTypeMeta(item.Key);
+
+                    foreach (var context in item.Value)
+                    {
+                        Engine.OnChangeDocuments(meta, context);
+                    }
+
+                    Engine.Cache.Set(meta, meta.Cache.Expire);
+                }
+
                 if (DbTransaction == null)
                 {
                     foreach (var storage in Storages)
@@ -99,27 +126,18 @@ namespace Objectiks
                     DbTransaction.Commit();
                 }
 
-                foreach (var item in TypeOf)
-                {
-                    var meta = Engine.GetTypeMeta(item.Key);
-
-                    foreach (var context in item.Value)
-                    {
-                        Engine.OnChangeDocuments(meta, context);
-                    }
-
-                    Engine.Cache.Set(meta, meta.Cache.Expire);
-                }
-
-                ExitAllTypeOfLock();
+               
             }
             catch (Exception ex)
             {
-                ExitAllTypeOfLock();
-
                 Engine.Logger?.Error(ex);
 
                 throw ex;
+            }
+            finally
+            {
+                ExitAllTypeOfLock();
+                ObjectiksOf.Core.ReleaseTransaction(this);
             }
         }
 
@@ -139,16 +157,17 @@ namespace Objectiks
                 {
                     DbTransaction.Rollback();
                 }
-
-                ExitAllTypeOfLock();
             }
             catch (Exception ex)
             {
-                ExitAllTypeOfLock();
-
                 Engine.Logger?.Error(ex);
 
                 throw ex;
+            }
+            finally
+            {
+                ExitAllTypeOfLock();
+                ObjectiksOf.Core.ReleaseTransaction(this);
             }
         }
 
@@ -161,8 +180,6 @@ namespace Objectiks
 
         public void Dispose()
         {
-            ExitAllTypeOfLock();
-
             GC.SuppressFinalize(this);
         }
     }

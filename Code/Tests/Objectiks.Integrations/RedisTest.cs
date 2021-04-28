@@ -41,11 +41,12 @@ namespace Objectiks.Integrations
             var size = 2;
             var pages = TestSetup.GeneratePages(size, false);
             var repos = new ObjectiksOf();
-            
+
             var meta_before = repos.GetTypeMeta<Pages>();
 
             using (var writer = repos.WriterOf<Pages>())
             {
+                //writer.UsePartialStore(1);
                 writer.UseFormatting();
 
                 foreach (var page in pages)
@@ -58,17 +59,17 @@ namespace Objectiks.Integrations
 
             var meta_after = repos.GetTypeMeta<Pages>();
 
-            repos.Flush();
-            repos.Reload();
+            //repos.Flush();
         }
 
         [Test]
         public void DocumentTransactionParalelTest()
         {
-            var size = 5;
+            var size = 20;
             var pages = TestSetup.GeneratePages(size, false);
             var repos = new ObjectiksOf();
             var meta_before = repos.GetTypeMeta<Pages>();
+            var count = meta_before.TotalRecords;
 
             var result = Parallel.ForEach(pages, page =>
             {
@@ -90,7 +91,7 @@ namespace Objectiks.Integrations
                         //    categoryWriter.SubmitChanges();
                         //}
 
-                        using (var pageWriter = repos.WriterOf<Pages>(trans))
+                        using (var pageWriter = repos.WriterOf<Pages>())
                         {
                             pageWriter.UseFormatting();
                             pageWriter.AddDocument(page);

@@ -133,7 +133,6 @@ namespace Objectiks
 
                 }).GetTypeOfSequence(primaryOfDataType, primaryOf);
 
-
                 if (sequence.IsNew)
                 {
                     info.PrimaryOf = sequence.Value;

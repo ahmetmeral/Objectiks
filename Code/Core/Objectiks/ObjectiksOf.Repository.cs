@@ -48,14 +48,14 @@ namespace Objectiks
             return new DocumentReader<dynamic>(Engine, typeOf);
         }
 
-        public DocumentWriter<T> WriterOf<T>(DocumentTransaction transaction = null)
+        public DocumentWriter<T> WriterOf<T>()
         {
-            return new DocumentWriter<T>(Engine, GetTypeOfName<T>(), transaction);
+            return new DocumentWriter<T>(Engine, GetTypeOfName<T>());
         }
 
-        public DocumentWriter<T> WriterOf<T>(string typeOf, DocumentTransaction transaction = null)
+        public DocumentWriter<T> WriterOf<T>(string typeOf)
         {
-            return new DocumentWriter<T>(Engine, typeOf, transaction);
+            return new DocumentWriter<T>(Engine, typeOf);
         }
 
         public DocumentTransaction BeginTransaction()
@@ -140,10 +140,23 @@ namespace Objectiks
             Engine.Cache.Flush();
         }
 
-        public void Reload()
+        public void Reload(string typeOf = "All")
         {
-            Engine.FirstLoaded = false;
-            Engine.FirstLoadAllDocumentType();
+            if (typeOf == "All")
+            {
+                Engine.FirstLoaded = false;
+                Engine.FirstLoadAllDocumentType();
+            }
+            else
+            {
+                Engine.LoadDocumentType(typeOf);
+            }
+        }
+
+        public void ReloadOf<T>()
+        {
+            var typeOf = GetTypeOfName<T>();
+            Engine.LoadDocumentType(typeOf);
         }
     }
 }

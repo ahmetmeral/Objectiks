@@ -207,7 +207,7 @@ namespace Objectiks
 
         internal virtual DocumentTransaction BeginTransaction()
         {
-            return new DocumentTransaction(this, false);
+            return ObjectiksOf.Core.GetTransaction(this, true, false);
         }
     }
 }

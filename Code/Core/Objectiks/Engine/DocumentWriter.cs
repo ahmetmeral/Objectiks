@@ -21,11 +21,10 @@ namespace Objectiks.Engine
 {
     public class DocumentWriter<T> : IDisposable, IDocumentWriter
     {
-        private Task ExecuteTask;
         private ConcurrentQueue<DocumentQueue> Queue = new ConcurrentQueue<DocumentQueue>();
         private ConcurrentQueue<DocumentPartition> Partitions = new ConcurrentQueue<DocumentPartition>();
-        private TransactionMonitor TransactionMonitor = new TransactionMonitor();
         private Format Formatting = Format.None;
+
         private readonly DocumentEngine Engine;
         private DocumentTransaction Transaction;
         //meta : should not be read-only 
@@ -37,7 +36,7 @@ namespace Objectiks.Engine
 
         public DocumentWriter() { }
 
-        internal DocumentWriter(DocumentEngine engine, string typeOf, DocumentTransaction transaction = null)
+        internal DocumentWriter(DocumentEngine engine, string typeOf)
         {
             Ensure.NotNullOrEmpty(typeOf, "TypeOf is empty");
 
@@ -51,15 +50,14 @@ namespace Objectiks.Engine
                 PartialStoreLimit = Engine.Option.SupportPartialStorageLimit;
             }
 
-            if (transaction == null)
+            Transaction = ObjectiksOf.Core.GetTransaction(engine, false, false);
+
+            if (Transaction == null)
             {
-                Transaction = new DocumentTransaction(engine, true);
-            }
-            else
-            {
-                Transaction = transaction;
+                Transaction = ObjectiksOf.Core.GetTransaction(engine, true, true);
             }
 
+            Transaction.EnterTypeOfLock(typeOf);
         }
 
         private void ReOrderPartitionByOperation()
@@ -151,11 +149,7 @@ namespace Objectiks.Engine
                 {
                     var primaryValue = property.GetValue(model, null);
 
-                    Transaction.EnterTypeOfLock(doc.TypeOf);
-
                     var info = Engine.GetTypeOfDocumentInfo(doc.TypeOf, primaryValue, property.PropertyType);
-
-                    Transaction.ExitTypeOfLock(doc.TypeOf);
 
                     doc.Primary = info.PrimaryOf.ToString();
                     doc.CacheOf = Engine.Cache.CacheOfDocument(doc.TypeOf, doc.Primary);
@@ -336,7 +330,7 @@ namespace Objectiks.Engine
             }
         }
 
-        private void Execute()
+        public void SubmitChanges()
         {
             if (Queue.Count == 0) return;
 
@@ -352,7 +346,7 @@ namespace Objectiks.Engine
                         Primary = Meta.Primary,
                         Partition = partOf.Partition,
                         Operation = partOf.Operation,
-                        Storage = Transaction.GetTransactionStorage(Meta.TypeOf, partOf.Partition, true),
+                        Storage = Transaction.GetTransactionalStorage(Meta.TypeOf, partOf.Partition, true),
                         Documents = Queue.Where(q => q.PartOf.Partition == partOf.Partition && q.PartOf.Operation == partOf.Operation).Select(s => s.Document).ToList(),
                         Formatting = Formatting
                     };
@@ -377,37 +371,8 @@ namespace Objectiks.Engine
             }
         }
 
-        public void SubmitChanges()
-        {
-            lock (Queue)
-            {
-                if (Queue.Count > 0 && (ExecuteTask == null || ExecuteTask.IsCompleted))
-                {
-                    // https://blog.stephencleary.com/2013/08/startnew-is-dangerous.html
-                    ExecuteTask = Task.Run(this.Execute);
-                }
-            }
-        }
-
-        public void Wait()
-        {
-            lock (Queue)
-            {
-                if (ExecuteTask != null)
-                {
-                    ExecuteTask.Wait();
-                }
-
-                if (Queue.Count > 0)
-                {
-                    this.Execute();
-                }
-            }
-        }
-
         public void Dispose()
         {
-            this.Wait();
             GC.SuppressFinalize(this);
             Engine.Watcher?.UnLock();
         }

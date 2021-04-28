@@ -75,7 +75,7 @@ namespace Objectiks.Integrations
                          //    categoryWriter.SubmitChanges();
                          //}
 
-                         using (var pageWriter = repos.WriterOf<Pages>(trans))
+                         using (var pageWriter = repos.WriterOf<Pages>())
                          {
                              pageWriter.UseFormatting();
                              pageWriter.AddDocument(page);
@@ -126,7 +126,7 @@ namespace Objectiks.Integrations
                     //    categoryWriter.SubmitChanges();
                     //}
 
-                    using (var pageWriter = repos.WriterOf<Pages>(trans))
+                    using (var pageWriter = repos.WriterOf<Pages>())
                     {
                         pageWriter.UseFormatting();
                         pageWriter.UsePartialStore(1);

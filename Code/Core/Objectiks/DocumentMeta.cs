@@ -277,6 +277,11 @@ namespace Objectiks
 
         public string SubmitChanges(Document document, OperationType operation)
         {
+            if (!Partitions.ContainsKey(document.Partition))
+            {
+                Partitions.Add(document.Partition, 0);
+            }
+
             if (operation == OperationType.Read || operation == OperationType.Create || operation == OperationType.Append)
             {
                 AddKeys(
