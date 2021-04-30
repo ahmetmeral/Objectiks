@@ -43,8 +43,8 @@ namespace Objectiks
         {
             TypeOf = typeOf;
             ParseOf = schema.ParseOf;
-            Primary = schema.Primary;
-            User = schema.User;
+            Primary = schema.PrimaryOf;
+            User = schema.UserOf;
 
             KeyOfNames = schema.KeyOf;
             Refs = schema.Refs;
@@ -60,7 +60,7 @@ namespace Objectiks
             RefsIndexBuild(option.SupportLoaderInRefs);
         }
 
-        public void UpdateSequence(object primary)
+        internal void UpdateSequence(object primary)
         {
             if (Int32.TryParse(primary.ToString(), out var out_primary_int32))
             {
@@ -89,84 +89,7 @@ namespace Objectiks
             }
         }
 
-        public object GetNewSequenceId(Type type)
-        {
-            TypeCode typeCode = Type.GetTypeCode(type);
-
-            if (typeCode == TypeCode.Int32)
-            {
-                int seq = 0;
-                Int32.TryParse(Sequence.ToString(), out seq);
-                Sequence = Interlocked.Increment(ref seq);
-            }
-            else if (typeCode == TypeCode.Int64)
-            {
-                long seq = 0;
-                Int64.TryParse(Sequence.ToString(), out seq);
-                Sequence = Interlocked.Increment(ref seq);
-            }
-            else if (typeCode == TypeCode.String || typeCode == TypeCode.Object)
-            {
-                Sequence = Guid.NewGuid();
-            }
-            else
-            {
-                throw new Exception($"Undefined sequence type {typeCode}");
-            }
-
-            return Sequence;
-        }
-
-        public object GetNewSequenceId(Type type, object currentValue)
-        {
-            if (currentValue == null)
-            {
-                return GetNewSequenceId(type);
-            }
-
-            TypeCode typeCode = Type.GetTypeCode(type);
-
-            if (typeCode == TypeCode.Int32)
-            {
-                int.TryParse(currentValue.ToString(), out int current);
-
-                if (current == 0)
-                {
-                    int seq = 0;
-                    Int32.TryParse(Sequence.ToString(), out seq);
-                    Sequence = Interlocked.Increment(ref seq);
-                    currentValue = Sequence;
-                }
-            }
-            else if (typeCode == TypeCode.Int64)
-            {
-                Int64.TryParse(currentValue.ToString(), out long current);
-
-                if (current == 0)
-                {
-                    long seq = 0;
-                    Int64.TryParse(Sequence.ToString(), out seq);
-                    Sequence = Interlocked.Increment(ref seq);
-                    currentValue = Sequence;
-                }
-            }
-            else if (typeCode == TypeCode.String || typeCode == TypeCode.Object)
-            {
-                if (String.IsNullOrWhiteSpace(currentValue.ToString()))
-                {
-                    Sequence = Guid.NewGuid();
-                    currentValue = Sequence;
-                }
-            }
-            else
-            {
-                throw new Exception($"Undefined sequence type {typeCode}");
-            }
-
-            return currentValue;
-        }
-
-        public void RefsIndexBuild(bool supportLoaderRefsManipulation)
+        internal void RefsIndexBuild(bool supportLoaderRefsManipulation)
         {
             if (Refs != null)
             {
@@ -215,10 +138,9 @@ namespace Objectiks
 
             if (query.HasPrimaryOf || query.HasKeyOf)
             {
-                result = Keys.AsQueryable().Where(query.AsWhere(),
-                       query.AsWhereParameters()).ToList();
+                result = Keys.AsQueryable().Where(query.AsWhere(), query.AsWhereParameters())?.ToList();
 
-                if (query.Take > 0)
+                if (result != null && query.Take > 0)
                 {
                     result = result.Skip(query.Skip).Take(query.Take).ToList();
                 }
@@ -238,7 +160,7 @@ namespace Objectiks
             return result;
         }
 
-        public DocumentPartition GetAvailablePartition(int partition, int? partialStoreLimit, int partitionTemporyCount)
+        internal DocumentPartition GetAvailablePartition(int partition, int? partialStoreLimit, int partitionTemporyCount)
         {
             if (partialStoreLimit.HasValue)
             {
@@ -270,12 +192,12 @@ namespace Objectiks
             return newPartition;
         }
 
-        public void AddKeys(DocumentKey documentKey)
+        internal void AddKeys(DocumentKey documentKey)
         {
             Keys.Add(documentKey);
         }
 
-        public string SubmitChanges(Document document, OperationType operation)
+        internal string SubmitChanges(Document document, OperationType operation)
         {
             if (!Partitions.ContainsKey(document.Partition))
             {
@@ -321,7 +243,7 @@ namespace Objectiks
             return document.PrimaryOf;
         }
 
-        public void UpdateKeys(DocumentKey documentKey)
+        internal void UpdateKeys(DocumentKey documentKey)
         {
             DocumentKey key = Keys.Where(k => k.CacheOf == documentKey.CacheOf).FirstOrDefault();
 
@@ -331,7 +253,7 @@ namespace Objectiks
             }
         }
 
-        public void RemoveKeys(object primaryOf)
+        internal void RemoveKeys(object primaryOf)
         {
             var primaryOfStr = primaryOf.ToString();
             DocumentKey key = Keys.Where(k => k.PrimaryOf == primaryOfStr).FirstOrDefault();

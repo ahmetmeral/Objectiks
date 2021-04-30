@@ -5,12 +5,13 @@ using System.Text;
 
 namespace Objectiks.Integrations.Models
 {
-    [TypeOf, Serializable]
+    [TypeOf("Tags"), Serializable]
     public class Tags
     {
         [Primary]
         public int Id { get; set; }
+
+        [Requried]
         public string Name { get; set; }
-        public string Language { get; set; }
     }
 }

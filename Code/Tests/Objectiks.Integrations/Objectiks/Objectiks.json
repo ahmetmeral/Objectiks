@@ -1,10 +1,10 @@
 ﻿{
   "Name": "Objectiks",
-  "Version": "0.0.4",
+  "Version": "1.0.0",
   "Author": "Ahmet Meral",
   "Primary": "Id",
   "KeyOf": [],
-  "TypeOf": [ "Pages", "Categories", "Tags", "Products" ],
+  "TypeOf": [ "Pages", "Tags" ],
   "BufferSize": 512,
   "Extention": "*.json",
   "SupportPartialLimit": 1000,

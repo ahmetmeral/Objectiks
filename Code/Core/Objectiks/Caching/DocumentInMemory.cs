@@ -165,6 +165,7 @@ namespace Objectiks.Caching
         public override void Remove(string typeOf, object primary)
         {
             Cache.Remove(CacheOfDocument(typeOf, primary));
+            Cache.Remove(CacheOfDocumentInfo(typeOf, primary));
         }
 
         public override void Remove(string typeOf)
@@ -175,6 +176,7 @@ namespace Objectiks.Caching
         public override void Remove(Document document)
         {
             Cache.Remove(CacheOf(document));
+            Cache.Remove(CacheOfDocumentInfo(document.TypeOf, document.PrimaryOf));
         }
 
         public override void Remove(DocumentMeta meta)

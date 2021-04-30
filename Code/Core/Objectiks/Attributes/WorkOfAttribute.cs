@@ -5,8 +5,8 @@ using System.Text;
 namespace Objectiks.Attributes
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class AccountOfAttribute : Attribute
+    public class WorkOfAttribute : Attribute
     {
-        public AccountOfAttribute() { }
+        public WorkOfAttribute() { }
     }
 }

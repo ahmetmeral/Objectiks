@@ -1,4 +1,5 @@
 ﻿using Objectiks.Caching.Serializer;
+using Objectiks.Engine;
 using Objectiks.Models;
 using Objectiks.StackExchange.Redis;
 using System;
@@ -7,33 +8,34 @@ using System.Text;
 
 namespace Objectiks.Integrations.Options
 {
-    public class RedisCacheProviderOption : DocumentOption
+    public class NoDbEngineRedisOption : DocumentOption
     {
-        public RedisCacheProviderOption() : base()
+        public NoDbEngineRedisOption() : base()
         {
-            var page = new DocumentSchema
+            var pages = new DocumentSchema
             {
                 TypeOf = "Pages",
                 ParseOf = "Document",
-                KeyOf = new DocumentKeyOfNames("Name"),
-                Primary = "Id"
+                PrimaryOf = "Id",
+                WorkOf = "AccountRef",
+                UserOf = "UserRef",
+                KeyOf = new DocumentKeyOfNames("Tag")
             };
 
-            var category = new DocumentSchema
+            var tags = new DocumentSchema
             {
-                TypeOf = "Categories",
+                TypeOf = "Tags",
                 ParseOf = "Document",
-                KeyOf = new DocumentKeyOfNames(),
-                Primary = "Id"
+                PrimaryOf = "Id",
+                KeyOf = new DocumentKeyOfNames()
             };
 
             Name = "RedisProject";
             BufferSize = 512;
-            TypeOf = new DocumentTypes("Pages", "Categories");
-            Schemes = new DocumentSchemes(page, category);
-            SupportLoaderInRefs = false;
+            TypeOf = new DocumentTypes("Pages", "Tags");
+            Schemes = new DocumentSchemes(pages, tags);
             SupportPartialStorage = true;
-
+            
 
             //var cacheConfig = new RedisConfiguration("localhost:6379");
             var cacheConfig = new RedisConfiguration
@@ -45,8 +47,11 @@ namespace Objectiks.Integrations.Options
             };
 
             var cacheProvider = new RedisDocumentCache(Name, cacheConfig, new DocumentJsonSerializer());
+            cacheProvider.Flush();
 
             UseCacheProvider(cacheProvider);
+            UseDocumentWatcher<DocumentWatcher>();
+            UseEngineProvider<DocumentEngine>();
 
             RegisterDefaultTypeOrParser();
         }

@@ -138,6 +138,9 @@ namespace Objectiks
                     info.PrimaryOf = sequence.Value;
                     info.Partition = 0;
                     info.Exists = false;
+
+                    Cache.Set(new DocumentSequence(typeOf, sequence.Value));
+                    Cache.Set(info);
                 }
                 else
                 {
@@ -154,11 +157,11 @@ namespace Objectiks
                         info.PrimaryOf = sequence.Value;
                         info.Partition = 0;
                         info.Exists = false;
+
+                        Cache.Set(new DocumentSequence(typeOf, sequence.Value));
+                        Cache.Set(info);
                     }
                 }
-
-                Cache.Set(info);
-                Cache.Set(new DocumentSequence(typeOf, sequence.Value));
 
                 return info;
             }
@@ -167,6 +170,8 @@ namespace Objectiks
                 throw ex;
             }
         }
+
+        
 
         public virtual Document Read(QueryOf query, DocumentMeta meta = null)
         {

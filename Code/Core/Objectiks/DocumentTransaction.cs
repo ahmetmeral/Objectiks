@@ -17,9 +17,13 @@ namespace Objectiks
         private readonly int _ThreadId = Environment.CurrentManagedThreadId;
 
         internal DbTransaction DbTransaction { get; set; }
-        internal ConcurrentDictionary<string, List<DocumentContext>> TypeOf { get; set; }
+        internal ConcurrentDictionary<string, List<DocumentContext>> TypeOfContext { get; set; }
+        internal List<string> TypeOfLock { get; set; }
+        internal List<string> TypeOfTruncate { get; set; }
         internal List<DocumentStorage> Storages { get; set; }
         internal bool IsInternalTransaction { get; set; }
+        internal bool IsTruncate { get; set; }
+
 
         public uint TransactionId
         {
@@ -37,7 +41,9 @@ namespace Objectiks
             Engine = engine;
             Monitor = monitor;
             Storages = new List<DocumentStorage>();
-            TypeOf = new ConcurrentDictionary<string, List<DocumentContext>>();
+            TypeOfContext = new ConcurrentDictionary<string, List<DocumentContext>>(StringComparer.OrdinalIgnoreCase);
+            TypeOfLock = new List<string>();
+            TypeOfTruncate = new List<string>();
             IsInternalTransaction = isInternal;
         }
 
@@ -71,48 +77,71 @@ namespace Objectiks
 
         internal void AddOperation(DocumentContext documentContext)
         {
-            if (!TypeOf.ContainsKey(documentContext.TypeOf.ToLowerInvariant()))
+            if (!TypeOfContext.ContainsKey(documentContext.TypeOf.ToLowerInvariant()))
             {
-                TypeOf.TryAdd(documentContext.TypeOf.ToLowerInvariant(), new List<DocumentContext>());
+                TypeOfContext.TryAdd(documentContext.TypeOf.ToLowerInvariant(), new List<DocumentContext>());
             }
 
-            TypeOf[documentContext.TypeOf.ToLowerInvariant()].Add(documentContext);
+            TypeOfContext[documentContext.TypeOf.ToLowerInvariant()].Add(documentContext);
         }
 
         internal void EnterTypeOfLock(string typeOf)
         {
             Monitor.EnterLock(typeOf);
+
+            if (!TypeOfLock.Contains(typeOf.ToLowerInvariant()))
+            {
+                TypeOfLock.Add(typeOf.ToLowerInvariant());
+            }
         }
 
         internal void ExitTypeOfLock(string typeOf)
         {
+            if (TypeOfLock.Contains(typeOf.ToLowerInvariant()))
+            {
+                TypeOfLock.Remove(typeOf.ToLowerInvariant());
+            }
+
             Monitor.ExitLock(typeOf);
         }
 
         internal void ExitAllTypeOfLock()
         {
-            foreach (var item in TypeOf.Keys)
+            var typeOfList = new List<string>(TypeOfLock);
+
+            foreach (var typeOf in typeOfList)
             {
-                ExitTypeOfLock(item);
+                ExitTypeOfLock(typeOf);
             }
+
+            TypeOfLock.Clear();
+        }
+
+        internal void AddTruncateTypeOf(string typeOf)
+        {
+            if (!TypeOfTruncate.Contains(typeOf.ToLowerInvariant()))
+            {
+                TypeOfTruncate.Add(typeOf.ToLowerInvariant());
+            }
+        }
+
+        internal void RemoveTruncateTypeOf(string typeOf)
+        {
+            if (TypeOfTruncate.Contains(typeOf.ToLowerInvariant()))
+            {
+                TypeOfTruncate.Remove(typeOf.ToLowerInvariant());
+            }
+        }
+
+        internal bool IsTruncateTypeOf(string typeOf)
+        {
+            return TypeOfTruncate.Contains(typeOf.ToLowerInvariant());
         }
 
         public void Commit()
         {
             try
             {
-                foreach (var item in TypeOf)
-                {
-                    var meta = Engine.GetTypeMeta(item.Key);
-
-                    foreach (var context in item.Value)
-                    {
-                        Engine.OnChangeDocuments(meta, context);
-                    }
-
-                    Engine.Cache.Set(meta, meta.Cache.Expire);
-                }
-
                 if (DbTransaction == null)
                 {
                     foreach (var storage in Storages)
@@ -126,7 +155,35 @@ namespace Objectiks
                     DbTransaction.Commit();
                 }
 
-               
+
+                foreach (var item in TypeOfContext)
+                {
+                    var typeOf = item.Key;
+                    var meta = Engine.GetTypeMeta(typeOf);
+
+                    foreach (var context in item.Value)
+                    {
+                        Engine.OnChangeDocuments(meta, context);
+                    }
+
+                    if (IsTruncateTypeOf(typeOf))
+                    {
+                        meta.Keys = new DocumentKeyIndex();
+                        meta.TotalRecords = 0;
+                        meta.HasData = false;
+                        meta.Sequence = 0;
+                        meta.DiskSize = 0;
+
+                        Engine.Cache.Set(meta, meta.Cache.Expire);
+                        Engine.Cache.Set(new DocumentSequence(typeOf, 0));
+
+                        RemoveTruncateTypeOf(typeOf);
+                    }
+                    else
+                    {
+                        Engine.Cache.Set(meta, meta.Cache.Expire);
+                    }
+                }
             }
             catch (Exception ex)
             {

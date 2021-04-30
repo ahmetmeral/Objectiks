@@ -58,6 +58,22 @@ namespace Objectiks
             return new DocumentWriter<T>(Engine, typeOf);
         }
 
+        public void TruncateOf<T>()
+        {
+            using (var writer = new DocumentWriter<T>(Engine, GetTypeOfName<T>()))
+            {
+                writer.Truncate();
+            }
+        }
+
+        public void TruncateOf<T>(string typeOf)
+        {
+            using (var writer = new DocumentWriter<T>(Engine, typeOf))
+            {
+                writer.Truncate();
+            }
+        }
+
         public DocumentTransaction BeginTransaction()
         {
             return Engine.BeginTransaction();

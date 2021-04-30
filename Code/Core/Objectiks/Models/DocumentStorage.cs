@@ -94,7 +94,10 @@ namespace Objectiks.Models
                         File.Delete(Backup);
                     }
                     catch { }
+                }
 
+                if (File.Exists(Target))
+                {
                     File.Copy(Target, Backup);
                 }
 

@@ -25,12 +25,11 @@ namespace Objectiks
         public string SqlProviderSchema { get; set; }
         public string SqlProviderSchemaSeperator { get; set; } = ".";
         public int SqlProviderPageLimit { get; set; } = 2;
+        
         public bool SupportSqlDataReaderPaging { get; set; } = true;
-        public string Extention { get; set; } = "*.json";
-        public int BufferSize { get; set; } = 512;
 
-        public bool SupportPartialStorage { get; set; } = true;
         public int SupportPartialStorageLimit { get; set; } = 1000;
+        public bool SupportPartialStorage { get; set; } = false;
         public bool SupportDocumentParser { get; set; } = false;
         public bool SupportTypeOfRefs { get; set; } = true;
         public bool SupportLoaderInRefs { get; set; } = false;
@@ -38,8 +37,10 @@ namespace Objectiks
         public bool SupportTransaction { get; set; } = true;
         public bool SupportDocumentWatcher { get; set; } = false;
         public bool SupportProperyOverride { get; set; } = true;
-        public bool SupportLoaderPaging { get; set; } = false;
         public bool SupportDocumentWriter { get; set; } = true;
+
+        public string Extention { get; set; } = "*.json";
+        public int BufferSize { get; set; } = 512;
 
         public DocumentCacheInfo CacheInfo { get; set; } = new DocumentCacheInfo { Expire = 10000 };
         public DocumentSchemes Schemes { get; set; } = new DocumentSchemes();

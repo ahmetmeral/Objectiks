@@ -23,7 +23,7 @@ namespace Objectiks
 
             public static DocumentEngine Get(DocumentProvider documentProvider, DocumentOption option)
             {
-                Engines.TryGetValue(documentProvider.CacheBucket, out DocumentEngine engine);
+                Engines.TryGetValue(documentProvider.Key, out DocumentEngine engine);
 
                 if (engine == null)
                 {
@@ -55,7 +55,7 @@ namespace Objectiks
 
                     engine.FirstLoadAllDocumentType();
 
-                    Engines.TryAdd(documentProvider.CacheBucket, engine);
+                    Engines.TryAdd(documentProvider.Key, engine);
                 }
 
                 return engine;

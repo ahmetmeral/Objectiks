@@ -21,16 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Objectiks\Documents\Pages\Contents\Features.tr.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Objectiks\Documents\Pages\Contents\Home.tr.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Objectiks\Documents\Pages\Pages.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Objectiks\Documents\Categories\Categories.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Objectiks\Documents\Tags\Tags.json">
@@ -40,9 +34,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Objectiks\Schemes\Pages.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Objectiks\Schemes\Categories.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Objectiks\Schemes\Tags.json">

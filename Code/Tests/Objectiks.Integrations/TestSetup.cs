@@ -14,6 +14,8 @@ namespace Objectiks.Integrations
     {
         private static Random random = new Random(1);
         private static List<int> idList = new List<int>();
+        private static Random randomGroup = new Random(1);
+        public static string[] Tags = new string[] { "Admin", "User", "Manager" };
 
         public static DocumentOption Options
         {
@@ -38,6 +40,11 @@ namespace Objectiks.Integrations
             return new_id.Value;
         }
 
+        public static string GetTagName()
+        {
+            return Tags[randomGroup.Next(1, Tags.Length)];
+        }
+
         public static List<Pages> GeneratePages(int size, bool auto_id = true)
         {
             var rows = new List<Pages>();
@@ -47,7 +54,8 @@ namespace Objectiks.Integrations
                 rows.Add(new Pages
                 {
                     Id = auto_id ? GenerateNewId() : 0,
-                    Title = "Home Tr Page Yaptık..1 "
+                    Title = "Home Tr Page Yaptık..1 ",
+                    Tag = GetTagName()
                 });
             }
 
@@ -64,12 +72,11 @@ namespace Objectiks.Integrations
                 {
                     Id = GenerateNewId(),
                     Title = "Home Tr Page Yaptık..1 ",
-                    CategoryRef = 1
+                    Tag = GetTagName()
                 }));
             }
 
             return rows;
         }
-
     }
 }

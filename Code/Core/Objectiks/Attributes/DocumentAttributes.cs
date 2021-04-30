@@ -8,12 +8,12 @@ namespace Objectiks.Attributes
     {
         public string TypeOf { get; set; }
         public string CacheOf { get; set; }
-        public string Primary { get; set; }
-        public string Account { get; set; }
-        public string User { get; set; }
+        public string WorkOf { get; set; }
+        public string UserOf { get; set; }
+        public string PrimaryOf { get; set; }
+        public int Partition { get; set; }
         public List<string> KeyOfValues { get; set; }
         public List<IgnoreAttribute> Ignored { get; set; }
-        public int Partition { get; set; }
         public bool Exists { get; set; }
 
         public DocumentAttributes()

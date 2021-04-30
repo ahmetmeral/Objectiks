@@ -84,6 +84,10 @@ namespace Objectiks.Engine
                     primary.Value = Sequence;
                     primary.IsNew = true;
                 }
+                else
+                {
+                    primary.Value = currentValue;
+                }
             }
             else if (typeCode == TypeCode.Int64)
             {
@@ -97,6 +101,10 @@ namespace Objectiks.Engine
                     primary.Value = Sequence;
                     primary.IsNew = true;
                 }
+                else
+                {
+                    primary.Value = currentValue;
+                }
             }
             else if (typeCode == TypeCode.String || typeCode == TypeCode.Object)
             {
@@ -105,6 +113,10 @@ namespace Objectiks.Engine
                     Sequence = Guid.NewGuid();
                     primary.Value = Sequence;
                     primary.IsNew = true;
+                }
+                else
+                {
+                    primary.Value = currentValue;
                 }
             }
             else

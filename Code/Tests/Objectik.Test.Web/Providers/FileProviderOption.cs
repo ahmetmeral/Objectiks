@@ -16,7 +16,7 @@ namespace Objectik.Test.Web.Providers
                 TypeOf = "Pages",
                 ParseOf = "Document",
                 KeyOf = new DocumentKeyOfNames("Name"),
-                Primary = "Id"
+                PrimaryOf = "Id"
             };
 
             var category = new DocumentSchema
@@ -24,7 +24,7 @@ namespace Objectik.Test.Web.Providers
                 TypeOf = "Categories",
                 ParseOf = "Document",
                 KeyOf = new DocumentKeyOfNames(),
-                Primary = "Id"
+                PrimaryOf = "Id"
             };
 
             Name = "FileProvider";

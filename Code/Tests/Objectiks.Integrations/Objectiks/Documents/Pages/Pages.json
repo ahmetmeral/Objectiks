@@ -1,38 +1,37 @@
 ﻿[
   {
     "Id": 1,
-    "CategoryRef": 1,
-    "TagRefs": [ 1, 2 ],
+    "AccountRef": 1,
+    "UserRef": 1,
+    "Tag": "Tag1",
     "Name": "Home",
-    "Language": "tr",
     "Title": "Home",
-    "File": "Home.tr.md",
-    "GroupRef": 1
+    "File": "Home.md"
   },
   {
     "Id": 2,
-    "CategoryRef": 2,
-    "Tags": [ 1, 2 ],
+    "AccountRef": 1,
+    "UserRef": 2,
+    "Tag": "Tag1",
     "Name": "Home",
-    "Language": "en",
     "Title": "Ana Sayfa",
-    "File": "Home.tr.md"
+    "File": "Home.md"
   },
   {
     "Id": 3,
-    "CategoryRef": 2,
-    "Tags": [ 3, 4 ],
+    "AccountRef": 2,
+    "UserRef": 3,
+    "Tag": "Tag1",
     "Name": "Features",
-    "Language": "tr",
     "Title": "Özellikler",
-    "File": "Features.tr.md"
+    "File": "Home.md"
   },
   {
     "Id": 4,
-    "CategoryRef": 4,
-    "Tags": [ 1, 2, 3, 4 ],
+    "AccountRef": 2,
+    "UserRef": 1,
+    "Tag": "Tag2",
     "Name": "Contact",
-    "Language": "tr",
     "Title": "İletişim",
     "File": ""
   }

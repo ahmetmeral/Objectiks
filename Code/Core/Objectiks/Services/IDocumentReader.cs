@@ -32,5 +32,6 @@ namespace Objectiks.Services
         long Count();
         T First();
         List<T> ToList();
+        int Delete();
     }
 }

@@ -78,6 +78,11 @@ namespace Objectiks
                 {
                     Document document = context.Documents[i];
 
+                    if (document.KeyOf == null)
+                    {
+                        document.KeyOf = new string[] { };
+                    }
+
                     if (Option.SupportDocumentParser)
                     {
                         ParseDocumentData(ref meta, ref document, context.Storage);

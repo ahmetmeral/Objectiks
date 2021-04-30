@@ -11,26 +11,23 @@ namespace Objectiks.Integrations.Models
     {
         [Primary]
         public int Id { get; set; }
-        [AccountOf]
+
+        [WorkOf, Requried]
         public int AccountRef { get; set; }
-        [UserOf]
+
+        [UserOf, Requried]
         public int UserRef { get; set; }
-        public int CategoryRef { get; set; }
 
-        [KeyOf]
-        public string Name { get; set; }
+        [KeyOf, Requried]
+        public string Tag { get; set; }
 
-        public string Language { get; set; }
         [Requried]
         public string Title { get; set; }
+
         public string File { get; set; }
+
         [Ignore]
         public string Contents { get; set; }
-        [Ignore]
-        public Categories Category { get; set; }
-        [Ignore]
-        public Tags[] Tags { get; set; }
-        [Ignore]
-        public Categories[] Categories { get; set; }
     }
 }
+

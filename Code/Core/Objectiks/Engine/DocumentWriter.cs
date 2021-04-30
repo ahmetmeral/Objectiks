@@ -31,7 +31,7 @@ namespace Objectiks.Engine
         private DocumentMeta Meta;
         private bool IsPartialStore = false;
         private int? PartialStoreLimit = 0;
-
+        private bool IsTruncate = false;
         public string TypeOf { get; set; }
 
         public DocumentWriter() { }
@@ -83,13 +83,15 @@ namespace Objectiks.Engine
             {
                 TypeOf = attr.TypeOf,
                 CacheOf = attr.CacheOf,
-                PrimaryOf = attr.Primary,
-                WorkOf = attr.Account,
-                UserOf = attr.User,
+                PrimaryOf = attr.PrimaryOf,
+                WorkOf = attr.WorkOf,
+                UserOf = attr.UserOf,
+                KeyOf = attr.KeyOfValues.ToArray(),
                 Data = JObject.FromObject(model),
                 Partition = attr.Partition,
                 HasArray = false,
-                Exists = attr.Exists
+                Exists = attr.Exists,
+                CreatedAt = DateTime.UtcNow
             };
 
             if (clearDocumentRefs)
@@ -100,6 +102,34 @@ namespace Objectiks.Engine
             Ensure.NotNullOrEmpty(document.TypeOf, "Document typeOf is empty");
 
             return document;
+        }
+
+        private object GetDocumentPrimaryValue(T model)
+        {
+            object primaryValue = null;
+            var type = model.GetType();
+            var properties = type.FindProperties();
+
+            foreach (PropertyInfo property in properties)
+            {
+                #region PrimaryOf set..
+                var primary = property.GetAttribute<PrimaryAttribute>();
+
+                if (primary != null)
+                {
+                    primaryValue = property.GetValue(model, null);
+
+                    break;
+                }
+                #endregion
+            }
+
+            if (primaryValue == null)
+            {
+                throw new ArgumentNullException($"Primary value is null typeOf:{TypeOf}");
+            }
+
+            return primaryValue;
         }
 
         private DocumentAttributes GetDocumentAttributes(T model)
@@ -138,7 +168,7 @@ namespace Objectiks.Engine
                         throw new ArgumentNullException(requried.Name);
                     }
 
-                    continue;
+
                 }
                 #endregion
 
@@ -151,12 +181,19 @@ namespace Objectiks.Engine
 
                     var info = Engine.GetTypeOfDocumentInfo(doc.TypeOf, primaryValue, property.PropertyType);
 
-                    doc.Primary = info.PrimaryOf.ToString();
-                    doc.CacheOf = Engine.Cache.CacheOfDocument(doc.TypeOf, doc.Primary);
+                    doc.PrimaryOf = info.PrimaryOf.ToString();
+                    doc.CacheOf = Engine.Cache.CacheOfDocument(doc.TypeOf, doc.PrimaryOf);
                     doc.Partition = info.Partition;
                     doc.Exists = info.Exists;
 
-                    property.SetValue(model, info.PrimaryOf);
+                    if (!info.Exists)
+                    {
+                        property.SetValue(model, info.PrimaryOf);
+                    }
+
+                    doc.KeyOfValues.Add(info.PrimaryOf.ToString().ToLowerInvariant());
+
+                    continue;
                 }
                 #endregion
 
@@ -167,7 +204,7 @@ namespace Objectiks.Engine
                     var value = property.GetValue(model, null);
                     if (value != null)
                     {
-                        doc.KeyOfValues.Add(value.ToString());
+                        doc.KeyOfValues.Add(value.ToString().ToLowerInvariant());
                     }
                 }
                 #endregion
@@ -181,14 +218,14 @@ namespace Objectiks.Engine
                 }
                 #endregion
 
-                #region AccountOf set
-                var accountOf = property.GetAttribute<UserOfAttribute>();
-                if (accountOf != null)
+                #region WorkOf set
+                var workOf = property.GetAttribute<WorkOfAttribute>();
+                if (workOf != null)
                 {
-                    var value = property.GetAttribute<UserOfAttribute>();
+                    var value = property.GetValue(model, null);
                     if (value != null)
                     {
-                        doc.Account = value.ToString();
+                        doc.WorkOf = value.ToString();
                     }
                 }
                 #endregion
@@ -200,7 +237,7 @@ namespace Objectiks.Engine
                     var value = property.GetValue(model, null);
                     if (value != null)
                     {
-                        doc.User = value.ToString();
+                        doc.UserOf = value.ToString();
                     }
                 }
                 #endregion
@@ -284,18 +321,21 @@ namespace Objectiks.Engine
             }
         }
 
-        public void Delete(T document)
+        public void UpdateDocument(T document, bool clearDocumentRefs = true)
         {
-            if (document == null)
-            {
-                throw new Exception("Document is null");
-            }
+            AddDocument(document, clearDocumentRefs);
+        }
 
-            var doc = GetDocument(document, false);
+        public void UpdateDocuments(List<T> documents, bool clearDocumentRefs = true)
+        {
+            AddDocuments(documents, clearDocumentRefs);
+        }
 
-            if (doc.Exists)
+        internal void DeleteDocument(Document Document)
+        {
+            if (Document.Exists)
             {
-                Enqueue(doc, new DocumentPartition(doc.Partition, OperationType.Delete));
+                Enqueue(Document, new DocumentPartition(Document.Partition, OperationType.Delete));
             }
             else
             {
@@ -303,11 +343,60 @@ namespace Objectiks.Engine
             }
         }
 
-        public void Delete(List<T> documents)
+        public void DeleteDocument(Guid primaryOf)
+        {
+            if (primaryOf == Guid.Empty)
+            {
+                throw new ArgumentNullException("primaryOf is null");
+            }
+
+            var doc = Engine.Read(TypeOf, primaryOf);
+
+            DeleteDocument(doc);
+        }
+
+        public void DeleteDocument(long primaryOf)
+        {
+            if (primaryOf == 0)
+            {
+                throw new ArgumentNullException("primaryOf is null");
+            }
+
+            var doc = Engine.Read(TypeOf, primaryOf);
+
+            DeleteDocument(doc);
+        }
+
+        public void DeleteDocument(int primaryOf)
+        {
+            if (primaryOf == 0)
+            {
+                throw new ArgumentNullException("primaryOf is null");
+            }
+
+            var doc = Engine.Read(TypeOf, primaryOf);
+
+            DeleteDocument(doc);
+        }
+
+        public void DeleteDocument(T document)
+        {
+            if (document == null)
+            {
+                throw new Exception("Document is null");
+            }
+
+            var primaryOf = GetDocumentPrimaryValue(document);
+            var doc = Engine.Read(TypeOf, primaryOf);
+
+            DeleteDocument(doc);
+        }
+
+        public void DeleteDocuments(List<T> documents)
         {
             foreach (var item in documents)
             {
-                Delete(item);
+                DeleteDocument(item);
             }
         }
 
@@ -357,17 +446,49 @@ namespace Objectiks.Engine
                 Queue.Clear();
                 Partitions.Clear();
 
-                if (Transaction.IsInternalTransaction)
+                Commit();
+            }
+            catch (IOException ex)
+            {
+                Rollback(ex);
+            }
+        }
+
+        public void Truncate()
+        {
+            try
+            {
+                var list = Engine.ReadList<T>(new QueryOf(TypeOf));
+
+                int numberOfRows = list.Count;
+
+                if (numberOfRows > 0)
                 {
-                    Transaction.Commit();
+                    Transaction.AddTruncateTypeOf(TypeOf);
+
+                    DeleteDocuments(list);
+                    SubmitChanges();
                 }
             }
-            catch (IOException)
+            catch (Exception ex)
             {
-                if (Transaction.IsInternalTransaction)
-                {
-                    Transaction.Rollback();
-                }
+                Engine.Logger?.Error(ex);
+            }
+        }
+
+        private void Commit()
+        {
+            if (Transaction.IsInternalTransaction)
+            {
+                Transaction.Commit();
+            }
+        }
+
+        private void Rollback(Exception exception = null)
+        {
+            if (Transaction.IsInternalTransaction)
+            {
+                Transaction.Rollback(exception);
             }
         }
 

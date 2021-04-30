@@ -77,19 +77,19 @@ namespace Objectiks
                 schema.ParseOf = DocumentDefaults.DocumentParseOf;
             }
 
-            if (String.IsNullOrWhiteSpace(schema.Primary))
+            if (String.IsNullOrWhiteSpace(schema.PrimaryOf))
             {
-                schema.Primary = DocumentDefaults.DocumentPrimaryOf;
+                schema.PrimaryOf = DocumentDefaults.DocumentPrimaryOf;
             }
 
-            if (String.IsNullOrWhiteSpace(schema.Account))
+            if (String.IsNullOrWhiteSpace(schema.WorkOf))
             {
-                schema.Account = Option.Account;
+                schema.WorkOf = Option.Account;
             }
 
-            if (String.IsNullOrWhiteSpace(schema.User))
+            if (String.IsNullOrWhiteSpace(schema.UserOf))
             {
-                schema.User = Option.User;
+                schema.UserOf = Option.User;
             }
 
             if (schema.KeyOf == null)

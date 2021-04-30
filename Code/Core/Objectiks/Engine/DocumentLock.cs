@@ -10,7 +10,7 @@ namespace Objectiks.Engine
     {
         private int Timeout = 1000 * 60;
         private readonly ReaderWriterLockSlim Transaction = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-        private readonly ConcurrentDictionary<string, object> TypeOf = new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, object> TypeOf = new ConcurrentDictionary<string, object>();
 
         public DocumentLock() { }
 
@@ -31,13 +31,17 @@ namespace Objectiks.Engine
         public void ExitTransaction()
         {
             if (Transaction.IsWriteLockHeld) { return; }
+            //if (!Transaction.IsReadLockHeld)
+            //{
+            //    return;
+            //}
 
             Transaction.ExitReadLock();
         }
 
         public void EnterLock(string typeOfName)
         {
-            var typeOf = TypeOf.GetOrAdd(typeOfName, (s) => new object());
+            var typeOf = TypeOf.GetOrAdd(typeOfName.ToLowerInvariant(), (s) => new object());
 
             if (!Monitor.TryEnter(typeOf, Timeout))
             {
@@ -47,7 +51,7 @@ namespace Objectiks.Engine
 
         public void ExitLock(string typeOfName)
         {
-            if (!TypeOf.TryGetValue(typeOfName, out var typeOf))
+            if (!TypeOf.Remove(typeOfName.ToLowerInvariant(), out var typeOf))
             {
                 throw new Exception("Transaction locker not found");
             }
@@ -104,6 +108,11 @@ namespace Objectiks.Engine
         public void ExitExclusive()
         {
             Transaction.ExitWriteLock();
+        }
+
+        public ICollection<string> GetTypeOfList()
+        {
+            return TypeOf.Keys;
         }
 
         public void Dispose()

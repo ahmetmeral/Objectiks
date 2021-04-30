@@ -138,6 +138,7 @@ namespace Objectiks.StackExchange.Redis
         public override void Remove(string typeOf, object primaryOf)
         {
             Database.Remove(CacheOfDocument(typeOf, primaryOf));
+            Database.Remove(CacheOfDocumentInfo(typeOf, primaryOf));
         }
 
         public override void Remove(string typeOf)
@@ -148,6 +149,7 @@ namespace Objectiks.StackExchange.Redis
         public override void Remove(Document document)
         {
             Database.Remove(CacheOf(document));
+            Database.Remove(CacheOfDocumentInfo(document.TypeOf, document.PrimaryOf));
         }
 
         public override void Remove(DocumentMeta meta)
@@ -157,19 +159,19 @@ namespace Objectiks.StackExchange.Redis
 
         public override void Flush()
         {
-            var endPoints = Client.GetDatabase(0).Database.Multiplexer.GetEndPoints();
+            var endPoints = Database.Database.Multiplexer.GetEndPoints();
 
             var tasks = new List<Task>(endPoints.Length);
 
             for (var i = 0; i < endPoints.Length; i++)
             {
-                var server = Client.GetDatabase(0).Database.Multiplexer.GetServer(endPoints[i]);
+                var server = Database.Database.Multiplexer.GetServer(endPoints[i]);
 
                 if (!server.IsReplica)
                     tasks.Add(server.FlushDatabaseAsync(Database.Number));
             }
 
-             Task.WhenAll(tasks);
+            Task.WhenAll(tasks);
         }
     }
 }

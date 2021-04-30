@@ -181,7 +181,7 @@ namespace Objectiks
                 temporySchema.TypeOf = typeOf;
                 temporySchema.ParseOf = "Document";
                 temporySchema.KeyOf = Option.KeyOf;
-                temporySchema.Primary = Option.Primary;
+                temporySchema.PrimaryOf = Option.Primary;
 
                 var schema = new JSONSerializer().Serialize(temporySchema);
 

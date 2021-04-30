@@ -178,6 +178,26 @@ namespace Objectiks.Engine
             return Engine.Read<T>(Query);
         }
 
+        public int Delete()
+        {
+            var list = Engine.ReadList<T>(Query);
+
+            int numberOfRows = list.Count;
+
+            if (numberOfRows == 0)
+            {
+                return 0;
+            }
+
+            using (var writer = new DocumentWriter<T>(Engine, Query.TypeOf))
+            {
+                writer.DeleteDocuments(list);
+                writer.SubmitChanges();
+            }
+
+            return numberOfRows;
+        }
+
         #endregion
 
         #region Utils

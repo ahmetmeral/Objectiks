@@ -15,8 +15,6 @@ namespace Objectiks.StackExchange.Redis
 
         private RedisConfiguration Configuration;
 
-        public RedisDatabase Db0 => GetDatabase(0);
-
         public RedisClient(string connectionString, IDocumentSerializer serializer = null)
             : this(new RedisConfiguration(connectionString), serializer)
         {

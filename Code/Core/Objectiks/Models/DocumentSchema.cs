@@ -20,7 +20,15 @@ namespace Objectiks.Models
 
         public DocumentSchemes(params DocumentSchema[] schemes)
         {
-            this.AddRange(schemes);
+            foreach (var item in schemes)
+            {
+                if (String.IsNullOrWhiteSpace(item.ParseOf))
+                {
+                    item.ParseOf = "Document";
+                }
+
+                this.Add(item);
+            }
         }
     }
 
@@ -37,11 +45,11 @@ namespace Objectiks.Models
         /// <summary>
         /// Identity Property
         /// </summary>
-        public string Primary { get; set; }
+        public string PrimaryOf { get; set; }
 
-        public string Account { get; set; }
+        public string WorkOf { get; set; }
 
-        public string User { get; set; }
+        public string UserOf { get; set; }
         /// <summary>
         /// Unique Keys..
         /// </summary>
