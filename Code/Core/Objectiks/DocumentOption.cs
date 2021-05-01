@@ -25,7 +25,7 @@ namespace Objectiks
         public string SqlProviderSchema { get; set; }
         public string SqlProviderSchemaSeperator { get; set; } = ".";
         public int SqlProviderPageLimit { get; set; } = 2;
-        
+
         public bool SupportSqlDataReaderPaging { get; set; } = true;
 
         public int SupportPartialStorageLimit { get; set; } = 1000;
@@ -44,18 +44,19 @@ namespace Objectiks
 
         public DocumentCacheInfo CacheInfo { get; set; } = new DocumentCacheInfo { Expire = 10000 };
         public DocumentSchemes Schemes { get; set; } = new DocumentSchemes();
-        public DocumentVars Vars { get; set; }
+        public DocumentVars Vars { get; set; } = new DocumentVars();
 
         internal IDocumentCache CacheInstance { get; set; }
         internal IDocumentWatcher DocumentWatcher { get; set; }
         internal IDocumentLogger DocumentLogger { get; set; }
+        internal List<IParser> ParserOfTypes { get; private set; }
 
         internal Type EngineProvider { get; private set; }
-        internal List<Type> ParserOfTypes { get; private set; }
+        
 
         public DocumentOption()
         {
-            ParserOfTypes = new List<Type>();
+            ParserOfTypes = new List<IParser>();
         }
 
         public virtual void RegisterDefaultTypeOrParser()
@@ -98,12 +99,17 @@ namespace Objectiks
 
         public void AddParserTypeOf<T>() where T : IParser
         {
-            ParserOfTypes.Add(typeof(T));
+            ParserOfTypes.Add(GetDocumentParser(typeof(T)));
         }
 
         public void ClearParserOf()
         {
             ParserOfTypes?.Clear();
+        }
+
+        internal IParser GetDocumentParser(Type type)
+        {
+            return (IParser)Activator.CreateInstance(type);
         }
     }
 }

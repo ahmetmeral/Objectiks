@@ -31,7 +31,6 @@ namespace Objectiks.Engine
         private DocumentMeta Meta;
         private bool IsPartialStore = false;
         private int? PartialStoreLimit = 0;
-        private bool IsTruncate = false;
         public string TypeOf { get; set; }
 
         public DocumentWriter() { }
@@ -50,11 +49,11 @@ namespace Objectiks.Engine
                 PartialStoreLimit = Engine.Option.SupportPartialStorageLimit;
             }
 
-            Transaction = ObjectiksOf.Core.GetTransaction(engine, false, false);
+            Transaction = Engine.GetThreadTransaction();
 
             if (Transaction == null)
             {
-                Transaction = ObjectiksOf.Core.GetTransaction(engine, true, true);
+                Transaction = Engine.BeginInternalTransaction();
             }
 
             Transaction.EnterTypeOfLock(typeOf);

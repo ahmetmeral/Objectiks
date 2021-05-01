@@ -24,9 +24,15 @@ namespace Objectiks
         public IDocumentWatcher Watcher { get; private set; }
         public List<IParser> ParseOf { get; private set; }
         public DocumentTypes TypeOf { get; set; }
-        public bool FirstLoaded { get; set; }
 
-        public DocumentEngine() { }
+        public bool IsInitialize { get; set; }
+
+        private readonly DocumentMonitor Monitor;
+
+        public DocumentEngine()
+        {
+            Monitor = new DocumentMonitor();
+        }
 
         public DocumentEngine(DocumentProvider documentProvider, DocumentOption option)
         {
@@ -35,14 +41,16 @@ namespace Objectiks
             Cache = option.CacheInstance;
             Logger = option.DocumentLogger;
             Watcher = option.DocumentWatcher;
-            ParseOf = GetDocumentParsers(option.ParserOfTypes);
+            ParseOf = option.ParserOfTypes;
             TypeOf = new DocumentTypes();
+            Monitor = new DocumentMonitor();
 
             if (Option.SupportDocumentWatcher)
             {
                 Watcher?.WaitForChanged(this);
             }
         }
+
 
         protected virtual DocumentSchema GetDocumentSchema(string typeOf)
         {
@@ -193,21 +201,29 @@ namespace Objectiks
             return DocumentManifest.Get(path);
         }
 
-        protected virtual List<IParser> GetDocumentParsers(List<Type> parseOfList)
-        {
-            var list = new List<IParser>();
-
-            foreach (var parseOf in parseOfList)
-            {
-                list.Add((IParser)Activator.CreateInstance(parseOf));
-            }
-
-            return list;
-        }
-
         internal virtual DocumentTransaction BeginTransaction()
         {
-            return ObjectiksOf.Core.GetTransaction(this, true, false);
+            return GetTransaction(true, false);
+        }
+
+        internal virtual DocumentTransaction BeginInternalTransaction()
+        {
+            return GetTransaction(true, true);
+        }
+
+        internal virtual DocumentTransaction GetThreadTransaction()
+        {
+            return GetTransaction(false, false);
+        }
+
+        internal virtual DocumentTransaction GetTransaction(bool create, bool isInternal)
+        {
+            return Monitor.GetTransaction(this, create, isInternal);
+        }
+
+        internal virtual void ReleaseTransaction(DocumentTransaction transaction)
+        {
+            Monitor.ReleaseTransaction(transaction);
         }
     }
 }

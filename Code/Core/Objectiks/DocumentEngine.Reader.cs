@@ -171,8 +171,6 @@ namespace Objectiks
             }
         }
 
-        
-
         public virtual Document Read(QueryOf query, DocumentMeta meta = null)
         {
             if (meta == null)
@@ -358,19 +356,6 @@ namespace Objectiks
             });
 
             return meta;
-        }
-
-        private void MonitorEnter(string typeOf)
-        {
-            Monitor.Enter(typeOf.ToLowerInvariant());
-        }
-
-        private void MonitorExit(string typeOf)
-        {
-            if (Monitor.IsEntered(typeOf.ToLowerInvariant()))
-            {
-                Monitor.Exit(typeOf.ToLowerInvariant());
-            }
         }
     }
 }

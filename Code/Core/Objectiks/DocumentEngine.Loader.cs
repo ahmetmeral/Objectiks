@@ -17,7 +17,7 @@ namespace Objectiks
 {
     public partial class DocumentEngine : IDocumentEngine
     {
-        public virtual void FirstLoadAllDocumentType()
+        internal virtual DocumentEngine Initialize()
         {
             Watcher?.Lock();
 
@@ -34,7 +34,9 @@ namespace Objectiks
 
             Watcher?.UnLock();
 
-            FirstLoaded = true;
+            IsInitialize = true;
+
+            return this;
         }
 
         public virtual bool LoadDocumentType(string typeOf)

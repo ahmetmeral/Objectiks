@@ -19,53 +19,28 @@ namespace Objectiks
         {
             private static DocumentEngines Engines = new DocumentEngines();
             private static DocumentOptions Options = new DocumentOptions();
-            private static DocumentMonitor Monitor = new DocumentMonitor();
 
             public static DocumentEngine Get(DocumentProvider documentProvider, DocumentOption option)
             {
-                Engines.TryGetValue(documentProvider.Key, out DocumentEngine engine);
+                DocumentEngine engine;
 
-                if (engine == null)
+                if (option == null)
                 {
-                    if (option == null)
-                    {
-                        option = GetOption(documentProvider);
-                    }
-
-                    if (option.CacheInstance == null)
-                    {
-                        option.CacheInstance = new DocumentInMemory(option.Name, new DocumentBsonSerializer());
-                    }
-
-                    if (documentProvider.Connection == null)
-                    {
-                        engine = new DocumentEngine(documentProvider, option);
-                    }
-                    else
-                    {
-                        if (option.EngineProvider != null)
-                        {
-                            engine = (DocumentEngine)Activator.CreateInstance(option.EngineProvider, documentProvider, option);
-                        }
-                        else
-                        {
-                            throw new Exception("Sql engine type undefined..");
-                        }
-                    }
-
-                    engine.FirstLoadAllDocumentType();
-
-                    Engines.TryAdd(documentProvider.Key, engine);
+                    option = GetOption(documentProvider);
                 }
 
-                return engine;
-            }
-
-            public static DocumentEngine Get(DocumentEngine engine)
-            {
-                if (!engine.FirstLoaded)
+                if (option.CacheInstance == null)
                 {
-                    engine.FirstLoadAllDocumentType();
+                    option.CacheInstance = new DocumentInMemory(option.Name, new DocumentBsonSerializer());
+                }
+
+                if (option.EngineProvider == null)
+                {
+                    engine = new DocumentEngine(documentProvider, option);
+                }
+                else
+                {
+                    engine = (DocumentEngine)Activator.CreateInstance(option.EngineProvider, documentProvider, option);
                 }
 
                 return engine;
@@ -75,6 +50,11 @@ namespace Objectiks
             {
                 var key = type.Name;
 
+                Map(key, option);
+            }
+
+            private static void Map(string key, DocumentOption option)
+            {
                 if (Options.ContainsKey(key))
                 {
                     Options[key] = option;
@@ -85,41 +65,76 @@ namespace Objectiks
                 }
             }
 
+            public static void Initialize(DocumentProvider provider, DocumentOption option = null)
+            {
+                if (option == null)
+                {
+                    option = GetOption(provider);
+                }
+                else
+                {
+                    Map(provider.Key, option);
+                }
+
+                var engine = Get(provider, option).Initialize();
+
+                if (!engine.IsInitialize)
+                {
+                    throw new Exception("Engine initialize error");
+                }
+            }
+
+            public static void Initialize(string baseDirectory, DocumentOption option = null)
+            {
+                Initialize(new DocumentProvider(baseDirectory), option);
+            }
+
+            public static void Initialize(IDbConnection connection, DocumentOption option = null)
+            {
+                Initialize(new DocumentProvider(connection), option);
+            }
+
+            public static void Initialize(DocumentOption option)
+            {
+                Initialize(new DocumentProvider(), option);
+            }
+
             public static DocumentOption GetOption(DocumentProvider provider)
             {
-                var key = provider.Connection != null ? provider.Connection.GetType().Name : typeof(DocumentProvider).Name;
+                var key = provider.Key;
 
-                Options.TryGetValue(key, out DocumentOption setting);
+                if (!Options.TryGetValue(key, out DocumentOption option))
+                {
+                    key = provider.Connection != null ? provider.Connection.GetType().Name : typeof(DocumentProvider).Name;
+                    Options.TryGetValue(key, out option);
+                }
 
-                if (setting == null)
+                if (option == null)
                 {
                     var path = Path.Combine(provider.BaseDirectory, DocumentDefaults.Manifest);
 
-                    setting = DocumentManifest.Get(path);
-                    setting.RegisterDefaultTypeOrParser();
+                    option = DocumentManifest.Get(path);
+                    option.RegisterDefaultTypeOrParser();
+
+                    if (option.CacheInstance == null)
+                    {
+                        option.CacheInstance = new DocumentInMemory(option.Name, new DocumentBsonSerializer());
+                    }
 
                     if (Options.ContainsKey(key))
                     {
-                        Options[key] = setting;
+                        Options[key] = option;
                     }
                     else
                     {
-                        Options.TryAdd(key, setting);
+                        Options.TryAdd(key, option);
                     }
                 }
 
-                return setting;
-            }
-
-            internal static DocumentTransaction GetTransaction(DocumentEngine engine, bool create, bool isInternal)
-            {
-                return Monitor.GetTransaction(engine, create, isInternal);
-            }
-
-            internal static void ReleaseTransaction(DocumentTransaction transaction)
-            {
-                Monitor.ReleaseTransaction(transaction);
+                return option;
             }
         }
     }
 }
+
+

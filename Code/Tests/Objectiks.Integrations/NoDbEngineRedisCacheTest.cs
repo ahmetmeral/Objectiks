@@ -18,7 +18,7 @@ namespace Objectiks.Integrations
         [SetUp]
         public override void Setup()
         {
-            ObjectiksOf.Core.Map(typeof(DocumentProvider), new NoDbEngineRedisOption());
+            ObjectiksOf.Core.Initialize(new DocumentProvider(), new NoDbEngineRedisOption());
         }
 
         [Test]

@@ -28,9 +28,9 @@ namespace Objectiks
             Engine = Core.Get(new DocumentProvider(baseDirectory), options);
         }
 
-        public ObjectiksOf(DocumentProvider fileProvider, DocumentOption options = null)
+        public ObjectiksOf(DocumentProvider documentProvider, DocumentOption options = null)
         {
-            Engine = Core.Get(fileProvider, options);
+            Engine = Core.Get(documentProvider, options);
         }
 
         public ObjectiksOf(IDbConnection connection, DocumentOption options = null)
@@ -160,8 +160,8 @@ namespace Objectiks
         {
             if (typeOf == "All")
             {
-                Engine.FirstLoaded = false;
-                Engine.FirstLoadAllDocumentType();
+                Engine.IsInitialize = false;
+                Engine.Initialize();
             }
             else
             {

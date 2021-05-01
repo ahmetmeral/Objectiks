@@ -31,10 +31,6 @@ namespace Objectiks.Engine
         public void ExitTransaction()
         {
             if (Transaction.IsWriteLockHeld) { return; }
-            //if (!Transaction.IsReadLockHeld)
-            //{
-            //    return;
-            //}
 
             Transaction.ExitReadLock();
         }
@@ -51,7 +47,7 @@ namespace Objectiks.Engine
 
         public void ExitLock(string typeOfName)
         {
-            if (!TypeOf.Remove(typeOfName.ToLowerInvariant(), out var typeOf))
+            if (!TypeOf.TryGetValue(typeOfName.ToLowerInvariant(), out var typeOf))
             {
                 throw new Exception("Transaction locker not found");
             }

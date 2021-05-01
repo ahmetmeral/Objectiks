@@ -307,14 +307,14 @@ namespace Objectiks.Integrations
         }
 
         [Test]
-        public void DocumentTransactionParalelTest()
+        public void DocumentTransactionInternalParalelTest()
         {
-            var size = 5;
+            var size = 500;
             var pages = TestSetup.GeneratePages(size, false);
             var repos = new ObjectiksOf();
 
-            //repos.TruncateOf<Pages>();
-            //repos.TruncateOf<Tags>();
+            repos.TruncateOf<Pages>();
+            repos.TruncateOf<Tags>();
 
             var result = Parallel.ForEach(pages, page =>
             {
@@ -326,13 +326,45 @@ namespace Objectiks.Integrations
                 }
             });
 
-            while (!result.IsCompleted)
-            {
+            Assert.IsTrue(repos.Count<Pages>() == size);
+        }
 
-            }
+        [Test]
+        public void DocumentTransactionGlobalParalelTest()
+        {
+            var size = 500;
+            var pages = TestSetup.GeneratePages(size, false);
+            var repos = new ObjectiksOf();
+
+            repos.TruncateOf<Pages>();
+            repos.TruncateOf<Tags>();
+
+            var result = Parallel.ForEach(pages, page =>
+            {
+                using (var trans = repos.BeginTransaction())
+                {
+                    try
+                    {
+                        using (var pageWriter = repos.WriterOf<Pages>())
+                        {
+                            pageWriter.UseFormatting();
+                            pageWriter.AddDocument(page);
+                            pageWriter.SubmitChanges();
+                        }
+
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback(ex);
+                    }
+                }
+            });
 
             Assert.IsTrue(repos.Count<Pages>() == size);
         }
+
+
 
         [Test]
         public void DocumentBulkWritePartial()
@@ -345,7 +377,7 @@ namespace Objectiks.Integrations
 
             using (var writer = repos.WriterOf<Pages>())
             {
-                writer.UsePartialStore(10);
+                writer.UsePartialStore(25);
                 writer.UseFormatting();
                 writer.AddDocuments(pages);
                 writer.SubmitChanges();

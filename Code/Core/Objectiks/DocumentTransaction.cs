@@ -194,7 +194,7 @@ namespace Objectiks
             finally
             {
                 ExitAllTypeOfLock();
-                ObjectiksOf.Core.ReleaseTransaction(this);
+                Engine.ReleaseTransaction(this);
             }
         }
 
@@ -224,7 +224,7 @@ namespace Objectiks
             finally
             {
                 ExitAllTypeOfLock();
-                ObjectiksOf.Core.ReleaseTransaction(this);
+                Engine.ReleaseTransaction(this);
             }
         }
 

@@ -19,7 +19,7 @@ namespace Objectiks.Integrations
         [SetUp]
         public override void Setup()
         {
-            ObjectiksOf.Core.Map(typeof(DocumentProvider), new NoDbEngineInMemoryOption());
+            ObjectiksOf.Core.Initialize(new DocumentProvider(), new NoDbEngineInMemoryOption());
         }
     }
 }
