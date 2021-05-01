@@ -15,7 +15,7 @@ namespace Objectiks.Integrations
         [Test]
         public void DocumentWriter()
         {
-            var size = 3;
+            var size = 500;
             var pages = TestSetup.GeneratePages(size, false);
             var repos = new ObjectiksOf();
 

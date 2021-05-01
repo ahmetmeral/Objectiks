@@ -98,22 +98,42 @@ namespace Objectiks.Helper
             {
                 using (var fs = new FileStream(storage.Target, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, BufferSize))
                 {
+                    bool isInStorageEmptyArray = fs.Length == 5;
+
                     SeekJsonArrayEndSquareBrackets(fs);
 
                     int rCount = rows.Count;
 
                     if (rCount == 1)
                     {
-                        var row = Encoding.UTF8.GetBytes($",{Serialize(rows[0], formatting)}]");
-                        fs.Write(row, 0, row.Length);
+                        if (isInStorageEmptyArray)
+                        {
+                            var row = Encoding.UTF8.GetBytes($"{Serialize(rows[0], formatting)}]");
+                            fs.Write(row, 0, row.Length);
+                        }
+                        else
+                        {
+                            var row = Encoding.UTF8.GetBytes($",{Serialize(rows[0], formatting)}]");
+                            fs.Write(row, 0, row.Length);
+                        }
                     }
                     else
                     {
-                        int arrayTagCloseIndex = rCount - 1;
+                        int startIndex = 0;
+                        int endIndex = rCount;
 
-                        for (int i = 0; i < rCount; i++)
+                        int arrayTagCloseIndex = endIndex - 1;
+
+                        for (int i = startIndex; i < endIndex; i++)
                         {
-                            if (i == arrayTagCloseIndex)
+
+                            if (isInStorageEmptyArray && i == 0)
+                            {
+                                //if empty json array []
+                                var row = Encoding.UTF8.GetBytes($"{Serialize(rows[i], formatting)}");
+                                fs.Write(row, 0, row.Length);
+                            }
+                            else if (i == arrayTagCloseIndex)
                             {
                                 var row = Encoding.UTF8.GetBytes($",{Serialize(rows[i], formatting)}]");
                                 fs.Write(row, 0, row.Length);
@@ -124,6 +144,7 @@ namespace Objectiks.Helper
                                 fs.Write(row, 0, row.Length);
                             }
                         }
+
                     }
 
                     fs.SetLength(fs.Position);
@@ -139,28 +160,47 @@ namespace Objectiks.Helper
             }
         }
 
+        //not tested..
         public void AppendRows(DocumentStorage storage, List<JObject> rows, Formatting formatting = Formatting.None)
         {
             try
             {
                 using (var fs = new FileStream(storage.Target, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, BufferSize))
                 {
+                    bool isInStorageEmptyArray = fs.Length == 5;
+
                     SeekJsonArrayEndSquareBrackets(fs);
 
                     int rCount = rows.Count;
 
                     if (rCount == 1)
                     {
-                        var row = Encoding.UTF8.GetBytes($",{rows[0].ToString(formatting)}]");
-                        fs.Write(row, 0, row.Length);
+                        if (isInStorageEmptyArray)
+                        {
+                            var row = Encoding.UTF8.GetBytes($"{rows[0].ToString(formatting)}]");
+                            fs.Write(row, 0, row.Length);
+                        }
+                        else
+                        {
+                            var row = Encoding.UTF8.GetBytes($",{rows[0].ToString(formatting)}]");
+                            fs.Write(row, 0, row.Length);
+                        }
                     }
                     else
                     {
-                        int arrayTagCloseIndex = rCount - 1;
+                        int startIndex = 0;
+                        int endIndex = rCount;
 
-                        for (int i = 0; i < rCount; i++)
+                        int arrayTagCloseIndex = endIndex - 1;
+
+                        for (int i = startIndex; i < endIndex; i++)
                         {
-                            if (i == arrayTagCloseIndex)
+                            if (isInStorageEmptyArray && i == 0)
+                            {
+                                var row = Encoding.UTF8.GetBytes($"{rows[i].ToString(formatting)}]");
+                                fs.Write(row, 0, row.Length);
+                            }
+                            else if (i == arrayTagCloseIndex)
                             {
                                 var row = Encoding.UTF8.GetBytes($",{rows[i].ToString(formatting)}]");
                                 fs.Write(row, 0, row.Length);

@@ -50,6 +50,7 @@ namespace Objectiks.Models
         public string WorkOf { get; set; }
 
         public string UserOf { get; set; }
+
         /// <summary>
         /// Unique Keys..
         /// </summary>

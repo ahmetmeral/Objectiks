@@ -168,14 +168,7 @@ namespace Objectiks
 
                     if (IsTruncateTypeOf(typeOf))
                     {
-                        meta.Keys = new DocumentKeyIndex();
-                        meta.TotalRecords = 0;
-                        meta.HasData = false;
-                        meta.Sequence = 0;
-                        meta.DiskSize = 0;
-
-                        Engine.Cache.Set(meta, meta.Cache.Expire);
-                        Engine.Cache.Set(new DocumentSequence(typeOf, 0));
+                        Engine.TruncateTypeOf(meta);
 
                         RemoveTruncateTypeOf(typeOf);
                     }

@@ -31,6 +31,7 @@ namespace Objectiks
         public DocumentRefs Refs { get; set; }
         public DocumentCacheInfo Cache { get; set; }
         public DocumentPartitions Partitions { get; set; }
+        public string Extention { get; set; }
         public string Directory { get; set; }
 
         [JsonIgnore]
@@ -54,6 +55,7 @@ namespace Objectiks
             Partitions.Current = 0;
             Partitions.Next = 0;
             Directory = Path.Combine(fileProvider.BaseDirectory, DocumentDefaults.Documents, typeOf);
+            Extention = option.Extention;
             HasLazy = GetRefs(true).Count > 0;
             Exists = true;
 
@@ -261,6 +263,41 @@ namespace Objectiks
             if (!key.Equals(null) && !String.IsNullOrEmpty(key.PrimaryOf))
             {
                 Keys.Remove(key);
+            }
+        }
+
+        internal void ClearPartitions()
+        {
+            Partitions.Clear();
+            Partitions.Current = 0;
+            Partitions.Next = 1;
+            Partitions.Add(0, 0);
+        }
+
+        internal void ClearStaticFiles()
+        {
+            if (String.IsNullOrWhiteSpace(Directory))
+            {
+                return;
+            }
+
+            var files = System.IO.Directory.GetFiles(Directory, Extention, SearchOption.TopDirectoryOnly);
+
+            foreach (var item in files)
+            {
+                try
+                {
+                    //default file not remove
+                    var typeOfNameCheck = Path.GetFileNameWithoutExtension(item);
+
+                    if (typeOfNameCheck.ToLowerInvariant() == TypeOf.ToLowerInvariant())
+                    {
+                        continue;
+                    }
+
+                    new FileInfo(item).Delete();
+                }
+                catch { }
             }
         }
 

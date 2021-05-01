@@ -132,5 +132,39 @@ namespace Objectiks
             var map = new DocumentMap(context.Primary, context.Primary);
             json.DeleteRows(context.Storage, context.Documents.Select(d => d.Data).ToList(), map, formatting);
         }
+
+        public virtual void TruncateTypeOf(DocumentMeta meta)
+        {
+            meta.Keys = new DocumentKeyIndex();
+            meta.TotalRecords = 0;
+            meta.HasData = false;
+            meta.Sequence = 0;
+            meta.DiskSize = 0;
+            meta.ClearPartitions();
+            meta.ClearStaticFiles();
+
+            Cache.Set(meta, meta.Cache.Expire);
+            Cache.Set(new DocumentSequence(meta.TypeOf, 0));
+        }
+
+        public virtual int Delete<T>(QueryOf query)
+        {
+            var list = ReadList<T>(query);
+
+            int numberOfRows = list.Count;
+
+            if (numberOfRows == 0)
+            {
+                return 0;
+            }
+
+            using (var writer = new DocumentWriter<T>(this, query.TypeOf))
+            {
+                writer.DeleteDocuments(list);
+                writer.SubmitChanges();
+            }
+
+            return numberOfRows;
+        }
     }
 }
