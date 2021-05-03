@@ -20,7 +20,7 @@ namespace Objectiks
             private static DocumentEngines Engines = new DocumentEngines();
             private static DocumentOptions Options = new DocumentOptions();
 
-            public static DocumentEngine Get(DocumentProvider documentProvider, DocumentOption option)
+            internal static DocumentEngine Get(DocumentProvider documentProvider, DocumentOption option)
             {
                 DocumentEngine engine;
 

@@ -142,6 +142,28 @@ namespace Objectiks
         {
             try
             {
+                foreach (var item in TypeOfContext)
+                {
+                    var typeOf = item.Key;
+                    var meta = Engine.GetTypeMeta(typeOf);
+
+                    if (IsTruncateTypeOf(typeOf))
+                    {
+                        Engine.TruncateTypeOf(meta);
+
+                        RemoveTruncateTypeOf(typeOf);
+
+                        continue;
+                    }
+
+                    foreach (var context in item.Value)
+                    {
+                        Engine.OnChangeDocuments(meta, context);
+                    }
+
+                    Engine.Cache.Set(meta, meta.Cache.Expire);
+                }
+
                 if (DbTransaction == null)
                 {
                     foreach (var storage in Storages)
@@ -154,29 +176,6 @@ namespace Objectiks
                 {
                     DbTransaction.Commit();
                 }
-
-
-                foreach (var item in TypeOfContext)
-                {
-                    var typeOf = item.Key;
-                    var meta = Engine.GetTypeMeta(typeOf);
-
-                    foreach (var context in item.Value)
-                    {
-                        Engine.OnChangeDocuments(meta, context);
-                    }
-
-                    if (IsTruncateTypeOf(typeOf))
-                    {
-                        Engine.TruncateTypeOf(meta);
-
-                        RemoveTruncateTypeOf(typeOf);
-                    }
-                    else
-                    {
-                        Engine.Cache.Set(meta, meta.Cache.Expire);
-                    }
-                }
             }
             catch (Exception ex)
             {
@@ -191,10 +190,15 @@ namespace Objectiks
             }
         }
 
-        public void Rollback()
+        public void Rollback(bool isTypeOfReload)
         {
             try
             {
+                if (!Monitor.IsInTransaction)
+                {
+                    throw new Exception("active transaction not found");
+                }
+
                 if (DbTransaction == null)
                 {
                     foreach (var storage in Storages)
@@ -207,6 +211,15 @@ namespace Objectiks
                 {
                     DbTransaction.Rollback();
                 }
+
+                if (isTypeOfReload)
+                {
+                    foreach (var item in TypeOfContext)
+                    {
+                        var typeOf = item.Key;
+                        Engine.LoadDocumentType(typeOf);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -216,14 +229,29 @@ namespace Objectiks
             }
             finally
             {
-                ExitAllTypeOfLock();
-                Engine.ReleaseTransaction(this);
+                if (Monitor.IsInTransaction)
+                {
+                    ExitAllTypeOfLock();
+                    Engine.ReleaseTransaction(this);
+                }
             }
+        }
+
+        public void Rollback()
+        {
+            Rollback(true);
         }
 
         public void Rollback(Exception ex)
         {
-            Rollback();
+            Rollback(true);
+
+            Engine.Logger?.Error(ex);
+        }
+
+        public void Rollback(Exception ex, bool isTypeOfReload)
+        {
+            Rollback(isTypeOfReload);
 
             Engine.Logger?.Error(ex);
         }

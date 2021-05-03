@@ -133,8 +133,26 @@ namespace Objectiks
             json.DeleteRows(context.Storage, context.Documents.Select(d => d.Data).ToList(), map, formatting);
         }
 
+        public virtual void TruncateTypeOf(string typeOf)
+        {
+            var meta = GetTypeMeta(typeOf);
+
+            TruncateTypeOf(meta);
+        }
+
         public virtual void TruncateTypeOf(DocumentMeta meta)
         {
+            if (meta.Keys.Count > 0)
+            {
+                var typeOf = meta.TypeOf;
+
+                foreach (var item in meta.Keys)
+                {
+                    Cache.Remove(Cache.CacheOfDocument(typeOf, item.PrimaryOf));
+                    Cache.Remove(Cache.CacheOfDocumentInfo(typeOf, item.PrimaryOf));
+                }
+            }
+
             meta.Keys = new DocumentKeyIndex();
             meta.TotalRecords = 0;
             meta.HasData = false;

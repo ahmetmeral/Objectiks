@@ -219,8 +219,6 @@ namespace Objectiks.Integrations
             Assert.True(numberOfRecord == size);
         }
 
-
-
         [Test]
         public void DocumentTransactionInternalTest()
         {

@@ -15,6 +15,7 @@ namespace Objectiks.Engine
         private int LastTransactionID = 0;
 
         public ICollection<DocumentTransaction> Transactions => TransactionList.Values;
+        public bool IsInTransaction { get { return Locker.IsInTransaction; } }
 
         public DocumentMonitor()
         {

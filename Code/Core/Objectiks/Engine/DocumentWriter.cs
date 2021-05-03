@@ -457,21 +457,19 @@ namespace Objectiks.Engine
         {
             try
             {
-                var list = Engine.ReadList<T>(new QueryOf(TypeOf));
-
-                int numberOfRows = list.Count;
-
-                if (numberOfRows > 0)
+                Transaction.AddTruncateTypeOf(TypeOf);
+                Transaction.AddOperation(new DocumentContext
                 {
-                    Transaction.AddTruncateTypeOf(TypeOf);
+                    TypeOf = TypeOf,
+                    Operation = OperationType.Truncate,
+                    Documents = new List<Document>(),
+                });
 
-                    DeleteDocuments(list);
-                    SubmitChanges();
-                }
+                Commit();
             }
             catch (Exception ex)
             {
-                Engine.Logger?.Error(ex);
+                Rollback(ex);
             }
         }
 

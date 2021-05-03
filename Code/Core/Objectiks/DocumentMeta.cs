@@ -292,6 +292,14 @@ namespace Objectiks
 
                     if (typeOfNameCheck.ToLowerInvariant() == TypeOf.ToLowerInvariant())
                     {
+                        try
+                        {
+                            new FileInfo(item).Delete();
+                        }
+                        catch { }
+
+                        File.WriteAllText(item, "[]", Encoding.UTF8);
+
                         continue;
                     }
 

@@ -28,7 +28,6 @@ namespace Objectiks
                 if (LoadDocumentType(typeOf))
                 {
                     TypeOf.Add(typeOf.ToLowerInvariant());
-
                 }
             }
 
