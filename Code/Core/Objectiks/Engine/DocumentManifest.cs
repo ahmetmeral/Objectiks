@@ -10,15 +10,6 @@ namespace Objectiks.Engine
 {
     public class DocumentManifest : DocumentOption
     {
-        //public string Name { get; set; }
-        //public string Version { get; set; }
-        //public string Author { get; set; }
-        //public string Primary { get; set; }
-        //public DocumentKeyOfNames KeyOf { get; set; }
-        //public DocumentTypes TypeOf { get; set; }
-        //public DocumentSetting Documents { get; set; }
-
-
         public bool Empty { get; set; }
 
         public DocumentManifest() { }

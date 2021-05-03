@@ -48,7 +48,7 @@ namespace Objectiks.PostgreSql
                             ParseDocumentData(ref meta, ref document, new DocumentStorage());
                         }
 
-                        if (Option.SupportLoaderInRefs)
+                        if (Option.SupportTypeOfRefsFirstLoad)
                         {
                             ParseDocumentRefs(refs, ref document);
                         }

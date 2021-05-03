@@ -333,7 +333,7 @@ namespace Objectiks
         {
             var list = new List<DocumentMeta>();
 
-            foreach (var typeOf in TypeOf)
+            foreach (var typeOf in Option.TypeOf)
             {
                 var meta = GetTypeMeta(typeOf);
 

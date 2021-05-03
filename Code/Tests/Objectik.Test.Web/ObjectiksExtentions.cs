@@ -13,12 +13,12 @@ namespace Objectik.Test.Web
 {
     public class DocumentLogger : IDocumentLogger
     {
-        public void Debug(DebugType debugType, string msg)
+        public void Debug(ScopeType debugType, string msg)
         {
 
         }
 
-        public void Debug(DebugType debugType, bool condition, string msg)
+        public void Debug(ScopeType debugType, bool condition, string msg)
         {
 
         }

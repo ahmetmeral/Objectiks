@@ -13,6 +13,7 @@ namespace Objectiks.Integrations.Options
     {
         public PostgreEngineRedisOption() : base()
         {
+            #region TypeOf
             var pages = new DocumentSchema
             {
                 TypeOf = "Pages",
@@ -30,22 +31,19 @@ namespace Objectiks.Integrations.Options
                 PrimaryOf = "Id",
                 KeyOf = new DocumentKeyOfNames()
             };
-
+            #endregion
 
             Name = "PostgreEngineProvider";
             SqlProviderSchema = "public";
             SqlProviderSchemaSeperator = ".";
+            SupportTypeOfRefs = false;
+
             TypeOf = new DocumentTypes("Pages", "Tags");
             Schemes = new DocumentSchemes(pages, tags);
 
-            SupportFileAppend = false;
-            SupportPartialStorage = false;
-            SupportTypeOfRefs = false;
-
-            var cacheProvider = new DocumentInMemory(Name, new DocumentBsonSerializer());
-
-            UseCacheProvider(cacheProvider);
+            UseCacheProvider(new DocumentInMemory(Name, new DocumentBsonSerializer()));
             UseEngineProvider<PostgreSqlEngine>();
+
             RegisterDefaultTypeOrParser();
         }
     }

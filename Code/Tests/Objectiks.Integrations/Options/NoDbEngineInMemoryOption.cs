@@ -12,6 +12,7 @@ namespace Objectiks.Integrations.Option
     {
         public NoDbEngineInMemoryOption() : base()
         {
+            #region TypeOf
             var pages = new DocumentSchema
             {
                 TypeOf = "Pages",
@@ -29,6 +30,7 @@ namespace Objectiks.Integrations.Option
                 PrimaryOf = "Id",
                 KeyOf = new DocumentKeyOfNames()
             };
+            #endregion
 
             Name = "NoDbEngineProvider";
             TypeOf = new DocumentTypes("Pages", "Tags");
@@ -37,7 +39,6 @@ namespace Objectiks.Integrations.Option
 
             UseCacheProvider(new DocumentInMemory(Name, new DocumentBsonSerializer()));
             UseDocumentWatcher<DocumentWatcher>();
-            UseEngineProvider<DocumentEngine>();
 
             RegisterDefaultTypeOrParser();
         }

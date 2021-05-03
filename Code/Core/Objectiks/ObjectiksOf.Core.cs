@@ -73,15 +73,16 @@ namespace Objectiks
                 }
                 else
                 {
+                    if (option.HasManifest)
+                    {
+                        option = GetOptionMergeManifest(provider, option);
+                    }
+
                     Map(provider.Key, option);
                 }
 
                 var engine = Get(provider, option).Initialize();
 
-                if (!engine.IsInitialize)
-                {
-                    throw new Exception("Engine initialize error");
-                }
             }
 
             public static void Initialize(string baseDirectory, DocumentOption option = null)
@@ -112,26 +113,47 @@ namespace Objectiks
                 if (option == null)
                 {
                     var path = Path.Combine(provider.BaseDirectory, DocumentDefaults.Manifest);
+                    var manifest = DocumentManifest.Get(path);
 
-                    option = DocumentManifest.Get(path);
+                    option = manifest;
                     option.RegisterDefaultTypeOrParser();
 
                     if (option.CacheInstance == null)
                     {
                         option.CacheInstance = new DocumentInMemory(option.Name, new DocumentBsonSerializer());
                     }
+                }
 
-                    if (Options.ContainsKey(key))
-                    {
-                        Options[key] = option;
-                    }
-                    else
-                    {
-                        Options.TryAdd(key, option);
-                    }
+                if (Options.ContainsKey(key))
+                {
+                    Options[key] = option;
+                }
+                else
+                {
+                    Options.TryAdd(key, option);
                 }
 
                 return option;
+            }
+
+            private static DocumentOption GetOptionMergeManifest(DocumentProvider provider, DocumentOption option)
+            {
+                var path = Path.Combine(provider.BaseDirectory, DocumentDefaults.Manifest);
+                var manifest = DocumentManifest.Get(path);
+
+                if (manifest == null)
+                {
+                    throw new Exception("Manifest file not found");
+                }
+
+                manifest.CacheInstance = option.CacheInstance;
+                manifest.ParserOfTypes = option.ParserOfTypes;
+                manifest.DocumentWatcher = option.DocumentWatcher;
+                manifest.DocumentLogger = option.DocumentLogger;
+                manifest.EngineProvider = option.EngineProvider;
+                manifest.HasManifest = true;
+
+                return manifest;
             }
         }
     }

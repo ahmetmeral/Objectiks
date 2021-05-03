@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Objectiks.StackExchange.Redis
+namespace Objectiks.Redis
 {
     public class RedisConnectionPool : IDisposable
     {

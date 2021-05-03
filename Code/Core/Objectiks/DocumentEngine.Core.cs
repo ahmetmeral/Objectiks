@@ -23,9 +23,6 @@ namespace Objectiks
         public IDocumentCache Cache { get; private set; }
         public IDocumentWatcher Watcher { get; private set; }
         public List<IParser> ParseOf { get; private set; }
-        public DocumentTypes TypeOf { get; set; }
-
-        public bool IsInitialize { get; set; }
 
         private readonly DocumentMonitor Monitor;
 
@@ -42,7 +39,6 @@ namespace Objectiks
             Logger = option.DocumentLogger;
             Watcher = option.DocumentWatcher;
             ParseOf = option.ParserOfTypes;
-            TypeOf = new DocumentTypes();
             Monitor = new DocumentMonitor();
 
             if (Option.SupportDocumentWatcher)
@@ -72,7 +68,7 @@ namespace Objectiks
                 schema = DocumentSchema.Default();
                 schema.Cache = Option.CacheInfo;
 
-                Logger?.Debug(DebugType.Engine, $"TypeOf: {typeOf} GetDocumentSchema Schema is null");
+                Logger?.Debug(ScopeType.Engine, $"TypeOf: {typeOf} GetDocumentSchema Schema is null");
             }
 
             if (schema.Cache == null)
@@ -92,7 +88,7 @@ namespace Objectiks
 
             if (String.IsNullOrWhiteSpace(schema.WorkOf))
             {
-                schema.WorkOf = Option.Account;
+                schema.WorkOf = Option.WorkOf;
             }
 
             if (String.IsNullOrWhiteSpace(schema.UserOf))

@@ -11,5 +11,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Objectiks\Objectiks.csproj" />
   </ItemGroup>
-
 </Project>

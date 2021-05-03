@@ -30,7 +30,7 @@ namespace Objectiks.PostgreSql
             Provider = provider;
             Option = option;
             Logger = logger;
-            Limit = option.SqlProviderPageLimit;
+            Limit = option.SqlProviderDataReaderPageSize;
             Skip = 0;
             CurrentPage = 1;
         }

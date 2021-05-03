@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Objectiks.StackExchange.Redis
+namespace Objectiks.Redis
 {
     public class RedisDatabase
     {

@@ -7,13 +7,12 @@
   "TypeOf": [ "Pages", "Tags" ],
   "BufferSize": 512,
   "Extention": "*.json",
-  "SupportPartialLimit": 1000,
+  "SupportPartialStorageSize": 1000,
   "SupportPartialStorage": true,
-  "SupportTypeOfRefs": true,
-  "SupportFileAppend": true,
-  "SupportTransaction": false,
+  "SupportDocumentParser": false,
   "SupportDocumentWatcher": true,
-  "SupportProperyOverride": true,
+  "SupportTypeOfRefs": true,
+  "SupportTypeOfRefsFirstLoad": false,
   "Cache": {
     "Expire": 10000
   },
@@ -21,3 +20,4 @@
     "AnyVariables": true
   }
 }
+

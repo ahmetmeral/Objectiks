@@ -41,7 +41,7 @@ namespace Objectiks.Engine
                 ".txt"
             };
 
-            engine.Logger?.Debug(DebugType.Writer, $"Watch Directory : {engine.Provider.BaseDirectory}");
+            engine.Logger?.Debug(ScopeType.Writer, $"Watch Directory : {engine.Provider.BaseDirectory}");
 
             var watcher = new FileSystemWatcher(engine.Provider.BaseDirectory);
             watcher.NotifyFilter = NotifyFilters.Attributes |
@@ -75,29 +75,29 @@ namespace Objectiks.Engine
 
                 if (!IsAcceptExtention(file.Extension) || CheckIgnorePrefix(file.FullName))
                 {
-                    Engine.Logger?.Debug(DebugType.Watcher, $"Skip File : {file.FullName}");
+                    Engine.Logger?.Debug(ScopeType.Watcher, $"Skip File : {file.FullName}");
 
                     return;
                 }
 
-                var types = Engine.TypeOf;
+                var types = Engine.Option.TypeOf;
                 var typeOf = file.Directory.Name;
                 if (typeOf == DocumentDefaults.Contents)
                 {
                     typeOf = file.Directory.Parent.Name;
 
-                    Engine.Logger?.Debug(DebugType.Watcher, $"TypeOf: {typeOf} Contents changes");
+                    Engine.Logger?.Debug(ScopeType.Watcher, $"TypeOf: {typeOf} Contents changes");
                 }
 
                 if (types.Contains(typeOf.ToLowerInvariant()))
                 {
-                    Engine.Logger?.Debug(DebugType.Watcher, $"OnChangeDocument TypeOf: {typeOf} - File: {file.FullName}");
+                    Engine.Logger?.Debug(ScopeType.Watcher, $"OnChangeDocument TypeOf: {typeOf} - File: {file.FullName}");
 
                     Engine.LoadDocumentType(typeOf);
 
                     foreach (var relationType in types)
                     {
-                        Engine.Logger?.Debug(DebugType.Watcher, $"{typeOf} Load releation types - TypeOf: {relationType}");
+                        Engine.Logger?.Debug(ScopeType.Watcher, $"{typeOf} Load releation types - TypeOf: {relationType}");
 
                         var meta = Engine.GetTypeMeta(relationType);
 

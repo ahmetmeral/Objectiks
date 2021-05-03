@@ -23,27 +23,36 @@ namespace Objectiks
 
             foreach (var typeOf in Option.TypeOf)
             {
-                CheckDirectoryOrSchema(typeOf);
-
-                if (LoadDocumentType(typeOf))
+                using (var trans = Monitor.GetTransaction(this, true, true))
                 {
-                    TypeOf.Add(typeOf.ToLowerInvariant());
+                    trans.EnterTypeOfLock(typeOf);
+
+                    CheckDirectoryOrSchema(typeOf);
+                    LoadDocumentType(typeOf);
+
+                    trans.ExitTypeOfLock(typeOf);
+
+                    Monitor.ReleaseTransaction(trans);
                 }
             }
 
             Watcher?.UnLock();
-
-            IsInitialize = true;
 
             return this;
         }
 
         public virtual bool LoadDocumentType(string typeOf)
         {
-            Logger?.Debug(DebugType.Engine, $"Load TypeOf: {typeOf}");
+            Logger?.Debug(ScopeType.Engine, $"Load TypeOf: {typeOf}");
 
             var schema = GetDocumentSchema(typeOf);
             var meta = new DocumentMeta(typeOf, schema, Provider, Option);
+
+            if (meta.Cache.Exclude)
+            {
+                return true;
+            }
+
             var refs = meta.GetRefs(false);
             var files = new List<DocumentStorage>();
 
@@ -89,19 +98,19 @@ namespace Objectiks
 
             if (files.Count == 0)
             {
-                Logger?.Debug(DebugType.Engine, "LoadDocumentType files.count = 0");
+                Logger?.Debug(ScopeType.Engine, "LoadDocumentType files.count = 0");
 
                 return false;
             }
 
-            Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} number of files : {files.Count}");
+            Logger?.Debug(ScopeType.Engine, $"TypeOf:{typeOf} number of files : {files.Count}");
 
             int bufferSize = Option.BufferSize;
             var serializer = new JsonSerializer();
 
             foreach (DocumentStorage file in files)
             {
-                Logger?.Debug(DebugType.Engine, $"Read TypeOf: {file.TypeOf} - File : {file.Target}");
+                Logger?.Debug(ScopeType.Engine, $"Read TypeOf: {file.TypeOf} - File : {file.Target}");
 
                 try
                 {
@@ -130,10 +139,10 @@ namespace Objectiks
                                     ParseDocumentData(ref meta, ref document, file);
                                 }
 
-                                if (Option.SupportLoaderInRefs)
-                                {
-                                    ParseDocumentRefs(refs, ref document);
-                                }
+                                //if (Option.SupportLoaderInRefs)
+                                //{
+                                //    ParseDocumentRefs(refs, ref document);
+                                //}
 
                                 Cache.Set(document, meta.Cache.Expire);
 
@@ -156,14 +165,14 @@ namespace Objectiks
 
         protected virtual void CheckDirectoryOrSchema(string typeOf)
         {
-            Logger?.Debug(DebugType.Engine, "Check Document Directory and Schema");
+            Logger?.Debug(ScopeType.Engine, "Check Document Directory and Schema");
 
             var documents = Path.Combine(Provider.BaseDirectory, DocumentDefaults.Documents, typeOf);
             if (!Directory.Exists(documents))
             {
                 Directory.CreateDirectory(documents);
 
-                Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} directory created.. Directory : {documents}");
+                Logger?.Debug(ScopeType.Engine, $"TypeOf:{typeOf} directory created.. Directory : {documents}");
             }
 
             var docFile = Path.Combine(documents, $"{typeOf}.json");
@@ -171,7 +180,7 @@ namespace Objectiks
             {
                 File.WriteAllText(docFile, "[]", Encoding.UTF8);
 
-                Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} document created.. File: {docFile}");
+                Logger?.Debug(ScopeType.Engine, $"TypeOf:{typeOf} document created.. File: {docFile}");
             }
 
             var docSchema = Path.Combine(Provider.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json");
@@ -188,7 +197,7 @@ namespace Objectiks
 
                 File.WriteAllText(docSchema, schema, Encoding.UTF8);
 
-                Logger?.Debug(DebugType.Engine, $"TypeOf:{typeOf} schema created.. File: {docSchema}");
+                Logger?.Debug(ScopeType.Engine, $"TypeOf:{typeOf} schema created.. File: {docSchema}");
             }
         }
 

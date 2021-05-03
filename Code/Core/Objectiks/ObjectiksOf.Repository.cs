@@ -160,7 +160,6 @@ namespace Objectiks
         {
             if (typeOf == "All")
             {
-                Engine.IsInitialize = false;
                 Engine.Initialize();
             }
             else

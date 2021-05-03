@@ -8,36 +8,31 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace Objectiks
 {
     public class DocumentOption
     {
         public string Name { get; set; } = "Objectiks";
-        public string Version { get; set; }
-        public string Author { get; set; }
+        public string Version { get; set; } = "1.0.0";
         public string Primary { get; set; } = "Id";
-        public string User { get; set; } = "UserRef";
-        public string Account { get; set; } = "AccountRef";
+        public string User { get; set; } = "UserOf";
+        public string WorkOf { get; set; } = "WorkOf";
         public string ParseOf { get; set; } = "Document";
         public DocumentKeyOfNames KeyOf { get; set; } = new DocumentKeyOfNames();
-        public DocumentTypes TypeOf { get; set; }
+        public DocumentTypes TypeOf { get; set; } = new DocumentTypes();
         public string SqlProviderSchema { get; set; }
         public string SqlProviderSchemaSeperator { get; set; } = ".";
-        public int SqlProviderPageLimit { get; set; } = 2;
-
+        public int SqlProviderDataReaderPageSize { get; set; } = 2;
         public bool SupportSqlDataReaderPaging { get; set; } = true;
 
-        public int SupportPartialStorageLimit { get; set; } = 1000;
+        public int SupportPartialStorageSize { get; set; } = 1000;
         public bool SupportPartialStorage { get; set; } = false;
         public bool SupportDocumentParser { get; set; } = false;
         public bool SupportTypeOfRefs { get; set; } = true;
-        public bool SupportLoaderInRefs { get; set; } = false;
-        public bool SupportFileAppend { get; set; } = true;
-        public bool SupportTransaction { get; set; } = true;
+        public bool SupportTypeOfRefsFirstLoad { get; set; } = false;
         public bool SupportDocumentWatcher { get; set; } = false;
-        public bool SupportProperyOverride { get; set; } = true;
-        public bool SupportDocumentWriter { get; set; } = true;
 
         public string Extention { get; set; } = "*.json";
         public int BufferSize { get; set; } = 512;
@@ -49,10 +44,17 @@ namespace Objectiks
         internal IDocumentCache CacheInstance { get; set; }
         internal IDocumentWatcher DocumentWatcher { get; set; }
         internal IDocumentLogger DocumentLogger { get; set; }
-        internal List<IParser> ParserOfTypes { get; private set; }
+        internal List<IParser> ParserOfTypes { get; set; }
+        internal Type EngineProvider { get; set; }
+        internal bool HasManifest { get; set; }
 
-        internal Type EngineProvider { get; private set; }
-        
+        internal bool HasTypeOf
+        {
+            get
+            {
+                return TypeOf.Count > 0;
+            }
+        }
 
         public DocumentOption()
         {
@@ -95,6 +97,11 @@ namespace Objectiks
         public void UseDocumentLogger<T>() where T : IDocumentLogger
         {
             DocumentLogger = (IDocumentLogger)Activator.CreateInstance(typeof(T));
+        }
+
+        public void UseManifestFile()
+        {
+            HasManifest = true;
         }
 
         public void AddParserTypeOf<T>() where T : IParser

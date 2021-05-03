@@ -46,7 +46,7 @@ namespace Objectiks.Engine
 
             if (IsPartialStore)
             {
-                PartialStoreLimit = Engine.Option.SupportPartialStorageLimit;
+                PartialStoreLimit = Engine.Option.SupportPartialStorageSize;
             }
 
             Transaction = Engine.GetThreadTransaction();

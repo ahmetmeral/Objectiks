@@ -1,5 +1,9 @@
 {
   "TypeOf": "Tags",
   "ParseOf": "Document",
-  "PrimaryOf": "Id"
+  "PrimaryOf": "Id",
+  "Cache": {
+    "Expire": 10000,
+    "Exclude": false
+  }
 }

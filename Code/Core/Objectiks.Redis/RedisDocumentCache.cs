@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Objectiks.StackExchange.Redis
+namespace Objectiks.Redis
 {
     public class RedisDocumentCache : DocumentCache
     {
@@ -21,10 +21,15 @@ namespace Objectiks.StackExchange.Redis
             }
         }
 
-        public RedisDocumentCache(string bucket, RedisConfiguration configuration, IDocumentSerializer serializer) : base(bucket, serializer)
+        public RedisDocumentCache(string bucket, RedisConfiguration configuration, IDocumentSerializer serializer, bool flush = false) : base(bucket, serializer)
         {
             Configuration = configuration;
             Client = new RedisClient(configuration, serializer);
+
+            if (flush)
+            {
+                Flush();
+            }
         }
 
         public override void Set(Document document, int expire)

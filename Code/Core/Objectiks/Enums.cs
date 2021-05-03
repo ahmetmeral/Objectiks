@@ -18,7 +18,7 @@ namespace Objectiks
         Disposed
     }
 
-    public enum DebugType
+    public enum ScopeType
     {
         None,
         Core,

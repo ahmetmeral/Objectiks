@@ -3,7 +3,7 @@ using Objectiks.Caching.Serializer;
 using Objectiks.Engine;
 using Objectiks.Integrations.Models;
 using Objectiks.Integrations.Options;
-using Objectiks.StackExchange.Redis;
+using Objectiks.Redis;
 
 
 using System;

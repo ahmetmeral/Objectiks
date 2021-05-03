@@ -7,5 +7,6 @@ namespace Objectiks.Models
     public class DocumentCacheInfo
     {
         public int Expire { get; set; }
+        public bool Exclude { get; set; }
     }
 }

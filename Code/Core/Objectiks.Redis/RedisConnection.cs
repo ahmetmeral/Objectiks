@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Objectiks.StackExchange.Redis
+namespace Objectiks.Redis
 {
     public class RedisConnection
     {

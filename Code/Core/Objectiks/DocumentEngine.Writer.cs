@@ -21,7 +21,7 @@ namespace Objectiks
         {
             if (context.HasDocuments)
             {
-                Logger?.Debug(DebugType.Engine, $"Document write");
+                Logger?.Debug(ScopeType.Engine, $"Document write");
 
                 try
                 {
@@ -90,7 +90,7 @@ namespace Objectiks
 
                     meta.SubmitChanges(document, context.Operation);
 
-                    if (!Option.SupportLoaderInRefs)
+                    if (!Option.SupportTypeOfRefsFirstLoad)
                     {
                         Cache.Set(document, meta.Cache.Expire);
                     }

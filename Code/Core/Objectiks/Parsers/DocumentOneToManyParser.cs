@@ -48,14 +48,6 @@ namespace Objectiks.Parsers
 
             if (docRef.MapOf != null && !String.IsNullOrEmpty(docRef.MapOf.Target))
             {
-                if (source.ContainsKey(property))
-                {
-                    if (!option.SupportProperyOverride)
-                    {
-                        throw new ArgumentException($"ParserOf:{ParseOf} - Ref Type : {docRef.TypeOf} - Ref Index: {docRef.Index} --> Document ref already define.. Use MapOf Target Property", docRef.TypeOf);
-                    }
-                }
-
                 source[property] = new JObject();
 
                 foreach (var key in keys)
@@ -69,14 +61,6 @@ namespace Objectiks.Parsers
             }
             else
             {
-                if (source.ContainsKey(property))
-                {
-                    if (!option.SupportProperyOverride)
-                    {
-                        throw new ArgumentException($"ParserOf:{ParseOf} - Ref Type : {docRef.TypeOf} - Ref Index: {docRef.Index} --> Document ref already define.. Use MapOf Target Property", docRef.TypeOf);
-                    }
-                }
-
                 source[property] = engine.ReadList(keys.GetQueryOfFromPrimaryOf(meta.TypeOf), meta);
             }
 

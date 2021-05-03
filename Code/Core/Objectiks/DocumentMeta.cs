@@ -59,7 +59,7 @@ namespace Objectiks
             HasLazy = GetRefs(true).Count > 0;
             Exists = true;
 
-            RefsIndexBuild(option.SupportLoaderInRefs);
+            RefsIndexBuild(option.SupportTypeOfRefsFirstLoad);
         }
 
         internal void UpdateSequence(object primary)
