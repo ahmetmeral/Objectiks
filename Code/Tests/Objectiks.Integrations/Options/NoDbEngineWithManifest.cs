@@ -23,7 +23,7 @@ namespace Objectiks.Integrations.Options
             };
 
             UseManifestFile();
-            UseCacheProvider(new RedisDocumentCache(Name, cacheConfig, new DocumentJsonSerializer(), false));
+            UseCacheProvider(new RedisDocumentCache(Name, cacheConfig, new DocumentJsonSerializer(), true));
             UseDocumentWatcher<DocumentWatcher>();
 
             RegisterDefaultTypeOrParser();

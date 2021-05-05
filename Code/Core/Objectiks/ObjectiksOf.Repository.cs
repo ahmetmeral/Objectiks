@@ -76,7 +76,7 @@ namespace Objectiks
 
         public T First<T>(string typeOf, object primaryOf) where T : class
         {
-            var query = new QueryOf(typeOf);
+            var query = new DocumentQuery(typeOf);
 
             query.PrimaryOf(primaryOf);
 
@@ -85,7 +85,7 @@ namespace Objectiks
 
         public T First<T>(object primaryOf) where T : class
         {
-            var query = new QueryOf(GetTypeOfName<T>());
+            var query = new DocumentQuery(GetTypeOfName<T>());
 
             query.PrimaryOf(primaryOf);
 
@@ -94,12 +94,12 @@ namespace Objectiks
 
         public long Count<T>()
         {
-            return Engine.GetCount<long>(new QueryOf(GetTypeOfName<T>()));
+            return Engine.GetCount<long>(new DocumentQuery(GetTypeOfName<T>()));
         }
 
         public long Count(string typeOf)
         {
-            return Engine.GetCount<long>(new QueryOf(typeOf));
+            return Engine.GetCount<long>(new DocumentQuery(typeOf));
         }
 
         public DocumentMeta GetTypeMeta<T>()

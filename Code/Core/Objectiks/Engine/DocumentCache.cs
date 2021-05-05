@@ -29,6 +29,7 @@ namespace Objectiks.Engine
         public abstract void Remove(string typeOf);
         public abstract void Remove(Document document);
         public abstract void Remove(DocumentMeta meta);
+        public abstract void Remove(DocumentQuery query);
         public abstract void Flush();
         public abstract void Set(Document document, int expire);
         public abstract void Set(DocumentMeta meta, int expire);
@@ -37,17 +38,12 @@ namespace Objectiks.Engine
         public abstract void Set(DocumentInfo info);
         public abstract DocumentInfo GetDocumentInfo(string typeOf, object primaryOf);
 
-        public abstract void SetCacheOf<T>(string typeOf, string key, T data, int expire);
-        public abstract T GetCacheOf<T>(string typeOf, string key);
+        public abstract void Set<T>(DocumentQuery query, T data);
+        public abstract T Get<T>(DocumentQuery query);
 
-        public virtual string CacheOf(string typeOf, string key)
+        public virtual string CacheOf(DocumentQuery query)
         {
-            if (String.IsNullOrEmpty(typeOf))
-            {
-                typeOf = "Any";
-            }
-
-            return $"objectiks:{Bucket}:{DocumentDefaults.CacheOf}:{typeOf}:{key}".ToLowerInvariant();
+            return $"objectiks:{Bucket}:{DocumentDefaults.CacheOf}:{query.TypeOf}:{query.GetCacheOfKey()}".ToLowerInvariant();
         }
 
         public virtual string CacheOf(Document doc)

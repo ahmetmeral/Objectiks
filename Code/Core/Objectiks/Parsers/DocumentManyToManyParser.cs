@@ -9,6 +9,7 @@ using Objectiks;
 using Objectiks.Services;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using Objectiks.Engine;
 
 namespace Objectiks.Parsers
 {
@@ -31,7 +32,7 @@ namespace Objectiks.Parsers
         public void Parse(IDocumentEngine engine, Document document, DocumentRef docRef)
         {
             JObject source = document.Data;
-            var query = new QueryOf(docRef.TypeOf);
+            var query = new DocumentQuery(docRef.TypeOf);
             var meta = engine.GetTypeMeta(query.TypeOf);
             var property = docRef.GetTargetProperty();
 

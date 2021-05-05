@@ -10,6 +10,7 @@ using Objectiks.Extentions;
 using System.IO;
 using Objectiks.Services;
 using Newtonsoft.Json;
+using Objectiks.Engine;
 
 namespace Objectiks
 {
@@ -119,7 +120,7 @@ namespace Objectiks
             return refs;
         }
 
-        public T GetCountFromQueryOf<T>(QueryOf query)
+        public T GetCountFromQueryOf<T>(DocumentQuery query)
         {
             return Keys.AsQueryable().Count(query.AsWhere(),
                      query.AsWhereParameters()).ChangeType<T>();
@@ -130,7 +131,7 @@ namespace Objectiks
             return Keys.Where(k => k.CacheOf == cacheOf).FirstOrDefault();
         }
 
-        public List<DocumentKey> GetDocumentKeysFromQueryOf(QueryOf query)
+        public List<DocumentKey> GetDocumentKeysFromQueryOf(DocumentQuery query)
         {
             List<DocumentKey> result = null;
 

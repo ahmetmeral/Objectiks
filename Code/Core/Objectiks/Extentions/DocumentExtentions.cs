@@ -114,9 +114,9 @@ namespace Objectiks.Extentions
             return false;
         }
 
-        public static QueryOf GetQueryOfFromPrimaryOf(this List<DocumentKey> keys, string typeOf)
+        public static DocumentQuery GetQueryOfFromPrimaryOf(this List<DocumentKey> keys, string typeOf)
         {
-            var query = new QueryOf(typeOf);
+            var query = new DocumentQuery(typeOf);
 
             foreach (var key in keys)
             {

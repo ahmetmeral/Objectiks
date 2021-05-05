@@ -18,13 +18,13 @@ namespace Objectiks.Services
 
         bool LoadDocumentType(string typeOf, bool isInitialize);
 
-        Document Read(QueryOf query, DocumentMeta meta = null);
+        Document Read(DocumentQuery query, DocumentMeta meta = null);
         Document Read(string typeOf, object primaryOf);
-        JArray ReadList(QueryOf query, DocumentMeta meta = null);
+        JArray ReadList(DocumentQuery query, DocumentMeta meta = null);
 
-        List<T> ReadList<T>(QueryOf query);
-        T Read<T>(QueryOf query, DocumentMeta meta = null);
-        T GetCount<T>(QueryOf query, DocumentMeta meta = null);
+        List<T> ReadList<T>(DocumentQuery query);
+        T Read<T>(DocumentQuery query, DocumentMeta meta = null);
+        T GetCount<T>(DocumentQuery query, DocumentMeta meta = null);
 
         List<DocumentMeta> GetTypeMetaAll();
         DocumentMeta GetTypeMeta(string typeOf);
@@ -38,6 +38,6 @@ namespace Objectiks.Services
 
         void TruncateTypeOf(string typeOf);
         void TruncateTypeOf(DocumentMeta meta);
-        int Delete<T>(QueryOf query);
+        int Delete<T>(DocumentQuery query);
     }
 }

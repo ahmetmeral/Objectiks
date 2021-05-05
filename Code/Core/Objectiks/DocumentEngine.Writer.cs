@@ -166,7 +166,7 @@ namespace Objectiks
             Cache.Set(new DocumentSequence(meta.TypeOf, 0));
         }
 
-        public virtual int Delete<T>(QueryOf query)
+        public virtual int Delete<T>(DocumentQuery query)
         {
             var list = ReadList<T>(query);
 

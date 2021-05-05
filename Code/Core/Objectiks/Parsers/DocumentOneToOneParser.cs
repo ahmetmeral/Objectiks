@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Objectiks.Engine;
 using Objectiks.Engine.Query;
 using Objectiks.Extentions;
 using Objectiks.Models;
@@ -21,7 +22,7 @@ namespace Objectiks.Parsers
         public void Parse(IDocumentEngine engine, Document document, DocumentRef docRef)
         {
             JObject source = document.Data;
-            var query = new QueryOf(docRef.TypeOf);
+            var query = new DocumentQuery(docRef.TypeOf);
             var meta = engine.GetTypeMeta(query.TypeOf);
             var property = docRef.GetTargetProperty();
 

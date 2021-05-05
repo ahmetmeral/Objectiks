@@ -18,7 +18,7 @@ namespace Objectiks
 {
     public partial class DocumentEngine : IDocumentEngine
     {
-        public virtual JArray ReadList(QueryOf query, DocumentMeta meta = null)
+        public virtual JArray ReadList(DocumentQuery query, DocumentMeta meta = null)
         {
             var results = new JArray();
 
@@ -171,7 +171,7 @@ namespace Objectiks
             }
         }
 
-        public virtual Document Read(QueryOf query, DocumentMeta meta = null)
+        public virtual Document Read(DocumentQuery query, DocumentMeta meta = null)
         {
             Document document = null;
 
@@ -212,7 +212,7 @@ namespace Objectiks
             return Read(query.TypeOf, documentKeys[0].PrimaryOf);
         }
 
-        public virtual T Read<T>(QueryOf query, DocumentMeta meta = null)
+        public virtual T Read<T>(DocumentQuery query, DocumentMeta meta = null)
         {
             var cacheOfData = ReadAnyCacheOfFromQuery<T>(query);
 
@@ -235,7 +235,7 @@ namespace Objectiks
             return data;
         }
 
-        public virtual List<T> ReadList<T>(QueryOf query)
+        public virtual List<T> ReadList<T>(DocumentQuery query)
         {
             var cacheOfData = ReadAnyCacheOfFromQuery<List<T>>(query);
 
@@ -315,7 +315,7 @@ namespace Objectiks
             return results;
         }
 
-        public virtual T GetCount<T>(QueryOf query, DocumentMeta meta = null)
+        public virtual T GetCount<T>(DocumentQuery query, DocumentMeta meta = null)
         {
             T result = ReadAnyCacheOfFromQuery<T>(query);
 
@@ -372,13 +372,15 @@ namespace Objectiks
             return meta;
         }
 
-        public virtual T ReadAnyCacheOfFromQuery<T>(string typeOf, string cacheOfKey)
+        public virtual T ReadAnyCacheOfFromQuery<T>(DocumentQuery query)
         {
-            return Cache.GetCacheOf<T>(typeOf, cacheOfKey);
-        }
+            if (query.CacheOfBeforeCallRemove)
+            {
+                RemoveAnyCacheOfFromQuery(query);
 
-        public virtual T ReadAnyCacheOfFromQuery<T>(QueryOf query)
-        {
+                return default;
+            }
+
             if (query == null)
             {
                 return default;
@@ -386,12 +388,21 @@ namespace Objectiks
 
             if (query.IsCacheOf)
             {
-                return Cache.GetCacheOf<T>(query.TypeOf, query.GetCacheOfKey());
+                return Cache.Get<T>(query);
             }
+
             return default;
         }
 
-        public virtual void SetAnyCacheOfDocument<T>(QueryOf query, T data)
+        public virtual void RemoveAnyCacheOfFromQuery(DocumentQuery query)
+        {
+            if (query.CacheOfBeforeCallRemove)
+            {
+                Cache.Remove(query);
+            }
+        }
+
+        public virtual void SetAnyCacheOfDocument<T>(DocumentQuery query, T data)
         {
             if (query == null)
             {
@@ -400,7 +411,7 @@ namespace Objectiks
 
             if (query.IsCacheOf)
             {
-                Cache.SetCacheOf<T>(query.TypeOf, query.GetCacheOfKey(), data, query.CacheOfExpire);
+                Cache.Set(query, data);
             }
         }
     }

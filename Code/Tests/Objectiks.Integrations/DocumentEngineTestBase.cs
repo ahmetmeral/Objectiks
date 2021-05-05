@@ -12,17 +12,30 @@ namespace Objectiks.Integrations
         public abstract void Setup();
 
         [Test]
+        public void DocumentWorkOf()
+        {
+            var repos = new ObjectiksOf();
+
+            var workOf_01 = repos.TypeOf<Pages>()
+                 .WorkOf(1).ToList();
+
+
+        }
+
+        [Test]
         public void RepositoryCacheOf()
         {
+            bool callBeforeCacheOf = true;
+
             var repos = new ObjectiksOf();
 
             var page = repos.TypeOf<Pages>()
                 .PrimaryOf(1)
-                .CacheOf("test")
+                .CacheOf("test", callBeforeCacheOf)
                 .First();
 
             var page_list = repos.TypeOf<Pages>()
-              .CacheOf()
+              .CacheOf(callBeforeCacheOf)
               .ToList();
 
             var tags = repos.TypeOf<Tags>().CacheOf().ToList();
@@ -31,7 +44,7 @@ namespace Objectiks.Integrations
                 .TypeOf<Tags>()
                 .PrimaryOf(1)
                 .PrimaryOf(2)
-                .CacheOf()
+                .CacheOf(callBeforeCacheOf)
                 .ToList();
         }
 

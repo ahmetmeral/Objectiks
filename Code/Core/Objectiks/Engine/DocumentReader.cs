@@ -11,25 +11,25 @@ namespace Objectiks.Engine
     public class DocumentReader<T> : IDocumentReader<T>
     {
         private readonly DocumentEngine Engine = null;
-        private readonly QueryOf Query = null;
+        private readonly DocumentQuery Query = null;
 
 
         public DocumentReader(DocumentEngine engine)
         {
             Engine = engine;
-            Query = new QueryOf();
+            Query = new DocumentQuery();
         }
 
         public DocumentReader(DocumentEngine engine, string typeOf)
         {
             Engine = engine;
-            Query = new QueryOf(typeOf);
+            Query = new DocumentQuery(typeOf);
         }
 
         public DocumentReader(DocumentEngine engine, string typeOf, params object[] primaryOf)
         {
             Engine = engine;
-            Query = new QueryOf(typeOf, primaryOf);
+            Query = new DocumentQuery(typeOf, primaryOf);
         }
 
         #region TypeOfBy
@@ -48,16 +48,30 @@ namespace Objectiks.Engine
             return this;
         }
 
-        public IDocumentReader<T> CacheOf(int expireMinute = 1000)
+        public IDocumentReader<T> CacheOf(int expireMinute = 60)
         {
-            Query.CacheOf(string.Empty, expireMinute);
+            Query.CacheOf(string.Empty, false, expireMinute);
 
             return this;
         }
 
-        public IDocumentReader<T> CacheOf(string cacheOf, int expireMinute = 1000)
+        public IDocumentReader<T> CacheOf(string cacheOf, int expireMinute = 60)
         {
-            Query.CacheOf(cacheOf, expireMinute);
+            Query.CacheOf(cacheOf, false, expireMinute);
+
+            return this;
+        }
+
+        public IDocumentReader<T> CacheOf(string cacheOf, bool beforeCallRemove, int expireMinute = 60)
+        {
+            Query.CacheOf(cacheOf, beforeCallRemove, expireMinute);
+
+            return this;
+        }
+
+        public IDocumentReader<T> CacheOf(bool beforeCallRemove, int expireMinute = 60)
+        {
+            Query.CacheOf(string.Empty, beforeCallRemove, expireMinute);
 
             return this;
         }
@@ -198,7 +212,7 @@ namespace Objectiks.Engine
         #endregion
 
         #region Utils
-        public QueryOf GetDocumentQueryOf()
+        public DocumentQuery GetDocumentQueryOf()
         {
             return Query;
         }

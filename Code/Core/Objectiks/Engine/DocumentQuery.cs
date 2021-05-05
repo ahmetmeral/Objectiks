@@ -1,11 +1,12 @@
-﻿using Objectiks.Helper;
+﻿using Objectiks.Engine.Query;
+using Objectiks.Helper;
 using Objectiks.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Objectiks.Engine.Query
+namespace Objectiks.Engine
 {
     public class QueryOfCompiler : IDisposable
     {
@@ -20,8 +21,7 @@ namespace Objectiks.Engine.Query
         }
     }
 
-    //todo:WorkOf or UserOf query builder check..
-    public class QueryOf
+    public class DocumentQuery
     {
         public string TypeOf { get; internal set; }
         public PrimaryOfList PrimaryOfList { get; internal set; }
@@ -36,6 +36,7 @@ namespace Objectiks.Engine.Query
         public bool IsCacheOf { get; internal set; }
         public string CacheOfKey { get; internal set; }
         public int CacheOfExpire { get; internal set; }
+        public bool CacheOfBeforeCallRemove { get; internal set; }
         public ResultType ResultType { get; internal set; }
 
         private WhereBy WhereByAndList = null;
@@ -74,17 +75,17 @@ namespace Objectiks.Engine.Query
             get { return UserOfList.Count > 0; }
         }
 
-        public QueryOf()
+        public DocumentQuery()
         {
             Initialize(null);
         }
 
-        public QueryOf(string typeOf)
+        public DocumentQuery(string typeOf)
         {
             Initialize(typeOf);
         }
 
-        public QueryOf(string typeOf, params object[] primaryOf)
+        public DocumentQuery(string typeOf, params object[] primaryOf)
         {
             Initialize(typeOf, primaryOf);
         }
@@ -189,12 +190,18 @@ namespace Objectiks.Engine.Query
             }
         }
 
-        public void CacheOf(string cacheOfKey, int expireMinute = 1000)
+        public void CacheOf(string cacheOfKey, bool beforeCallRemove, int expireMinute)
         {
             IsCacheOf = true;
             CacheOfKey = cacheOfKey;
             CacheOfExpire = expireMinute;
+
+            if (beforeCallRemove)
+            {
+                CacheOfBeforeCallRemove = true;
+            }
         }
+
 
         public int ValueOf(object value)
         {

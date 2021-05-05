@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Objectiks.Engine;
 using Objectiks.Engine.Query;
 using Objectiks.Extentions;
 using Objectiks.Models;
@@ -29,7 +30,7 @@ namespace Objectiks.Parsers
 
         public void Parse(IDocumentEngine engine, Document document, DocumentRef docRef)
         {
-            var query = new QueryOf(docRef.TypeOf);
+            var query = new DocumentQuery(docRef.TypeOf);
             var option = engine.Option;
             var meta = engine.GetTypeMeta(query.TypeOf);
             JObject source = document.Data;
@@ -52,7 +53,7 @@ namespace Objectiks.Parsers
 
                 foreach (var key in keys)
                 {
-                    var queryOfFromKey = new QueryOf(meta.TypeOf, key.PrimaryOf);
+                    var queryOfFromKey = new DocumentQuery(meta.TypeOf, key.PrimaryOf);
                     var target = engine.Read<JObject>(queryOfFromKey, meta);
 
                     var sourcePropertyName = target[docRef.MapOf.Target].ToString();

@@ -70,20 +70,20 @@ namespace Objectiks.Caching
             Cache.Set(CacheOf(info), Serializer.Serialize(info), options);
         }
 
-        public override void SetCacheOf<T>(string typeOf, string key, T data, int expire)
+        public override void Set<T>(DocumentQuery query, T data)
         {
-            var expiration = TimeSpan.FromMinutes(expire);
+            var expiration = TimeSpan.FromMinutes(query.CacheOfExpire);
             var options = new MemoryCacheEntryOptions()
                 .SetPriority(CacheItemPriority.Normal)
                 .SetAbsoluteExpiration(expiration);
             options.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
 
-            Cache.Set(CacheOf(typeOf, key), data, options);
+            Cache.Set(CacheOf(query), data, options);
         }
 
-        public override T GetCacheOf<T>(string typeOf, string key)
+        public override T Get<T>(DocumentQuery query)
         {
-            if (Cache.TryGetValue(CacheOf(typeOf, key), out byte[] data))
+            if (Cache.TryGetValue(CacheOf(query), out byte[] data))
             {
                 return Serializer.Deserialize<T>(data);
             }
@@ -192,6 +192,11 @@ namespace Objectiks.Caching
         public override void Remove(string typeOf)
         {
             Cache.Remove(CacheOfMeta(typeOf));
+        }
+
+        public override void Remove(DocumentQuery query)
+        {
+            Cache.Remove(CacheOf(query));
         }
 
         public override void Remove(Document document)

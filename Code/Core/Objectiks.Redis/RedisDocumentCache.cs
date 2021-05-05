@@ -56,14 +56,14 @@ namespace Objectiks.Redis
             Database.Set(CacheOf(info), info);
         }
 
-        public override void SetCacheOf<T>(string typeOf, string key, T data, int expire)
+        public override void Set<T>(DocumentQuery query, T data)
         {
-            Database.Set(CacheOf(typeOf, key), data, expire);
+            Database.Set(CacheOf(query), data, query.CacheOfExpire);
         }
 
-        public override T GetCacheOf<T>(string typeOf, string key)
+        public override T Get<T>(DocumentQuery query)
         {
-            return Database.Get<T>(CacheOf(typeOf, key));
+            return Database.Get<T>(CacheOf(query));
         }
 
         public override Document Get(string typeOf, object primaryOf)
@@ -169,6 +169,11 @@ namespace Objectiks.Redis
         public override void Remove(DocumentMeta meta)
         {
             Database.Remove(CacheOf(meta));
+        }
+
+        public override void Remove(DocumentQuery query)
+        {
+            Database.Remove(CacheOf(query));
         }
 
         public override void Flush()
