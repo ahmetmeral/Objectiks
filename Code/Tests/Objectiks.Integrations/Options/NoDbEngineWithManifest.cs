@@ -12,9 +12,7 @@ namespace Objectiks.Integrations.Options
     {
         public NoDbEngineWithManifest() : base()
         {
-
             Name = "NoDbEngineWithManifest";
-            SupportTypeOfRefsFirstLoad = false;
 
             var cacheConfig = new RedisConfiguration
             {
@@ -25,7 +23,7 @@ namespace Objectiks.Integrations.Options
             };
 
             UseManifestFile();
-            UseCacheProvider(new RedisDocumentCache(Name, cacheConfig, new DocumentJsonSerializer(), true));
+            UseCacheProvider(new RedisDocumentCache(Name, cacheConfig, new DocumentJsonSerializer(), false));
             UseDocumentWatcher<DocumentWatcher>();
 
             RegisterDefaultTypeOrParser();

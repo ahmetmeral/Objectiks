@@ -13,6 +13,7 @@ namespace Objectiks.Engine
         private readonly DocumentEngine Engine = null;
         private readonly QueryOf Query = null;
 
+
         public DocumentReader(DocumentEngine engine)
         {
             Engine = engine;
@@ -43,6 +44,20 @@ namespace Objectiks.Engine
         {
             Query.TypeOfBy(typeOf);
             Query.PrimaryOf(primaryOf);
+
+            return this;
+        }
+
+        public IDocumentReader<T> CacheOf(int expireMinute = 1000)
+        {
+            Query.CacheOf(string.Empty, expireMinute);
+
+            return this;
+        }
+
+        public IDocumentReader<T> CacheOf(string cacheOf, int expireMinute = 1000)
+        {
+            Query.CacheOf(cacheOf, expireMinute);
 
             return this;
         }
@@ -82,17 +97,8 @@ namespace Objectiks.Engine
             return this;
         }
 
-        public IDocumentReader<T> Lazy(bool isLoadLazyRefs)
-        {
-            Query.Lazy = isLoadLazyRefs;
-
-            return this;
-        }
-
         public IDocumentReader<T> Refs(object refObjectOrClass)
         {
-            Query.Lazy = true;
-
             if (refObjectOrClass is DocumentRef)
             {
                 Query.RefList.Add((DocumentRef)refObjectOrClass);
@@ -162,16 +168,22 @@ namespace Objectiks.Engine
 
         public long Count()
         {
+            Query.ResultType = ResultType.Count;
+
             return Engine.GetCount<long>(Query);
         }
 
         public List<T> ToList()
         {
+            Query.ResultType = ResultType.List;
+
             return Engine.ReadList<T>(Query);
         }
 
         public T First()
         {
+            Query.ResultType = ResultType.First;
+
             Ensure.Try(Query.PrimaryOfList.Count > 0 && Query.KeyOfList.Count > 0, "PrimarOf and KeyOf cannot be used together");
             Ensure.Try(Query.PrimaryOfList.Count > 1, "Use ToList() for multiple results");
 

@@ -5,7 +5,16 @@
   "UserOf": "UserRef",
   "PrimaryOf": "Id",
   "KeyOf": [ "Tag" ],
-  "Refs": [],
+  "Refs": [
+    {
+      "ParseOf": "1:1F",
+      "TypeOf": "Copy",
+      "MapOf": {
+        "Source": "File",
+        "Target": "Contents"
+      }
+    }
+  ],
   "Cache": {
     "Expire": 100000
   }

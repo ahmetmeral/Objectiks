@@ -31,9 +31,12 @@ namespace Objectiks.Engine.Query
         public DocumentRefs RefList { get; internal set; }
         public int Skip { get; internal set; }
         public int Take { get; internal set; }
-        public bool Lazy { get; internal set; } = true;
         public bool IsAny { get; internal set; } = false;
         public OrderDirection Direction { get; internal set; } = OrderDirection.None;
+        public bool IsCacheOf { get; internal set; }
+        public string CacheOfKey { get; internal set; }
+        public int CacheOfExpire { get; internal set; }
+        public ResultType ResultType { get; internal set; }
 
         private WhereBy WhereByAndList = null;
         private ValueBy ValueByList = null;
@@ -59,6 +62,16 @@ namespace Objectiks.Engine.Query
         public bool HasPrimaryOf
         {
             get { return PrimaryOfList.Count > 0; }
+        }
+
+        public bool HasWorkOf
+        {
+            get { return WorkOfList.Count > 0; }
+        }
+
+        public bool HasUserOf
+        {
+            get { return UserOfList.Count > 0; }
         }
 
         public QueryOf()
@@ -174,6 +187,13 @@ namespace Objectiks.Engine.Query
                     ContainsBy(DocumentDefaults.DocumentMetaKeyOfProperty, key);
                 }
             }
+        }
+
+        public void CacheOf(string cacheOfKey, int expireMinute = 1000)
+        {
+            IsCacheOf = true;
+            CacheOfKey = cacheOfKey;
+            CacheOfExpire = expireMinute;
         }
 
         public int ValueOf(object value)
@@ -296,6 +316,44 @@ namespace Objectiks.Engine.Query
             }
 
             ContainsBy(memberName, value);
+        }
+
+        public string GetCacheOfKey()
+        {
+            if (String.IsNullOrEmpty(CacheOfKey))
+            {
+                var keys = new List<string>();
+                keys.Add(TypeOf);
+                keys.Add(Skip.ToString());
+                keys.Add(Take.ToString());
+                keys.Add(IsAny.ToString());
+                keys.Add(HasRefs.ToString());
+                keys.Add(ResultType.ToString());
+
+                if (HasWorkOf)
+                {
+                    keys.AddRange(WorkOfList);
+                }
+
+                if (HasUserOf)
+                {
+                    keys.AddRange(UserOfList);
+                }
+
+                if (HasKeyOf)
+                {
+                    keys.AddRange(KeyOfList);
+                }
+
+                if (HasPrimaryOf)
+                {
+                    keys.AddRange(PrimaryOfList);
+                }
+
+                return HashHelper.CreateMD5(string.Join(":", keys));
+            }
+
+            return CacheOfKey;
         }
     }
 }

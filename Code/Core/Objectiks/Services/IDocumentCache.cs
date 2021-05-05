@@ -21,11 +21,15 @@ namespace Objectiks.Services
         void Set(DocumentInfo documentInfo);
         DocumentInfo GetDocumentInfo(string typeOf, object primaryOf);
 
+        void SetCacheOf<T>(string typeOf, string key, T data, int expire);
+        T GetCacheOf<T>(string typeOf, string key);
+
         void Remove(string typeOf, object primaryOf);
         void Remove(string typeOf);
         void Remove(Document document);
         void Remove(DocumentMeta meta);
         void Flush();
+        string CacheOf(string typeOf, string key);
         string CacheOf(Document document);
         string CacheOfDocument(string typeOf, object primaryOf);
         string CacheOf(DocumentMeta meta);

@@ -90,13 +90,14 @@ namespace Objectiks
 
                     meta.SubmitChanges(document, context.Operation);
 
-                    if (!Option.SupportTypeOfRefsFirstLoad)
+                    if (Option.SupportTypeOfRefs)
                     {
+                        ParseDocumentRefs(refs, ref document);
+
                         Cache.Set(document, meta.Cache.Expire);
                     }
                     else
                     {
-                        ParseDocumentRefs(refs, ref document);
                         Cache.Set(document, meta.Cache.Expire);
                     }
                 }

@@ -18,10 +18,15 @@ namespace Objectiks.PostgreSql
 
         }
 
-        public override bool LoadDocumentType(string typeOf)
+        public override bool LoadDocumentType(string typeOf, bool isInitialize = false)
         {
             var schema = GetDocumentSchema(typeOf);
             var meta = new DocumentMeta(typeOf, schema, Provider, Option);
+
+            if (isInitialize && meta.Cache.Lazy)
+            {
+                return false;
+            }
 
             meta.Partitions.Add(0, 0);
 
@@ -48,11 +53,6 @@ namespace Objectiks.PostgreSql
                             ParseDocumentData(ref meta, ref document, new DocumentStorage());
                         }
 
-                        if (Option.SupportTypeOfRefsFirstLoad)
-                        {
-                            ParseDocumentRefs(refs, ref document);
-                        }
-
                         Cache.Set(document, meta.Cache.Expire);
 
                         document.Dispose();
@@ -67,7 +67,7 @@ namespace Objectiks.PostgreSql
 
         public override void BulkAppend(DocumentContext context, DocumentTransaction transaction)
         {
-          
+
         }
 
         public override void BulkCreate(DocumentContext context, DocumentTransaction transaction)
@@ -80,12 +80,12 @@ namespace Objectiks.PostgreSql
 
         public override void BulkMerge(DocumentContext context, DocumentTransaction transaction)
         {
-            
+
         }
 
         public override void BulkDelete(DocumentContext context, DocumentTransaction transaction)
         {
-            
+
         }
     }
 }

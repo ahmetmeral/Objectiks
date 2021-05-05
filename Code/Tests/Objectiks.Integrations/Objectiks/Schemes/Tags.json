@@ -4,6 +4,6 @@
   "PrimaryOf": "Id",
   "Cache": {
     "Expire": 10000,
-    "Exclude": false
+    "Lazy": true
   }
 }

@@ -31,7 +31,6 @@ namespace Objectiks
         public bool SupportPartialStorage { get; set; } = false;
         public bool SupportDocumentParser { get; set; } = false;
         public bool SupportTypeOfRefs { get; set; } = true;
-        public bool SupportTypeOfRefsFirstLoad { get; set; } = false;
         public bool SupportDocumentWatcher { get; set; } = false;
 
         public string Extention { get; set; } = "*.json";

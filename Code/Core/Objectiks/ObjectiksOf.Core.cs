@@ -17,11 +17,22 @@ namespace Objectiks
     {
         public static class Core
         {
+            private static DocumentProvider Provider;
             private static DocumentEngines Engines = new DocumentEngines();
             private static DocumentOptions Options = new DocumentOptions();
 
+            internal static DocumentEngine Get()
+            {
+                return Get(Provider, null);
+            }
+
             internal static DocumentEngine Get(DocumentProvider documentProvider, DocumentOption option)
             {
+                if (documentProvider == null)
+                {
+                    throw new Exception("DocumentProvider is null");
+                }
+
                 DocumentEngine engine;
 
                 if (option == null)
@@ -67,6 +78,8 @@ namespace Objectiks
 
             public static void Initialize(DocumentProvider provider, DocumentOption option = null)
             {
+                Provider = provider;
+
                 if (option == null)
                 {
                     option = GetOption(provider);

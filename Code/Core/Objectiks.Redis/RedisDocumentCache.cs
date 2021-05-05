@@ -56,6 +56,15 @@ namespace Objectiks.Redis
             Database.Set(CacheOf(info), info);
         }
 
+        public override void SetCacheOf<T>(string typeOf, string key, T data, int expire)
+        {
+            Database.Set(CacheOf(typeOf, key), data, expire);
+        }
+
+        public override T GetCacheOf<T>(string typeOf, string key)
+        {
+            return Database.Get<T>(CacheOf(typeOf, key));
+        }
 
         public override Document Get(string typeOf, object primaryOf)
         {
@@ -178,5 +187,7 @@ namespace Objectiks.Redis
 
             Task.WhenAll(tasks);
         }
+
+
     }
 }

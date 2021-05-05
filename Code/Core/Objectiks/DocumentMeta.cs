@@ -24,7 +24,7 @@ namespace Objectiks
         public long TotalRecords { get; set; }
         public long DiskSize { get; set; }
         public long MemorySize { get; set; }
-        public bool HasLazy { get; set; }
+        public bool HasRefs { get; set; }
         public bool HasData { get; set; }
         public DocumentKeyIndex Keys { get; set; }
         public DocumentKeyOfNames KeyOfNames { get; set; }
@@ -56,10 +56,10 @@ namespace Objectiks
             Partitions.Next = 0;
             Directory = Path.Combine(fileProvider.BaseDirectory, DocumentDefaults.Documents, typeOf);
             Extention = option.Extention;
-            HasLazy = GetRefs(true).Count > 0;
+            HasRefs = GetRefs(true).Count > 0;
             Exists = true;
 
-            RefsIndexBuild(option.SupportTypeOfRefsFirstLoad);
+            RefsIndexBuild();
         }
 
         internal void UpdateSequence(object primary)
@@ -91,23 +91,19 @@ namespace Objectiks
             }
         }
 
-        internal void RefsIndexBuild(bool supportLoaderRefsManipulation)
+        internal void RefsIndexBuild()
         {
             if (Refs != null)
             {
                 int index = 0;
                 foreach (var item in Refs)
                 {
-                    if (!supportLoaderRefsManipulation)
-                    {
-                        item.Lazy = true;
-                    }
-
+                    item.Lazy = true;
                     item.Index = index;
                     index++;
                 }
 
-                HasLazy = GetRefs(true).Count > 0;
+                HasRefs = GetRefs(true).Count > 0;
             }
         }
 

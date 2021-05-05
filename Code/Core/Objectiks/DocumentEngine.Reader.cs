@@ -45,14 +45,14 @@ namespace Objectiks
                     }
 
                     //check schema refs
-                    if (meta.HasLazy && query.Lazy)
+                    if (meta.HasRefs)
                     {
                         //default refs
                         ParseDocumentRefs(meta.GetRefs(true), ref document);
                     }
 
                     //check dynamic refs..
-                    if (query.HasRefs && query.Lazy)
+                    if (query.HasRefs)
                     {
                         //custom refs
                         ParseDocumentRefs(query.RefList, ref document);
@@ -82,13 +82,13 @@ namespace Objectiks
                     }
 
                     //check schema refs
-                    if (meta.HasLazy && query.Lazy)
+                    if (meta.HasRefs)
                     {
                         ParseDocumentRefs(meta.GetRefs(true), ref document);
                     }
 
                     //check dynamic refs..
-                    if (query.HasRefs && query.Lazy)
+                    if (query.HasRefs)
                     {
                         ParseDocumentRefs(query.RefList, ref document);
                     }
@@ -173,9 +173,33 @@ namespace Objectiks
 
         public virtual Document Read(QueryOf query, DocumentMeta meta = null)
         {
+            Document document = null;
+
             if (meta == null)
             {
                 meta = GetTypeMeta(query.TypeOf);
+            }
+
+            if (query.HasPrimaryOf)
+            {
+                document = Read(query.TypeOf, query.PrimaryOfList[0]);
+
+                if (document != null && document.Exists)
+                {
+                    if (meta.HasRefs)
+                    {
+                        //default refs
+                        ParseDocumentRefs(meta.GetRefs(true), ref document);
+                    }
+
+                    if (query.HasRefs)
+                    {
+                        //custom refs
+                        ParseDocumentRefs(query.RefList, ref document);
+                    }
+
+                    return document;
+                }
             }
 
             List<DocumentKey> documentKeys = meta.GetDocumentKeysFromQueryOf(query);
@@ -190,49 +214,36 @@ namespace Objectiks
 
         public virtual T Read<T>(QueryOf query, DocumentMeta meta = null)
         {
-            if (meta == null)
+            var cacheOfData = ReadAnyCacheOfFromQuery<T>(query);
+
+            if (cacheOfData != null)
             {
-                meta = GetTypeMeta(query.TypeOf);
+                return cacheOfData;
             }
 
-            Document document;
-
-            if (query.HasPrimaryOf)
-            {
-                document = Read(query.TypeOf, query.PrimaryOfList[0]);
-            }
-            else
-            {
-                document = Read(query, meta);
-            }
+            Document document = Read(query, meta);
 
             if (document == null)
             {
-                return default(T);
+                return default;
             }
 
-            if (!document.Exists)
-            {
-                return default(T);
-            }
+            var data = ((JObject)document.Data).ToObject<T>();
 
-            if (meta.HasLazy && query.Lazy)
-            {
-                //default refs
-                ParseDocumentRefs(meta.GetRefs(true), ref document);
-            }
+            SetAnyCacheOfDocument(query, data);
 
-            if (query.HasRefs && query.Lazy)
-            {
-                //custom refs
-                ParseDocumentRefs(query.RefList, ref document);
-            }
-
-            return ((JObject)document.Data).ToObject<T>();
+            return data;
         }
 
         public virtual List<T> ReadList<T>(QueryOf query)
         {
+            var cacheOfData = ReadAnyCacheOfFromQuery<List<T>>(query);
+
+            if (cacheOfData != null)
+            {
+                return cacheOfData;
+            }
+
             var results = new List<T>();
             //read document meta data..
             var meta = GetTypeMeta(query.TypeOf);
@@ -243,24 +254,19 @@ namespace Objectiks
                 {
                     var document = Read(query.TypeOf, primaryOf);
 
-                    if (document == null)
-                    {
-                        continue;
-                    }
-
-                    if (!document.Exists)
+                    if (document == null || !document.Exists)
                     {
                         continue;
                     }
 
                     //check schema refs
-                    if (meta.HasLazy && query.Lazy)
+                    if (meta.HasRefs)
                     {
                         ParseDocumentRefs(meta.GetRefs(true), ref document);
                     }
 
                     //check dynamic refs..
-                    if (query.HasRefs && query.Lazy)
+                    if (query.HasRefs)
                     {
                         ParseDocumentRefs(query.RefList, ref document);
                     }
@@ -278,24 +284,19 @@ namespace Objectiks
                     //direct read from cache key..
                     var document = Read(query.TypeOf, key.PrimaryOf);
 
-                    if (document == null)
-                    {
-                        continue;
-                    }
-
-                    if (!document.Exists)
+                    if (document == null || !document.Exists)
                     {
                         continue;
                     }
 
                     //check schema refs
-                    if (meta.HasLazy && query.Lazy)
+                    if (meta.HasRefs)
                     {
                         ParseDocumentRefs(meta.GetRefs(true), ref document);
                     }
 
                     //check dynamic refs..
-                    if (query.HasRefs && query.Lazy)
+                    if (query.HasRefs)
                     {
                         ParseDocumentRefs(query.RefList, ref document);
                     }
@@ -309,11 +310,20 @@ namespace Objectiks
                 return results.AsQueryable().OrderBy(query.AsOrderBy()).ToList();
             }
 
+            SetAnyCacheOfDocument(query, results);
+
             return results;
         }
 
         public virtual T GetCount<T>(QueryOf query, DocumentMeta meta = null)
         {
+            T result = ReadAnyCacheOfFromQuery<T>(query);
+
+            if (result != null)
+            {
+                return result;
+            }
+
             if (meta == null)
             {
                 meta = GetTypeMeta(query.TypeOf);
@@ -321,12 +331,16 @@ namespace Objectiks
 
             if (query.HasPrimaryOf || query.HasKeyOf)
             {
-                return meta.GetCountFromQueryOf<T>(query);
+                result = meta.GetCountFromQueryOf<T>(query);
             }
             else
             {
-                return meta.TotalRecords.ChangeType<T>();
+                result = meta.TotalRecords.ChangeType<T>();
             }
+
+            SetAnyCacheOfDocument<T>(query, result);
+
+            return result;
         }
 
         public virtual List<DocumentMeta> GetTypeMetaAll()
@@ -356,6 +370,38 @@ namespace Objectiks
             });
 
             return meta;
+        }
+
+        public virtual T ReadAnyCacheOfFromQuery<T>(string typeOf, string cacheOfKey)
+        {
+            return Cache.GetCacheOf<T>(typeOf, cacheOfKey);
+        }
+
+        public virtual T ReadAnyCacheOfFromQuery<T>(QueryOf query)
+        {
+            if (query == null)
+            {
+                return default;
+            }
+
+            if (query.IsCacheOf)
+            {
+                return Cache.GetCacheOf<T>(query.TypeOf, query.GetCacheOfKey());
+            }
+            return default;
+        }
+
+        public virtual void SetAnyCacheOfDocument<T>(QueryOf query, T data)
+        {
+            if (query == null)
+            {
+                return;
+            }
+
+            if (query.IsCacheOf)
+            {
+                Cache.SetCacheOf<T>(query.TypeOf, query.GetCacheOfKey(), data, query.CacheOfExpire);
+            }
         }
     }
 }

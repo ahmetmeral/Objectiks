@@ -70,6 +70,27 @@ namespace Objectiks.Caching
             Cache.Set(CacheOf(info), Serializer.Serialize(info), options);
         }
 
+        public override void SetCacheOf<T>(string typeOf, string key, T data, int expire)
+        {
+            var expiration = TimeSpan.FromMinutes(expire);
+            var options = new MemoryCacheEntryOptions()
+                .SetPriority(CacheItemPriority.Normal)
+                .SetAbsoluteExpiration(expiration);
+            options.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
+
+            Cache.Set(CacheOf(typeOf, key), data, options);
+        }
+
+        public override T GetCacheOf<T>(string typeOf, string key)
+        {
+            if (Cache.TryGetValue(CacheOf(typeOf, key), out byte[] data))
+            {
+                return Serializer.Deserialize<T>(data);
+            }
+
+            return default;
+        }
+
         public override DocumentInfo GetDocumentInfo(string typeOf, object primary)
         {
             if (Cache.TryGetValue(CacheOfDocumentInfo(typeOf, primary), out byte[] data))

@@ -28,7 +28,7 @@ namespace Objectiks
                     trans.EnterTypeOfLock(typeOf);
 
                     CheckDirectoryOrSchema(typeOf);
-                    LoadDocumentType(typeOf);
+                    LoadDocumentType(typeOf, true);
 
                     trans.ExitTypeOfLock(typeOf);
 
@@ -41,14 +41,14 @@ namespace Objectiks
             return this;
         }
 
-        public virtual bool LoadDocumentType(string typeOf)
+        public virtual bool LoadDocumentType(string typeOf, bool isInitialize = false)
         {
             Logger?.Debug(ScopeType.Engine, $"Load TypeOf: {typeOf}");
 
             var schema = GetDocumentSchema(typeOf);
             var meta = new DocumentMeta(typeOf, schema, Provider, Option);
 
-            if (meta.Cache.Exclude)
+            if (isInitialize && meta.Cache.Lazy)
             {
                 return true;
             }
@@ -139,10 +139,10 @@ namespace Objectiks
                                     ParseDocumentData(ref meta, ref document, file);
                                 }
 
-                                //if (Option.SupportLoaderInRefs)
-                                //{
-                                //    ParseDocumentRefs(refs, ref document);
-                                //}
+                                if (Option.SupportTypeOfRefs && !isInitialize)
+                                {
+                                    ParseDocumentRefs(refs, ref document);
+                                }
 
                                 Cache.Set(document, meta.Cache.Expire);
 
@@ -159,6 +159,9 @@ namespace Objectiks
 
             Cache.Set(meta, meta.Cache.Expire);
             Cache.Set(new DocumentSequence(typeOf, meta.Sequence));
+
+            schema.Dispose();
+            meta.Dispose();
 
             return true;
         }

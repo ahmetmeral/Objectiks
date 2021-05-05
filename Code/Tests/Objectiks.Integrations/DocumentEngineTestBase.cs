@@ -11,6 +11,29 @@ namespace Objectiks.Integrations
     {
         public abstract void Setup();
 
+        [Test]
+        public void RepositoryCacheOf()
+        {
+            var repos = new ObjectiksOf();
+
+            var page = repos.TypeOf<Pages>()
+                .PrimaryOf(1)
+                .CacheOf("test")
+                .First();
+
+            var page_list = repos.TypeOf<Pages>()
+              .CacheOf()
+              .ToList();
+
+            var tags = repos.TypeOf<Tags>().CacheOf().ToList();
+
+            var tags_first = repos
+                .TypeOf<Tags>()
+                .PrimaryOf(1)
+                .PrimaryOf(2)
+                .CacheOf()
+                .ToList();
+        }
 
         [Test]
         public void DocumentWriter()

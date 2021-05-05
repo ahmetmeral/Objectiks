@@ -15,9 +15,10 @@ namespace Objectiks.Services
         IDocumentReader<T> WorkOf(object workOf);
         IDocumentReader<T> UserOf(object userOf);
         IDocumentReader<T> KeyOf(object keyOf);
+        IDocumentReader<T> CacheOf(int expireMinute = 1000);
+        IDocumentReader<T> CacheOf(string cacheOf, int expireMinute = 1000);
         IDocumentReader<T> Any();
 
-        IDocumentReader<T> Lazy(bool isLoadLazyRefs);
         IDocumentReader<T> Refs(object refObjectOrClass);
 
         IDocumentReader<T> OrderBy(string property);

@@ -15,12 +15,7 @@ namespace Objectiks
 
         public ObjectiksOf()
         {
-            Engine = Core.Get(new DocumentProvider(), null);
-        }
-
-        public ObjectiksOf(DocumentOption options)
-        {
-            Engine = Core.Get(new DocumentProvider(), options);
+            Engine = Core.Get();
         }
 
         public ObjectiksOf(string baseDirectory, DocumentOption options = null)

@@ -10,6 +10,13 @@ namespace Objectiks
         Write
     }
 
+    public enum ResultType
+    {
+        First,
+        List,
+        Count
+    }
+
     public enum TransactionState
     {
         Active,

@@ -13,6 +13,7 @@ namespace Objectiks
         public const string Info = "Info";
         public const string Schemes = "Schemes";
         public const string Documents = "Documents";
+        public const string CacheOf = "CacheOf";
         public const string Contents = "Contents";
         public const string Partitions = "Partitions";
 

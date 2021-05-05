@@ -16,7 +16,7 @@ namespace Objectiks.Services
         DocumentProvider Provider { get; }
 
 
-        bool LoadDocumentType(string typeOf);
+        bool LoadDocumentType(string typeOf, bool isInitialize);
 
         Document Read(QueryOf query, DocumentMeta meta = null);
         Document Read(string typeOf, object primaryOf);
@@ -35,5 +35,9 @@ namespace Objectiks.Services
         void BulkAppend(DocumentContext context, DocumentTransaction transaction);
         void BulkMerge(DocumentContext context, DocumentTransaction transaction);
         void BulkDelete(DocumentContext context, DocumentTransaction transaction);
+
+        void TruncateTypeOf(string typeOf);
+        void TruncateTypeOf(DocumentMeta meta);
+        int Delete<T>(QueryOf query);
     }
 }

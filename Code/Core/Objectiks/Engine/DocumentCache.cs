@@ -18,7 +18,7 @@ namespace Objectiks.Engine
         }
 
 
-       
+
         public abstract Document Get(string typeOf, object primaryOf);
 
         public abstract DocumentMeta Get(string typeOf);
@@ -37,6 +37,18 @@ namespace Objectiks.Engine
         public abstract void Set(DocumentInfo info);
         public abstract DocumentInfo GetDocumentInfo(string typeOf, object primaryOf);
 
+        public abstract void SetCacheOf<T>(string typeOf, string key, T data, int expire);
+        public abstract T GetCacheOf<T>(string typeOf, string key);
+
+        public virtual string CacheOf(string typeOf, string key)
+        {
+            if (String.IsNullOrEmpty(typeOf))
+            {
+                typeOf = "Any";
+            }
+
+            return $"objectiks:{Bucket}:{DocumentDefaults.CacheOf}:{typeOf}:{key}".ToLowerInvariant();
+        }
 
         public virtual string CacheOf(Document doc)
         {
@@ -78,7 +90,7 @@ namespace Objectiks.Engine
             return $"objectiks:{Bucket}:{DocumentDefaults.Info}:{typeOf}:{primaryOf.ToString()}".ToLowerInvariant();
         }
 
-        protected virtual T CreateNotExistEntity<T>() where T : class
+        protected virtual T CreateNotExistEntity<T>()
         {
             return (T)Activator.CreateInstance(typeof(T));
         }

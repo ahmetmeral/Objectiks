@@ -12,7 +12,7 @@
   "SupportDocumentParser": false,
   "SupportDocumentWatcher": true,
   "SupportTypeOfRefs": true,
-  "SupportTypeOfRefsFirstLoad": false,
+  "SupportTypeOfRefsInitialize": false,
   "Cache": {
     "Expire": 10000
   },
