@@ -36,9 +36,7 @@ namespace Objectiks.Caching
 
             Cache.Set(CacheOf(document), Serializer.Serialize(document), options);
 
-            var info = new DocumentInfo(document);
-
-            Cache.Set(CacheOf(info), info);
+            Set(new DocumentInfo(document));
         }
 
         public override void Set(DocumentMeta meta, int expire)

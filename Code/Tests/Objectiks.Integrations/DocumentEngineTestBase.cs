@@ -27,6 +27,8 @@ namespace Objectiks.Integrations
                 writer.SubmitChanges();
             }
 
+            Assert.IsTrue(pages.Count == repos.Count<Pages>());
+
             var select_first = pages[0];
             var select_second = pages[1];
 
@@ -35,10 +37,16 @@ namespace Objectiks.Integrations
                 .WorkOf(select_first.WorkSpaceRef)
                 .ToList();
 
+            int workOfResultsCheckCount = pages.Count(p => p.WorkSpaceRef == select_first.WorkSpaceRef);
+            Assert.IsTrue(workOfResults.Count == workOfResultsCheckCount);
+
             var keyOfResults = repos
                 .TypeOf<Pages>()
                 .KeyOf(select_first.Tag)
                 .ToList();
+
+            int keyOfResultsCheckCount = pages.Count(p => p.Tag == select_first.Tag);
+            Assert.IsTrue(keyOfResults.Count == keyOfResultsCheckCount);
 
             var primaryOfResults = repos
                 .TypeOf<Pages>()
@@ -47,10 +55,15 @@ namespace Objectiks.Integrations
                 .Any()
                 .ToList();
 
+            int primaryOfResultsCheckCount = pages.Count(p => p.Id == select_first.Id || p.Id == select_second.Id);
+            Assert.IsTrue(primaryOfResults.Count == primaryOfResultsCheckCount);
+
             var primaryOfFirstResult = repos
                 .TypeOf<Pages>()
                 .PrimaryOf(select_first.Id)
                 .First();
+
+            Assert.NotNull(primaryOfFirstResult);
 
             var multiple = repos
                 .TypeOf<Pages>()
@@ -60,6 +73,14 @@ namespace Objectiks.Integrations
                 .PrimaryOf(select_second.Id)
                 .Any()
                 .ToList();
+
+            int multipleCheckCount = pages.Count(
+                    p => p.WorkSpaceRef == select_first.WorkSpaceRef
+                    && p.Tag.Contains(select_first.Tag)
+                    && (p.Id == select_first.Id || p.Id == select_second.Id)
+                    );
+
+            Assert.IsTrue(multiple.Count == multipleCheckCount);
         }
 
         [Test]
@@ -134,6 +155,7 @@ namespace Objectiks.Integrations
 
             int pageID = pages[0].Id;
             var page_update_before = repos.TypeOf<Pages>().PrimaryOf(pageID).First();
+            var meta_before = repos.GetTypeMeta<Pages>();
 
             Assert.NotNull(page_update_before);
 
@@ -145,6 +167,8 @@ namespace Objectiks.Integrations
                 writer.UpdateDocument(page_update_before);
                 writer.SubmitChanges();
             }
+
+            var meta_after = repos.GetTypeMeta<Pages>();
 
             var page_update_after = repos.First<Pages>(pageID);
 

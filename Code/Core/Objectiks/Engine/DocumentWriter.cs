@@ -166,8 +166,6 @@ namespace Objectiks.Engine
                     {
                         throw new ArgumentNullException(requried.Name);
                     }
-
-
                 }
                 #endregion
 
@@ -189,8 +187,6 @@ namespace Objectiks.Engine
                     {
                         property.SetValue(model, info.PrimaryOf);
                     }
-
-                    //doc.KeyOfValues.Add(info.PrimaryOf.ToString().ToLowerInvariant());
 
                     continue;
                 }

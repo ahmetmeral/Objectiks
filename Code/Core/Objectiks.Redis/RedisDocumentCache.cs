@@ -36,9 +36,7 @@ namespace Objectiks.Redis
         {
             Database.Set(CacheOf(document), document, expire);
 
-            var info = new DocumentInfo(document);
-
-            Database.Set(CacheOf(info), info);
+            Set(new DocumentInfo(document));
         }
 
         public override void Set(DocumentMeta meta, int expire)
