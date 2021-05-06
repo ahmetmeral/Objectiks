@@ -77,8 +77,13 @@ namespace Objectiks
         public T First<T>(string typeOf, object primaryOf) where T : class
         {
             var query = new DocumentQuery(typeOf);
-
-            query.PrimaryOf(primaryOf);
+            query.HasPrimaryOf = true;
+            query.AddParameter(new QueryParameter
+            {
+                Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
+                Value = primaryOf,
+                Type = QueryParameterType.PrimaryOf
+            });
 
             return Engine.Read<T>(query);
         }
@@ -86,8 +91,13 @@ namespace Objectiks
         public T First<T>(object primaryOf) where T : class
         {
             var query = new DocumentQuery(GetTypeOfName<T>());
-
-            query.PrimaryOf(primaryOf);
+            query.HasPrimaryOf = true;
+            query.AddParameter(new QueryParameter
+            {
+                Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
+                Value = primaryOf,
+                Type = QueryParameterType.PrimaryOf
+            });
 
             return Engine.Read<T>(query);
         }

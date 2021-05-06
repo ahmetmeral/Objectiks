@@ -42,8 +42,15 @@ namespace Objectiks.Parsers
                     throw new Exception("Not supported..");
                 }
 
-                var index = query.ValueOf(sourceValue);
-                query.KeyOfStatement($"{DocumentDefaults.DocumentMetaKeyOfProperty}.Contains(@{index})");
+                query.AddParameter(new QueryParameter
+                {
+                    Type = QueryParameterType.KeyOf,
+                    Field = DocumentDefaults.DocumentMetaKeyOfProperty,
+                    Value = sourceKeyOf.ToString()
+                });
+
+                //var index = query.ValueOf(sourceValue);
+                //query.KeyOfStatement($"{DocumentDefaults.DocumentMetaKeyOfProperty}.Contains(@{index})");
             }
 
             if (docRef.KeyOf.Any)

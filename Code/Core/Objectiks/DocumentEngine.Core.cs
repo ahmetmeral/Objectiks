@@ -121,10 +121,18 @@ namespace Objectiks
             {
                 document.WorkOf = target[meta.Workspace].AsString();
             }
+            else
+            {
+                document.WorkOf = "0";
+            }
 
             if (!String.IsNullOrEmpty(meta.User) && target.ContainsKey(meta.User))
             {
                 document.UserOf = target[meta.User].AsString();
+            }
+            else
+            {
+                document.UserOf = "0";
             }
 
             if (!target.ContainsKey(DocumentDefaults.DocumentTypeOf))

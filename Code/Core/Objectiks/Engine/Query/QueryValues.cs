@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Objectiks.Engine.Query
 {
-    public class OrderBy : List<string>
+    public class QueryValues : List<object>
     {
 
     }

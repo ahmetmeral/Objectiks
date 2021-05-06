@@ -8,71 +8,31 @@ using System.Text;
 
 namespace Objectiks.Engine
 {
-    public class QueryOfCompiler : IDisposable
-    {
-        public string TypeOf { get; set; }
-        public string Query { get; set; }
-        public string OrderBy { get; set; }
-        public string[] Parameters { get; set; }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-    }
-
     public class DocumentQuery
     {
         public string TypeOf { get; internal set; }
-        public PrimaryOfList PrimaryOfList { get; internal set; }
-        public WorkOfList WorkOfList { get; internal set; }
-        public UserOfList UserOfList { get; internal set; }
-        public KeyOfList KeyOfList { get; internal set; }
-        public DocumentRefs RefList { get; internal set; }
+        public QueryCacheOf CacheOf { get; internal set; }
+        public QueryParameters Parameters { get; internal set; }
+        public QueryOrderBy OrderBy { get; internal set; }
+        public DocumentRefs Refs { get; internal set; }
+        public ResultType ResultType { get; internal set; }
         public int Skip { get; internal set; }
         public int Take { get; internal set; }
+        public bool HasWorkOf { get; internal set; }
+        public bool HasUserOf { get; internal set; }
+        public bool HasPrimaryOf { get; internal set; }
+        public bool HasKeyOf { get; internal set; }
+        public bool HasOrderBy { get; internal set; }
+        public bool HasRefs { get; internal set; }
+        public bool HasCacheOf { get; internal set; }
         public bool IsAny { get; internal set; } = false;
-        public OrderDirection Direction { get; internal set; } = OrderDirection.None;
-        public bool IsCacheOf { get; internal set; }
-        public string CacheOfKey { get; internal set; }
-        public int CacheOfExpire { get; internal set; }
-        public bool CacheOfBeforeCallRemove { get; internal set; }
-        public ResultType ResultType { get; internal set; }
 
-        private WhereBy WhereByAndList = null;
-        private ValueBy ValueByList = null;
-        private OrderBy OrderByList = null;
-
-        private int ValueByIndex = 0;
-
-        public bool HasRefs
+        public bool HasFilter
         {
-            get { return RefList.Count > 0; }
-        }
-
-        public bool HasKeyOf
-        {
-            get { return KeyOfList.Count > 0; }
-        }
-
-        public bool HasOrderBy
-        {
-            get { return OrderByList.Count > 0; }
-        }
-
-        public bool HasPrimaryOf
-        {
-            get { return PrimaryOfList.Count > 0; }
-        }
-
-        public bool HasWorkOf
-        {
-            get { return WorkOfList.Count > 0; }
-        }
-
-        public bool HasUserOf
-        {
-            get { return UserOfList.Count > 0; }
+            get
+            {
+                return HasWorkOf || HasUserOf || HasPrimaryOf || HasKeyOf;
+            }
         }
 
         public DocumentQuery()
@@ -92,148 +52,27 @@ namespace Objectiks.Engine
 
         private void Initialize(string typeOf, params object[] primaryOf)
         {
-            PrimaryOfList = new PrimaryOfList();
-            WorkOfList = new WorkOfList();
-            UserOfList = new UserOfList();
-            KeyOfList = new KeyOfList();
-            RefList = new DocumentRefs();
-            WhereByAndList = new WhereBy();
-            ValueByList = new ValueBy();
-            OrderByList = new OrderBy();
-
-            TypeOfBy(typeOf);
-            PrimaryOf(primaryOf);
-        }
-
-        public void TypeOfBy(string typeOf)
-        {
             TypeOf = typeOf;
-        }
+            CacheOf = new QueryCacheOf();
+            Parameters = new QueryParameters();
+            OrderBy = new QueryOrderBy();
+            Refs = new DocumentRefs();
+            HasPrimaryOf = primaryOf.Length > 0;
+            OrderBy.Direction = OrderByDirection.Asc;
 
-        public void PrimaryOf(List<string> primaryOf)
-        {
-            PrimaryOf(primaryOf.ToArray());
-        }
-
-        public void PrimaryOf(params object[] primaryOf)
-        {
-            foreach (var key in primaryOf)
+            foreach (var primaryOfValue in primaryOf)
             {
-                if (key == null)
-                    continue;
-
-                if (!PrimaryOfList.Contains(key.ToString()))
+                AddParameter(new QueryParameter
                 {
-                    PrimaryOfList.Add(key.ToString());
-                    ContainsBy(DocumentDefaults.DocumentMetaPrimaryOfProperty, key);
-                }
+                    Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
+                    Value = primaryOfValue
+                });
             }
         }
 
-        public void WorkOf(List<object> workOf)
+        public void AddParameter(QueryParameter parameter)
         {
-            WorkOf(workOf.ToArray());
-        }
-
-        public void WorkOf(params object[] workOf)
-        {
-            foreach (var key in workOf)
-            {
-                if (key == null)
-                    continue;
-
-                if (!WorkOfList.Contains(key.ToString()))
-                {
-                    WorkOfList.Add(key.ToString());
-                    ContainsBy(DocumentDefaults.DocumentMetaWorkOfProperty, key);
-                }
-            }
-        }
-
-        public void UserOf(List<object> userOf)
-        {
-            UserOf(userOf.ToArray());
-        }
-
-        public void UserOf(params object[] userOf)
-        {
-            foreach (var key in userOf)
-            {
-                if (key == null)
-                    continue;
-
-                if (!UserOfList.Contains(key.ToString()))
-                {
-                    UserOfList.Add(key.ToString());
-                    ContainsBy(DocumentDefaults.DocumentMetaUserOfProperty, key);
-                }
-            }
-        }
-
-        public void KeyOf(List<object> keyOf)
-        {
-            KeyOf(keyOf.ToArray());
-        }
-
-        public void KeyOf(params object[] keyOf)
-        {
-            foreach (var key in keyOf)
-            {
-                if (key == null)
-                    continue;
-
-                if (!KeyOfList.Contains(key.ToString()))
-                {
-                    KeyOfList.Add(key.ToString());
-                    ContainsBy(DocumentDefaults.DocumentMetaKeyOfProperty, key);
-                }
-            }
-        }
-
-        public void CacheOf(string cacheOfKey, bool beforeCallRemove, int expireMinute)
-        {
-            IsCacheOf = true;
-            CacheOfKey = cacheOfKey;
-            CacheOfExpire = expireMinute;
-
-            if (beforeCallRemove)
-            {
-                CacheOfBeforeCallRemove = true;
-            }
-        }
-
-
-        public int ValueOf(object value)
-        {
-            var index = ValueByIndex;
-            ValueByList.Add(value.ToString().ToLowerInvariant());
-            this.ValueByIndex++;
-            return index;
-        }
-
-        public void WhereBy(string property, object value)
-        {
-            this.WhereByAndList.Add($"{property}=@{ValueByIndex}");
-            this.ValueByList.Add(value.ToString());
-            this.ValueByIndex++;
-        }
-
-        public void ContainsBy(string property, object value)
-        {
-            //https://dynamic-linq.net/knowledge-base/4599989/how-to-use-dynamic-linq--system-linq-dynamic--for-like-operation-
-            this.WhereByAndList.Add($"{property}.Contains(@{ValueByIndex})");
-            this.ValueByList.Add(value.ToString().ToLowerInvariant());
-            this.ValueByIndex++;
-        }
-
-        public void KeyOfStatement(string statement)
-        {
-            if (this.KeyOfList.Count == 0)
-            {
-                this.KeyOfList.Add("ByPassHasKeyOf");
-            }
-
-            this.WhereByAndList.Add(statement);
+            Parameters.Add(parameter);
         }
 
         public void Any()
@@ -241,50 +80,15 @@ namespace Objectiks.Engine
             IsAny = true;
         }
 
-        public void OrderBy(string property)
+        public void AddOrderBy(string property)
         {
             //https://dotnetfiddle.net/bs34gh
-            this.OrderByList.Add(property);
+            this.OrderBy.Add(property);
         }
 
-        public void OrderByTypeOf(OrderDirection orderByType)
+        public void OrderByTypeOf(OrderByDirection orderByType)
         {
-            Direction = orderByType;
-        }
-
-        public string AsWhere()
-        {
-            return String.Join(IsAny ? " OR " : " AND ", WhereByAndList);
-        }
-
-        public string[] AsWhereParameters()
-        {
-            return ValueByList.ToArray();
-        }
-
-        public string AsOrderBy()
-        {
-            string orderBy = string.Empty;
-
-            if (Direction != OrderDirection.None)
-            {
-                orderBy = " " + Direction.ToString().ToLowerInvariant();
-            }
-
-            return string.Join(",", OrderByList) + orderBy;
-        }
-
-        public QueryOfCompiler AsCompiler()
-        {
-            var compiler = new QueryOfCompiler
-            {
-                TypeOf = this.TypeOf,
-                Query = AsWhere(),
-                OrderBy = AsOrderBy(),
-                Parameters = AsWhereParameters(),
-            };
-
-            return compiler;
+            this.OrderBy.Direction = orderByType;
         }
 
         internal void ParsePredicateExprOrderBy(Expression expr)
@@ -303,7 +107,7 @@ namespace Objectiks.Engine
                     throw new NotImplementedException(expr.GetType().ToString());
             }
 
-            OrderBy(memberName);
+            AddOrderBy(memberName);
         }
 
         internal void ParsePredicateExprSearchBy(Expression expr, object value)
@@ -322,45 +126,24 @@ namespace Objectiks.Engine
                     throw new NotImplementedException(expr.GetType().ToString());
             }
 
-            ContainsBy(memberName, value);
+            //ContainsBy(memberName, value);
         }
 
         public string GetCacheOfKey()
         {
-            if (String.IsNullOrEmpty(CacheOfKey))
+            if (String.IsNullOrEmpty(CacheOf.Key))
             {
                 var keys = new List<string>();
-                keys.Add(TypeOf);
-                keys.Add(Skip.ToString());
-                keys.Add(Take.ToString());
-                keys.Add(IsAny.ToString());
-                keys.Add(HasRefs.ToString());
-                keys.Add(ResultType.ToString());
 
-                if (HasWorkOf)
+                foreach (var item in Parameters)
                 {
-                    keys.AddRange(WorkOfList);
-                }
-
-                if (HasUserOf)
-                {
-                    keys.AddRange(UserOfList);
-                }
-
-                if (HasKeyOf)
-                {
-                    keys.AddRange(KeyOfList);
-                }
-
-                if (HasPrimaryOf)
-                {
-                    keys.AddRange(PrimaryOfList);
+                    keys.Add($"{item.Field}:{item.Value}");
                 }
 
                 return HashHelper.CreateMD5(string.Join(":", keys));
             }
 
-            return CacheOfKey;
+            return CacheOf.Key;
         }
     }
 }

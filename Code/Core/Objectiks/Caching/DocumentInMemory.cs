@@ -72,7 +72,7 @@ namespace Objectiks.Caching
 
         public override void Set<T>(DocumentQuery query, T data)
         {
-            var expiration = TimeSpan.FromMinutes(query.CacheOfExpire);
+            var expiration = TimeSpan.FromMinutes(query.CacheOf.Expire);
             var options = new MemoryCacheEntryOptions()
                 .SetPriority(CacheItemPriority.Normal)
                 .SetAbsoluteExpiration(expiration);

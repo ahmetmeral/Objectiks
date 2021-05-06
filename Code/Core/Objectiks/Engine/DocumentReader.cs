@@ -35,71 +35,131 @@ namespace Objectiks.Engine
         #region TypeOfBy
         public IDocumentReader<T> TypeOf(string typeOf)
         {
-            Query.TypeOfBy(typeOf);
+            Query.TypeOf = typeOf;
 
             return this;
         }
 
         public IDocumentReader<T> TypeOf(string typeOf, object primaryOf)
         {
-            Query.TypeOfBy(typeOf);
-            Query.PrimaryOf(primaryOf);
+            Query.TypeOf = typeOf;
+            Query.AddParameter(new QueryParameter
+            {
+                Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
+                Value = primaryOf,
+                Type = QueryParameterType.PrimaryOf
+            });
 
             return this;
         }
 
         public IDocumentReader<T> CacheOf(int expireMinute = 60)
         {
-            Query.CacheOf(string.Empty, false, expireMinute);
+            Query.HasCacheOf = true;
+            Query.CacheOf = new QueryCacheOf
+            {
+                Key = string.Empty,
+                BeforeCallClear = false,
+                Expire = expireMinute
+            };
 
             return this;
         }
 
         public IDocumentReader<T> CacheOf(string cacheOf, int expireMinute = 60)
         {
-            Query.CacheOf(cacheOf, false, expireMinute);
+            Query.HasCacheOf = true;
+            Query.CacheOf = new QueryCacheOf
+            {
+                Key = cacheOf,
+                BeforeCallClear = false,
+                Expire = expireMinute
+            };
 
             return this;
         }
 
         public IDocumentReader<T> CacheOf(string cacheOf, bool beforeCallRemove, int expireMinute = 60)
         {
-            Query.CacheOf(cacheOf, beforeCallRemove, expireMinute);
+            Query.HasCacheOf = true;
+            Query.CacheOf = new QueryCacheOf
+            {
+                Key = cacheOf,
+                BeforeCallClear = beforeCallRemove,
+                Expire = expireMinute
+            };
 
             return this;
         }
 
         public IDocumentReader<T> CacheOf(bool beforeCallRemove, int expireMinute = 60)
         {
-            Query.CacheOf(string.Empty, beforeCallRemove, expireMinute);
+            Query.HasCacheOf = true;
+            Query.CacheOf = new QueryCacheOf
+            {
+                Key = string.Empty,
+                BeforeCallClear = beforeCallRemove,
+                Expire = expireMinute
+            };
+
+            return this;
+        }
+
+        public IDocumentReader<T> CacheOf(QueryCacheOf cacheOf)
+        {
+            Query.HasCacheOf = true;
+            Query.CacheOf = cacheOf;
 
             return this;
         }
 
         public IDocumentReader<T> PrimaryOf(object primaryOf)
         {
-            Query.PrimaryOf(primaryOf.ToString());
-
+            Query.HasPrimaryOf = true;
+            Query.AddParameter(new QueryParameter
+            {
+                Type = QueryParameterType.PrimaryOf,
+                Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
+                Value = primaryOf
+            });
             return this;
         }
 
         public IDocumentReader<T> WorkOf(object workOf)
         {
-            Query.WorkOf(workOf);
+            Query.HasWorkOf = true;
+            Query.AddParameter(new QueryParameter
+            {
+                Type = QueryParameterType.WorkOf,
+                Field = DocumentDefaults.DocumentMetaWorkOfProperty,
+                Value = workOf
+            });
 
             return this;
         }
 
         public IDocumentReader<T> UserOf(object userOf)
         {
-            Query.UserOf(userOf);
+            Query.HasUserOf = true;
+            Query.AddParameter(new QueryParameter
+            {
+                Type = QueryParameterType.UserOf,
+                Field = DocumentDefaults.DocumentMetaUserOfProperty,
+                Value = userOf
+            });
 
             return this;
         }
 
         public IDocumentReader<T> KeyOf(object keyOf)
         {
-            Query.KeyOf(keyOf.ToString());
+            Query.HasKeyOf = true;
+            Query.AddParameter(new QueryParameter
+            {
+                Type = QueryParameterType.KeyOf,
+                Field = DocumentDefaults.DocumentMetaKeyOfProperty,
+                Value = keyOf
+            });
 
             return this;
         }
@@ -113,13 +173,15 @@ namespace Objectiks.Engine
 
         public IDocumentReader<T> Refs(object refObjectOrClass)
         {
+            Query.HasRefs = true;
+
             if (refObjectOrClass is DocumentRef)
             {
-                Query.RefList.Add((DocumentRef)refObjectOrClass);
+                Query.Refs.Add((DocumentRef)refObjectOrClass);
             }
             else
             {
-                Query.RefList.Add(DocumentRef.FromObject(refObjectOrClass));
+                Query.Refs.Add(DocumentRef.FromObject(refObjectOrClass));
             }
 
             return this;
@@ -130,21 +192,21 @@ namespace Objectiks.Engine
         #region Where & Query By
         public IDocumentReader<T> OrderBy(string property)
         {
-            Query.OrderBy(property);
+            Query.AddOrderBy(property);
 
             return this;
         }
 
         public IDocumentReader<T> Desc()
         {
-            Query.Direction = OrderDirection.Desc;
+            Query.OrderBy.Direction = OrderByDirection.Desc;
 
             return this;
         }
 
         public IDocumentReader<T> Asc()
         {
-            Query.Direction = OrderDirection.Asc;
+            Query.OrderBy.Direction = OrderByDirection.Asc;
 
             return this;
         }
@@ -152,14 +214,14 @@ namespace Objectiks.Engine
         public IDocumentReader<T> OrderBy(Expression<Func<T, object>> expr)
         {
             Query.ParsePredicateExprOrderBy(expr.Body);
-            Query.Direction = OrderDirection.Asc;
+            Query.OrderBy.Direction = OrderByDirection.Asc;
             return this;
         }
 
         public IDocumentReader<T> OrderByDesc(Expression<Func<T, object>> expr)
         {
             Query.ParsePredicateExprOrderBy(expr.Body);
-            Query.Direction = OrderDirection.Desc;
+            Query.OrderBy.Direction = OrderByDirection.Desc;
             return this;
         }
 
@@ -198,8 +260,8 @@ namespace Objectiks.Engine
         {
             Query.ResultType = ResultType.First;
 
-            Ensure.Try(Query.PrimaryOfList.Count > 0 && Query.KeyOfList.Count > 0, "PrimarOf and KeyOf cannot be used together");
-            Ensure.Try(Query.PrimaryOfList.Count > 1, "Use ToList() for multiple results");
+            //Ensure.Try(Query.PrimaryOfList.Count > 0 && Query.KeyOfList.Count > 0, "PrimarOf and KeyOf cannot be used together");
+            //Ensure.Try(Query.PrimaryOfList.Count > 1, "Use ToList() for multiple results");
 
             return Engine.Read<T>(Query);
         }
@@ -216,6 +278,8 @@ namespace Objectiks.Engine
         {
             return Query;
         }
+
+
         #endregion
     }
 }

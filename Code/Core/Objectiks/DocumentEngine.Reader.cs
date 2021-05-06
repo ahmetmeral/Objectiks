@@ -28,73 +28,37 @@ namespace Objectiks
                 meta = GetTypeMeta(query.TypeOf);
             }
 
-            if (query.HasPrimaryOf)
+            //get KeyOf match items..
+            QueryResult queryResult = GetDocumentKeysFromQueryOf(query, meta);
+
+            foreach (var key in queryResult.Keys)
             {
-                foreach (var primaryOf in query.PrimaryOfList)
+                //direct read from cache key..
+                var document = Read(query.TypeOf, key.PrimaryOf);
+
+                if (document == null)
                 {
-                    var document = Read(query.TypeOf, primaryOf);
-
-                    if (document == null)
-                    {
-                        continue;
-                    }
-
-                    if (!document.Exists)
-                    {
-                        continue;
-                    }
-
-                    //check schema refs
-                    if (meta.HasRefs)
-                    {
-                        //default refs
-                        ParseDocumentRefs(meta.GetRefs(true), ref document);
-                    }
-
-                    //check dynamic refs..
-                    if (query.HasRefs)
-                    {
-                        //custom refs
-                        ParseDocumentRefs(query.RefList, ref document);
-                    }
-
-                    results.Add(((JObject)document.Data));
+                    continue;
                 }
-            }
-            else
-            {
-                //get KeyOf match items..
-                List<DocumentKey> documentKeys = meta.GetDocumentKeysFromQueryOf(query);
 
-                foreach (var key in documentKeys)
+                if (!document.Exists)
                 {
-                    //direct read from cache key..
-                    var document = Read(query.TypeOf, key.PrimaryOf);
-
-                    if (document == null)
-                    {
-                        continue;
-                    }
-
-                    if (!document.Exists)
-                    {
-                        continue;
-                    }
-
-                    //check schema refs
-                    if (meta.HasRefs)
-                    {
-                        ParseDocumentRefs(meta.GetRefs(true), ref document);
-                    }
-
-                    //check dynamic refs..
-                    if (query.HasRefs)
-                    {
-                        ParseDocumentRefs(query.RefList, ref document);
-                    }
-
-                    results.Add(((JObject)document.Data));
+                    continue;
                 }
+
+                //check schema refs
+                if (meta.HasRefs)
+                {
+                    ParseDocumentRefs(meta.GetRefs(true), ref document);
+                }
+
+                //check dynamic refs..
+                if (query.HasRefs)
+                {
+                    ParseDocumentRefs(query.Refs, ref document);
+                }
+
+                results.Add(((JObject)document.Data));
             }
 
             if (query.HasOrderBy)
@@ -180,9 +144,11 @@ namespace Objectiks
                 meta = GetTypeMeta(query.TypeOf);
             }
 
-            if (query.HasPrimaryOf)
+            var queryResult = GetDocumentKeysFromQueryOf(query, meta);
+
+            if (queryResult.Keys.Count == 1)
             {
-                document = Read(query.TypeOf, query.PrimaryOfList[0]);
+                document = Read(query.TypeOf, queryResult.Keys[0].PrimaryOf);
 
                 if (document != null && document.Exists)
                 {
@@ -195,21 +161,12 @@ namespace Objectiks
                     if (query.HasRefs)
                     {
                         //custom refs
-                        ParseDocumentRefs(query.RefList, ref document);
+                        ParseDocumentRefs(query.Refs, ref document);
                     }
-
-                    return document;
                 }
             }
 
-            List<DocumentKey> documentKeys = meta.GetDocumentKeysFromQueryOf(query);
-
-            if (documentKeys.Count > 1 || documentKeys.Count == 0)
-            {
-                return null;
-            }
-
-            return Read(query.TypeOf, documentKeys[0].PrimaryOf);
+            return document;
         }
 
         public virtual T Read<T>(DocumentQuery query, DocumentMeta meta = null)
@@ -248,66 +205,37 @@ namespace Objectiks
             //read document meta data..
             var meta = GetTypeMeta(query.TypeOf);
 
-            if (query.HasPrimaryOf && !query.HasKeyOf)
+            //get KeyOf match items..
+            var queryResult = GetDocumentKeysFromQueryOf(query, meta);
+
+            foreach (var key in queryResult.Keys)
             {
-                foreach (var primaryOf in query.PrimaryOfList)
+                //direct read from cache key..
+                var document = Read(query.TypeOf, key.PrimaryOf);
+
+                if (document == null || !document.Exists)
                 {
-                    var document = Read(query.TypeOf, primaryOf);
-
-                    if (document == null || !document.Exists)
-                    {
-                        continue;
-                    }
-
-                    //check schema refs
-                    if (meta.HasRefs)
-                    {
-                        ParseDocumentRefs(meta.GetRefs(true), ref document);
-                    }
-
-                    //check dynamic refs..
-                    if (query.HasRefs)
-                    {
-                        ParseDocumentRefs(query.RefList, ref document);
-                    }
-
-                    results.Add(((JObject)document.Data).ToObject<T>());
+                    continue;
                 }
-            }
-            else
-            {
-                //get KeyOf match items..
-                List<DocumentKey> documentKeys = meta.GetDocumentKeysFromQueryOf(query);
 
-                foreach (var key in documentKeys)
+                //check schema refs
+                if (meta.HasRefs)
                 {
-                    //direct read from cache key..
-                    var document = Read(query.TypeOf, key.PrimaryOf);
-
-                    if (document == null || !document.Exists)
-                    {
-                        continue;
-                    }
-
-                    //check schema refs
-                    if (meta.HasRefs)
-                    {
-                        ParseDocumentRefs(meta.GetRefs(true), ref document);
-                    }
-
-                    //check dynamic refs..
-                    if (query.HasRefs)
-                    {
-                        ParseDocumentRefs(query.RefList, ref document);
-                    }
-
-                    results.Add(((JObject)document.Data).ToObject<T>());
+                    ParseDocumentRefs(meta.GetRefs(true), ref document);
                 }
+
+                //check dynamic refs..
+                if (query.HasRefs)
+                {
+                    ParseDocumentRefs(query.Refs, ref document);
+                }
+
+                results.Add(((JObject)document.Data).ToObject<T>());
             }
 
-            if (query.HasOrderBy)
+            if (query.HasOrderBy && results.Count > 1)
             {
-                return results.AsQueryable().OrderBy(query.AsOrderBy()).ToList();
+                return results.AsQueryable().OrderBy(queryResult.Query.OrderBy).ToList();
             }
 
             SetAnyCacheOfDocument(query, results);
@@ -317,28 +245,30 @@ namespace Objectiks
 
         public virtual T GetCount<T>(DocumentQuery query, DocumentMeta meta = null)
         {
-            T result = ReadAnyCacheOfFromQuery<T>(query);
+            long? readFromCache = ReadAnyCacheOfFromQuery<long?>(query);
 
-            if (result != null)
+            if (readFromCache.HasValue)
             {
-                return result;
+                return readFromCache.Value.ChangeType<T>();
             }
+
+            T result;
 
             if (meta == null)
             {
                 meta = GetTypeMeta(query.TypeOf);
             }
 
-            if (query.HasPrimaryOf || query.HasKeyOf)
+            if (query.HasFilter)
             {
-                result = meta.GetCountFromQueryOf<T>(query);
+                result = GetCountFromQueryOf<T>(query, meta);
             }
             else
             {
                 result = meta.TotalRecords.ChangeType<T>();
             }
 
-            SetAnyCacheOfDocument<T>(query, result);
+            SetAnyCacheOfDocument(query, result);
 
             return result;
         }
@@ -374,29 +304,24 @@ namespace Objectiks
 
         public virtual T ReadAnyCacheOfFromQuery<T>(DocumentQuery query)
         {
-            if (query.CacheOfBeforeCallRemove)
+            if (!query.HasCacheOf)
+            {
+                return default;
+            }
+
+            if (query.CacheOf.BeforeCallClear)
             {
                 RemoveAnyCacheOfFromQuery(query);
 
                 return default;
             }
 
-            if (query == null)
-            {
-                return default;
-            }
-
-            if (query.IsCacheOf)
-            {
-                return Cache.Get<T>(query);
-            }
-
-            return default;
+            return Cache.Get<T>(query);
         }
 
         public virtual void RemoveAnyCacheOfFromQuery(DocumentQuery query)
         {
-            if (query.CacheOfBeforeCallRemove)
+            if (query.CacheOf.BeforeCallClear)
             {
                 Cache.Remove(query);
             }
@@ -409,10 +334,57 @@ namespace Objectiks
                 return;
             }
 
-            if (query.IsCacheOf)
+            if (query.HasCacheOf)
             {
                 Cache.Set(query, data);
             }
+        }
+
+        public virtual T GetCountFromQueryOf<T>(DocumentQuery query, DocumentMeta meta = null)
+        {
+            if (meta == null)
+            {
+                meta = GetTypeMeta(query.TypeOf);
+            }
+
+            var compiler = query.Compiler();
+            return meta.Keys.AsQueryable().Count(compiler.WhereBy,
+                     compiler.ValueBy).ChangeType<T>();
+        }
+
+        public virtual QueryResult GetDocumentKeysFromQueryOf(DocumentQuery query, DocumentMeta meta = null)
+        {
+            if (meta == null)
+            {
+                meta = GetTypeMeta(query.TypeOf);
+            }
+
+            List<DocumentKey> keys;
+
+            var queryCompiler = query.Compiler();
+
+            if (query.HasFilter)
+            {
+                keys = meta.Keys.AsQueryable().Where(queryCompiler.WhereBy, queryCompiler.ValueBy.ToArray())?.ToList();
+
+                if (keys != null && query.Take > 0)
+                {
+                    keys = keys.Skip(query.Skip).Take(query.Take).ToList();
+                }
+            }
+            else
+            {
+                if (query.Take > 0)
+                {
+                    keys = meta.Keys.Skip(query.Skip).Take(query.Take).ToList();
+                }
+                else
+                {
+                    keys = meta.Keys.ToList();
+                }
+            }
+
+            return new QueryResult(queryCompiler, keys);
         }
     }
 }

@@ -39,19 +39,25 @@ namespace Objectiks.Parsers
             {
                 foreach (var sourceKeyOf in docRef.KeyOf.Source)
                 {
-                    query.ContainsBy(DocumentDefaults.DocumentMetaKeyOfProperty, source[sourceKeyOf]);
+                    query.AddParameter(new QueryParameter
+                    {
+                        Type = QueryParameterType.KeyOf,
+                        Field = DocumentDefaults.DocumentMetaKeyOfProperty,
+                        Value = source[sourceKeyOf]
+                    });
                 }
             }
 
             //match keys..
-            var keys = meta.GetDocumentKeysFromQueryOf(query);
+            var queryResult = engine.GetDocumentKeysFromQueryOf(query, meta);
+            var documentKeys = queryResult.Keys;
             var property = docRef.GetTargetProperty();
 
             if (docRef.MapOf != null && !String.IsNullOrEmpty(docRef.MapOf.Target))
             {
                 source[property] = new JObject();
 
-                foreach (var key in keys)
+                foreach (var key in documentKeys)
                 {
                     var queryOfFromKey = new DocumentQuery(meta.TypeOf, key.PrimaryOf);
                     var target = engine.Read<JObject>(queryOfFromKey, meta);
@@ -62,7 +68,7 @@ namespace Objectiks.Parsers
             }
             else
             {
-                source[property] = engine.ReadList(keys.GetQueryOfFromPrimaryOf(meta.TypeOf), meta);
+                source[property] = engine.ReadList(documentKeys.GetQueryOfFromPrimaryOf(meta.TypeOf), meta);
             }
 
             document.Data = source;

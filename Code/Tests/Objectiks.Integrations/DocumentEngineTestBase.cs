@@ -12,14 +12,54 @@ namespace Objectiks.Integrations
         public abstract void Setup();
 
         [Test]
-        public void DocumentWorkOf()
+        public void DocumentWorkOfUserOfKeyOfPrimaryOf()
         {
             var repos = new ObjectiksOf();
 
-            var workOf_01 = repos.TypeOf<Pages>()
-                 .WorkOf(1).ToList();
+            repos.TruncateOf<Pages>();
 
+            var pages = TestSetup.GeneratePages(10, false, true);
 
+            using (var writer = repos.WriterOf<Pages>())
+            {
+                writer.UseFormatting();
+                writer.AddDocuments(pages);
+                writer.SubmitChanges();
+            }
+
+            var select_first = pages[0];
+            var select_second = pages[1];
+
+            var workOfResults = repos
+                .TypeOf<Pages>()
+                .WorkOf(select_first.WorkSpaceRef)
+                .ToList();
+
+            var keyOfResults = repos
+                .TypeOf<Pages>()
+                .KeyOf(select_first.Tag)
+                .ToList();
+
+            var primaryOfResults = repos
+                .TypeOf<Pages>()
+                .PrimaryOf(select_first.Id)
+                .PrimaryOf(select_second.Id)
+                .Any()
+                .ToList();
+
+            var primaryOfFirstResult = repos
+                .TypeOf<Pages>()
+                .PrimaryOf(select_first.Id)
+                .First();
+
+            var multiple = repos
+                .TypeOf<Pages>()
+                .WorkOf(select_first.WorkSpaceRef)
+                .KeyOf(select_first.Tag)
+                .PrimaryOf(select_first.Id)
+                .PrimaryOf(select_second.Id)
+                .Any()
+                .ToList();
         }
 
         [Test]
@@ -154,12 +194,13 @@ namespace Objectiks.Integrations
             Assert.IsTrue(userPages.Count == 0);
 
             var keyOfTag = list[0].Tag;
+            var keyOfTagNumberOfCount = list.Count(l => l.Tag == keyOfTag);
 
             Debug.WriteLine($"KeyOf:{keyOfTag}");
 
             var keyOfPages = repos.TypeOf<Pages>().KeyOf(keyOfTag).ToList();
 
-            Assert.IsTrue(keyOfPages.Count > 0);
+            Assert.IsTrue(keyOfPages.Count == keyOfTagNumberOfCount);
         }
 
         [Test]

@@ -17,6 +17,22 @@ namespace Objectiks
         Count
     }
 
+    public enum QueryParameterType
+    {
+        None,
+        WorkOf,
+        UserOf,
+        PrimaryOf,
+        KeyOf
+    }
+
+    public enum OperatorType
+    {
+        None,
+        Equal,
+        In
+    }
+
     public enum TransactionState
     {
         Active,
@@ -72,7 +88,7 @@ namespace Objectiks
         Array
     }
 
-    public enum OrderDirection
+    public enum OrderByDirection
     {
         None,
         Asc,

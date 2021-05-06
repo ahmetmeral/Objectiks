@@ -190,7 +190,7 @@ namespace Objectiks.Engine
                         property.SetValue(model, info.PrimaryOf);
                     }
 
-                    doc.KeyOfValues.Add(info.PrimaryOf.ToString().ToLowerInvariant());
+                    //doc.KeyOfValues.Add(info.PrimaryOf.ToString().ToLowerInvariant());
 
                     continue;
                 }
@@ -226,6 +226,10 @@ namespace Objectiks.Engine
                     {
                         doc.WorkOf = value.ToString();
                     }
+                    else
+                    {
+                        doc.WorkOf = "0";
+                    }
                 }
                 #endregion
 
@@ -237,6 +241,10 @@ namespace Objectiks.Engine
                     if (value != null)
                     {
                         doc.UserOf = value.ToString();
+                    }
+                    else
+                    {
+                        doc.UserOf = "0";
                     }
                 }
                 #endregion

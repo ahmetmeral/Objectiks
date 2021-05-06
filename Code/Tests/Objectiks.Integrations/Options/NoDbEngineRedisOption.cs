@@ -37,6 +37,7 @@ namespace Objectiks.Integrations.Options
             TypeOf = new DocumentTypes("Pages", "Tags");
             Schemes = new DocumentSchemes(pages, tags);
             SupportPartialStorage = true;
+            SupportTypeOfRefs = false;
 
             //var cacheConfig = new RedisConfiguration("localhost:6379");
             var cacheConfig = new RedisConfiguration

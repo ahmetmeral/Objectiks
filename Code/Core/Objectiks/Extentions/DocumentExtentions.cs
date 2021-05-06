@@ -25,10 +25,10 @@ namespace Objectiks.Extentions
             var keyOfProperties = keyOfNames;
             var keyOfValues = new List<string>();
 
-            if (!keyOfProperties.Contains(primary))
-            {
-                keyOfProperties.Add(primary);
-            }
+            //if (!keyOfProperties.Contains(primary))
+            //{
+            //    keyOfProperties.Add(primary);
+            //}
 
             foreach (var key in keyOfProperties)
             {
@@ -120,7 +120,12 @@ namespace Objectiks.Extentions
 
             foreach (var key in keys)
             {
-                query.PrimaryOf(key.PrimaryOf);
+                query.AddParameter(new QueryParameter
+                {
+                    Type = QueryParameterType.PrimaryOf,
+                    Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
+                    Value = key.PrimaryOf
+                });
             }
 
             return query;

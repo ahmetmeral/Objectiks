@@ -58,7 +58,7 @@ namespace Objectiks.Redis
 
         public override void Set<T>(DocumentQuery query, T data)
         {
-            Database.Set(CacheOf(query), data, query.CacheOfExpire);
+            Database.Set(CacheOf(query), data, query.CacheOf.Expire);
         }
 
         public override T Get<T>(DocumentQuery query)

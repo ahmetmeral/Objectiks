@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Objectiks.Models
+namespace Objectiks.Engine.Query
 {
-    public class DocumentCacheInfo
+    public class QueryCacheOf
     {
         public string Key { get; set; }
         public int Expire { get; set; }
-        public bool Lazy { get; set; }
+        public bool BeforeCallClear { get; set; }
     }
 }

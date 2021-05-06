@@ -13,7 +13,7 @@ namespace Objectiks.Integrations.Models
         public int Id { get; set; }
 
         [WorkOf, Requried]
-        public int AccountRef { get; set; }
+        public int WorkSpaceRef { get; set; }
 
         [UserOf, Requried]
         public int UserRef { get; set; }

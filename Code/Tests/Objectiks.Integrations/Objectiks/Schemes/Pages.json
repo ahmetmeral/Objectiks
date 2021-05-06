@@ -1,7 +1,7 @@
 ﻿{
   "TypeOf": "Pages",
   "ParseOf": "Document",
-  "WorkOf": "AccountRef",
+  "WorkOf": "WorkSpaceRef",
   "UserOf": "UserRef",
   "PrimaryOf": "Id",
   "KeyOf": [ "Tag" ],

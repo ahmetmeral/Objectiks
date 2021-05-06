@@ -15,7 +15,12 @@ namespace Objectiks.Integrations
         private static Random random = new Random(1);
         private static List<int> idList = new List<int>();
         private static Random randomGroup = new Random(1);
+        private static Random randomWorkspace = new Random(1);
+        private static Random randomUser = new Random(1);
+
         public static string[] Tags = new string[] { "Admin", "User", "Manager" };
+        public static int[] WorkspaceIDs = new int[] { 1, 2, 3, 4 };
+        public static int[] UsersIDs = new int[] { 1, 2, 3, 4 };
 
         public static DocumentOption Options
         {
@@ -45,18 +50,42 @@ namespace Objectiks.Integrations
             return Tags[randomGroup.Next(1, Tags.Length)];
         }
 
-        public static List<Pages> GeneratePages(int size, bool auto_id = true)
+        public static int GetUserID()
+        {
+            return UsersIDs[randomUser.Next(1, UsersIDs.Length)];
+        }
+
+        public static int GetWorkSpaceID()
+        {
+            return WorkspaceIDs[randomWorkspace.Next(1, WorkspaceIDs.Length)];
+        }
+
+        public static List<Pages> GeneratePages(int size, bool auto_id = true, bool workOf = false)
         {
             var rows = new List<Pages>();
 
             for (int i = 0; i < size; i++)
             {
-                rows.Add(new Pages
+                if (workOf)
                 {
-                    Id = auto_id ? GenerateNewId() : 0,
-                    Title = "Home Tr Page Yaptık..1 ",
-                    Tag = GetTagName()
-                });
+                    rows.Add(new Pages
+                    {
+                        Id = auto_id ? GenerateNewId() : 0,
+                        WorkSpaceRef = GetWorkSpaceID(),
+                        UserRef = GetUserID(),
+                        Title = "Home Tr Page Yaptık..1 ",
+                        Tag = GetTagName()
+                    });
+                }
+                else
+                {
+                    rows.Add(new Pages
+                    {
+                        Id = auto_id ? GenerateNewId() : 0,
+                        Title = "Home Tr Page Yaptık..1 ",
+                        Tag = GetTagName()
+                    });
+                }
             }
 
             return rows;

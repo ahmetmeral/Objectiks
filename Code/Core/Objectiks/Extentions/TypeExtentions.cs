@@ -13,6 +13,8 @@ namespace Objectiks.Extentions
     {
         private static readonly ConcurrentDictionary<Type, PropertyInfo[]> Properties = new ConcurrentDictionary<Type, PropertyInfo[]>();
 
+       
+
         public static bool IsDynamic(this Type objectType)
         {
             return objectType.FullName == "System.Object";

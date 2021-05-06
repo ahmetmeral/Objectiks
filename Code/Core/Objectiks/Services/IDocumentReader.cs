@@ -16,6 +16,7 @@ namespace Objectiks.Services
         IDocumentReader<T> WorkOf(object workOf);
         IDocumentReader<T> UserOf(object userOf);
         IDocumentReader<T> KeyOf(object keyOf);
+        IDocumentReader<T> CacheOf(QueryCacheOf cacheOf);
         IDocumentReader<T> CacheOf(int expireMinute = 60);
         IDocumentReader<T> CacheOf(string cacheOf, int expireMinute = 60);
         IDocumentReader<T> CacheOf(string cacheOf, bool beforeCallRemove, int expireMinute = 60);

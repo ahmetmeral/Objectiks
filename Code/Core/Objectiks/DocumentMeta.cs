@@ -120,45 +120,6 @@ namespace Objectiks
             return refs;
         }
 
-        public T GetCountFromQueryOf<T>(DocumentQuery query)
-        {
-            return Keys.AsQueryable().Count(query.AsWhere(),
-                     query.AsWhereParameters()).ChangeType<T>();
-        }
-
-        public DocumentKey GetDocumentKeyFromCacheOf(string cacheOf)
-        {
-            return Keys.Where(k => k.CacheOf == cacheOf).FirstOrDefault();
-        }
-
-        public List<DocumentKey> GetDocumentKeysFromQueryOf(DocumentQuery query)
-        {
-            List<DocumentKey> result = null;
-
-            if (query.HasPrimaryOf || query.HasKeyOf)
-            {
-                result = Keys.AsQueryable().Where(query.AsWhere(), query.AsWhereParameters())?.ToList();
-
-                if (result != null && query.Take > 0)
-                {
-                    result = result.Skip(query.Skip).Take(query.Take).ToList();
-                }
-            }
-            else
-            {
-                if (query.Take > 0)
-                {
-                    result = Keys.Skip(query.Skip).Take(query.Take).ToList();
-                }
-                else
-                {
-                    result = Keys.ToList();
-                }
-            }
-
-            return result;
-        }
-
         internal DocumentPartition GetAvailablePartition(int partition, int? partialStoreLimit, int partitionTemporyCount)
         {
             if (partialStoreLimit.HasValue)
