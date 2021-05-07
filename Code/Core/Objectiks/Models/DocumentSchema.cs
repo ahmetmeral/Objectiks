@@ -40,7 +40,6 @@ namespace Objectiks.Models
         public string UserOf { get; set; }
         public string PrimaryOf { get; set; }
         public DocumentKeyOfNames KeyOf { get; set; }
-        public DocumentRefs Refs { get; set; }
         public DocumentCacheInfo Cache { get; set; }
         public DocumentVars Vars { get; set; }
 

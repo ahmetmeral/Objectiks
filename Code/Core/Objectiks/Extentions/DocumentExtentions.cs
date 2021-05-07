@@ -89,20 +89,6 @@ namespace Objectiks.Extentions
             return sOutput.ToString();
         }
 
-        public static string GetTargetProperty(this DocumentRef docRef)
-        {
-            var property = docRef.TypeOf;
-
-            if (docRef.MapOf != null)
-            {
-                if (!String.IsNullOrWhiteSpace(docRef.MapOf.Source))
-                {
-                    property = docRef.MapOf.Source;
-                }
-            }
-
-            return property;
-        }
 
         public static bool HasArray(this object obj)
         {

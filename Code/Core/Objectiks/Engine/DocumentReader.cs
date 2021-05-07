@@ -171,21 +171,6 @@ namespace Objectiks.Engine
             return this;
         }
 
-        public IDocumentReader<T> Refs(object refObjectOrClass)
-        {
-            Query.HasRefs = true;
-
-            if (refObjectOrClass is DocumentRef)
-            {
-                Query.Refs.Add((DocumentRef)refObjectOrClass);
-            }
-            else
-            {
-                Query.Refs.Add(DocumentRef.FromObject(refObjectOrClass));
-            }
-
-            return this;
-        }
         #endregion
 
 

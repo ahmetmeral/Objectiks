@@ -94,19 +94,6 @@ namespace Objectiks.Engine
                     Engine.Logger?.Debug(ScopeType.Watcher, $"OnChangeDocument TypeOf: {typeOf} - File: {file.FullName}");
 
                     Engine.LoadDocumentType(typeOf);
-
-                    foreach (var relationType in types)
-                    {
-                        Engine.Logger?.Debug(ScopeType.Watcher, $"{typeOf} Load releation types - TypeOf: {relationType}");
-
-                        var meta = Engine.GetTypeMeta(relationType);
-
-                        if (meta.Refs != null &&
-                            meta.Refs.Count(r => r.TypeOf == typeOf && r.Lazy == false && r.Disabled == false) > 0)
-                        {
-                            Engine.LoadDocumentType(relationType);
-                        }
-                    }
                 }
             }
             catch (Exception ex)

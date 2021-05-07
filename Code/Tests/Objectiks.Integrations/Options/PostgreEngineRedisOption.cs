@@ -36,7 +36,6 @@ namespace Objectiks.Integrations.Options
             Name = "PostgreEngineProvider";
             SqlProviderSchema = "public";
             SqlProviderSchemaSeperator = ".";
-            SupportTypeOfRefs = false;
 
             TypeOf = new DocumentTypes("Pages", "Tags");
             Schemes = new DocumentSchemes(pages, tags);

@@ -15,7 +15,6 @@ namespace Objectiks
     public class DocumentOption
     {
         public string Name { get; set; } = "Objectiks";
-        public string Version { get; set; } = "1.0.0";
         public string Primary { get; set; } = "Id";
         public string User { get; set; } = "UserOf";
         public string WorkOf { get; set; } = "WorkOf";
@@ -30,11 +29,10 @@ namespace Objectiks
         public int SupportPartialStorageSize { get; set; } = 1000;
         public bool SupportPartialStorage { get; set; } = false;
         public bool SupportDocumentParser { get; set; } = false;
-        public bool SupportTypeOfRefs { get; set; } = true;
         public bool SupportDocumentWatcher { get; set; } = false;
-
-        public string Extention { get; set; } = "*.json";
+       
         public int BufferSize { get; set; } = 512;
+        public string Extention { get; set; } = "*.json";
 
         public DocumentCacheInfo CacheInfo { get; set; } = new DocumentCacheInfo { Expire = 10000 };
         public DocumentSchemes Schemes { get; set; } = new DocumentSchemes();
@@ -43,7 +41,7 @@ namespace Objectiks
         internal IDocumentCache CacheInstance { get; set; }
         internal IDocumentWatcher DocumentWatcher { get; set; }
         internal IDocumentLogger DocumentLogger { get; set; }
-        internal List<IParser> ParserOfTypes { get; set; }
+        internal List<IDocumentParser> ParserOfTypes { get; set; }
         internal Type EngineProvider { get; set; }
         internal bool HasManifest { get; set; }
 
@@ -57,7 +55,7 @@ namespace Objectiks
 
         public DocumentOption()
         {
-            ParserOfTypes = new List<IParser>();
+            ParserOfTypes = new List<IDocumentParser>();
         }
 
         public virtual void RegisterDefaultTypeOrParser()
@@ -65,10 +63,6 @@ namespace Objectiks
             if (ParserOfTypes.Count == 0)
             {
                 //AddParserTypeOf<DocumentDefaultParser>();
-                AddParserTypeOf<DocumentOneToOneParser>();
-                AddParserTypeOf<DocumentManyToManyParser>();
-                AddParserTypeOf<DocumentOneToManyParser>();
-                AddParserTypeOf<DocumentOneToOneFileParser>();
             }
 
             if (CacheInstance == null)
@@ -103,7 +97,7 @@ namespace Objectiks
             HasManifest = true;
         }
 
-        public void AddParserTypeOf<T>() where T : IParser
+        public void AddParserTypeOf<T>() where T : IDocumentParser
         {
             ParserOfTypes.Add(GetDocumentParser(typeof(T)));
         }
@@ -113,9 +107,9 @@ namespace Objectiks
             ParserOfTypes?.Clear();
         }
 
-        internal IParser GetDocumentParser(Type type)
+        internal IDocumentParser GetDocumentParser(Type type)
         {
-            return (IParser)Activator.CreateInstance(type);
+            return (IDocumentParser)Activator.CreateInstance(type);
         }
     }
 }

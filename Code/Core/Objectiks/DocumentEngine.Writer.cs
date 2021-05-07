@@ -72,8 +72,6 @@ namespace Objectiks
             }
             else
             {
-                var refs = meta.GetRefs(false);
-
                 for (int i = 0; i < count; i++)
                 {
                     Document document = context.Documents[i];
@@ -85,21 +83,12 @@ namespace Objectiks
 
                     if (Option.SupportDocumentParser)
                     {
-                        ParseDocumentData(ref meta, ref document, context.Storage);
+                        ParseDocumentData(ref meta, ref document, context.Storage, context.Operation);
                     }
 
                     meta.SubmitChanges(document, context.Operation);
 
-                    if (Option.SupportTypeOfRefs)
-                    {
-                        ParseDocumentRefs(refs, ref document);
-
-                        Cache.Set(document, meta.Cache.Expire);
-                    }
-                    else
-                    {
-                        Cache.Set(document, meta.Cache.Expire);
-                    }
+                    Cache.Set(document, meta.Cache.Expire);
                 }
             }
         }

@@ -6,7 +6,6 @@ namespace Objectiks.Models
 {
     public class DocumentCacheInfo
     {
-        public string Key { get; set; }
         public int Expire { get; set; }
         public bool Lazy { get; set; }
     }

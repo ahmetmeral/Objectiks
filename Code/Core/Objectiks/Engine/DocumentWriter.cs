@@ -95,7 +95,7 @@ namespace Objectiks.Engine
 
             if (clearDocumentRefs)
             {
-                RemoveIgnoredOrRefProperty(ref document, attr);
+                RemoveIgnoredProperties(ref document, attr);
             }
 
             Ensure.NotNullOrEmpty(document.TypeOf, "Document typeOf is empty");
@@ -249,24 +249,11 @@ namespace Objectiks.Engine
             return doc;
         }
 
-        private void RemoveIgnoredOrRefProperty(ref Document document, DocumentAttributes attrValues)
+        private void RemoveIgnoredProperties(ref Document document, DocumentAttributes attrValues)
         {
             foreach (var prop in attrValues.Ignored)
             {
                 document.Data.Remove(prop.Name);
-            }
-
-            if (Meta.Refs != null)
-            {
-                foreach (var item in Meta.Refs)
-                {
-                    string refPropertyName = item.GetTargetProperty();
-
-                    if (attrValues.Ignored.Count(i => i.Name == refPropertyName) > 0)
-                    {
-                        document.Data.Remove(refPropertyName);
-                    }
-                }
             }
         }
 

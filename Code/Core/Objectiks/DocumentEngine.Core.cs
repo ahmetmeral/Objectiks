@@ -22,7 +22,7 @@ namespace Objectiks
         public IDocumentLogger Logger { get; private set; }
         public IDocumentCache Cache { get; private set; }
         public IDocumentWatcher Watcher { get; private set; }
-        public List<IParser> ParseOf { get; private set; }
+        public List<IDocumentParser> ParseOf { get; private set; }
 
         private readonly DocumentMonitor Monitor;
 
@@ -146,31 +146,14 @@ namespace Objectiks
             return document;
         }
 
-        protected virtual void ParseDocumentData(ref DocumentMeta meta, ref Document document, DocumentStorage file)
+        protected virtual void ParseDocumentData(ref DocumentMeta meta, ref Document document, DocumentStorage file, OperationType operation)
         {
             var parser = GetDocumentParser(meta.TypeOf);
 
             if (parser != null)
             {
-                parser.Parse(this, meta, document, file);
+                parser.Parse(this, meta, document, file, operation);
             }
-        }
-
-        protected virtual bool ParseDocumentRefs(List<DocumentRef> refs, ref Document document)
-        {
-            foreach (var docRef in refs)
-            {
-                var parser = GetReferenceParser(docRef);
-
-                if (!parser.IsValidRef(docRef))
-                {
-                    throw new Exception($"Document ref schema incorrect {document.TypeOf} -> {docRef?.ParseOf} - {docRef?.TypeOf}");
-                }
-
-                parser.Parse(this, document, docRef);
-            }
-
-            return true;
         }
 
         protected virtual IDocumentParser GetDocumentParser(string typeOf)
@@ -190,14 +173,6 @@ namespace Objectiks
             return (IDocumentParser)converter;
         }
 
-        protected virtual IDocumentRefParser GetReferenceParser(DocumentRef docRef)
-        {
-            var converter = ParseOf.Where(c => c.ParseOf == docRef.ParseOf).FirstOrDefault();
-
-            Ensure.NotNull(converter, $"Core ReferenceParser Type : {docRef.ParseOf} -> Parser undefined..");
-
-            return (IDocumentRefParser)converter;
-        }
 
         protected virtual DocumentManifest GetDocumentManifest(string baseDirectory)
         {

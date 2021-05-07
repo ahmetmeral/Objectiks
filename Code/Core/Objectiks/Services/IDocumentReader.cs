@@ -10,6 +10,7 @@ namespace Objectiks.Services
     public interface IDocumentReader<T>
     {
         DocumentQuery GetDocumentQueryOf();
+
         IDocumentReader<T> TypeOf(string typeOf);
         IDocumentReader<T> TypeOf(string typeOf, object primaryOf);
         IDocumentReader<T> PrimaryOf(object primaryOf);
@@ -22,8 +23,6 @@ namespace Objectiks.Services
         IDocumentReader<T> CacheOf(string cacheOf, bool beforeCallRemove, int expireMinute = 60);
         IDocumentReader<T> CacheOf(bool beforeCallRemove, int expireMinute = 60);
         IDocumentReader<T> Any();
-
-        IDocumentReader<T> Refs(object refObjectOrClass);
 
         IDocumentReader<T> OrderBy(string property);
         IDocumentReader<T> Desc();

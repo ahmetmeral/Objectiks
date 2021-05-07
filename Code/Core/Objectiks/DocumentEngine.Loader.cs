@@ -53,7 +53,6 @@ namespace Objectiks
                 return true;
             }
 
-            var refs = meta.GetRefs(false);
             var files = new List<DocumentStorage>();
 
             #region Files
@@ -128,12 +127,7 @@ namespace Objectiks
 
                                 if (Option.SupportDocumentParser)
                                 {
-                                    ParseDocumentData(ref meta, ref document, file);
-                                }
-
-                                if (Option.SupportTypeOfRefs && !isInitialize)
-                                {
-                                    ParseDocumentRefs(refs, ref document);
+                                    ParseDocumentData(ref meta, ref document, file, OperationType.Load);
                                 }
 
                                 meta.SubmitChanges(document, OperationType.Load);

@@ -480,8 +480,6 @@ namespace Objectiks.Integrations
             Assert.IsTrue(repos.Count<Pages>() == size);
         }
 
-
-
         [Test]
         public void DocumentBulkWritePartial()
         {
@@ -500,44 +498,6 @@ namespace Objectiks.Integrations
             }
 
             Assert.IsTrue(repos.Count<Pages>() == size);
-        }
-
-        public void DocumenRefs()
-        {
-            var repos = new ObjectiksOf();
-
-            var refs_1 = new
-            {
-                ParseOf = "M:M",
-                TypeOf = "Sections",
-                MapOf = new
-                {
-                    Target = "DynamicRefs"
-                }
-            };
-
-            var refs_2 = new
-            {
-                ParseOf = "1:M",
-                TypeOf = "Sections",
-                KeyOf = new
-                {
-                    Source = new string[] { "Language" },
-                    Target = new string[] { "Language" }
-                },
-                MapOf = new
-                {
-                    Source = "Name",
-                    Target = "Sections"
-                }
-            };
-
-            var page = repos
-               .TypeOf("pages")
-               .PrimaryOf(2)
-               .Refs(refs_1)
-               .Refs(refs_2)
-               .First();
         }
     }
 }

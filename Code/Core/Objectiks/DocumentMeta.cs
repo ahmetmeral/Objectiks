@@ -25,11 +25,9 @@ namespace Objectiks
         public long TotalRecords { get; set; }
         public long DiskSize { get; set; }
         public long MemorySize { get; set; }
-        public bool HasRefs { get; set; }
         public bool HasData { get; set; }
         public DocumentKeyIndex Keys { get; set; }
         public DocumentKeyOfNames KeyOfNames { get; set; }
-        public DocumentRefs Refs { get; set; }
         public DocumentCacheInfo Cache { get; set; }
         public DocumentPartitions Partitions { get; set; }
         public string Extention { get; set; }
@@ -47,9 +45,7 @@ namespace Objectiks
             ParseOf = schema.ParseOf;
             Primary = schema.PrimaryOf;
             User = schema.UserOf;
-
             KeyOfNames = schema.KeyOf;
-            Refs = schema.Refs;
             Cache = schema.Cache;
             Keys = new DocumentKeyIndex();
             Partitions = new DocumentPartitions();
@@ -57,10 +53,7 @@ namespace Objectiks
             Partitions.Next = 0;
             Directory = Path.Combine(fileProvider.BaseDirectory, DocumentDefaults.Documents, typeOf);
             Extention = option.Extention;
-            HasRefs = GetRefs(true).Count > 0;
             Exists = true;
-
-            RefsIndexBuild();
         }
 
         internal void UpdateSequence(object primary)
@@ -90,34 +83,6 @@ namespace Objectiks
                     Sequence = primary_out;
                 }
             }
-        }
-
-        internal void RefsIndexBuild()
-        {
-            if (Refs != null)
-            {
-                int index = 0;
-                foreach (var item in Refs)
-                {
-                    item.Lazy = true;
-                    item.Index = index;
-                    index++;
-                }
-
-                HasRefs = GetRefs(true).Count > 0;
-            }
-        }
-
-        public DocumentRefs GetRefs(bool lazy = true)
-        {
-            var refs = new DocumentRefs();
-
-            if (Refs != null)
-            {
-                refs.AddRange(Refs.Where(r => r.Lazy == lazy && r.Disabled == false).ToList());
-            }
-
-            return refs;
         }
 
         internal DocumentPartition GetPartition(int partition, int? partialStoreLimit, int partitionTemporyCount)

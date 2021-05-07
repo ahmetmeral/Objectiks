@@ -7,13 +7,6 @@ namespace Objectiks.Extentions
 {
     public static class OptionExtentions
     {
-        public static void AddDefaultParsers(this DocumentOption options)
-        {
-            options.AddParserTypeOf<DocumentDefaultParser>();
-            options.AddParserTypeOf<DocumentOneToOneParser>();
-            options.AddParserTypeOf<DocumentManyToManyParser>();
-            options.AddParserTypeOf<DocumentOneToManyParser>();
-            options.AddParserTypeOf<DocumentOneToOneFileParser>();
-        }
+        
     }
 }

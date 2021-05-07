@@ -30,7 +30,6 @@ namespace Objectiks.PostgreSql
 
             meta.Partitions.Add(0, 0);
 
-            var refs = meta.GetRefs(false);
 
             using (var reader = new PostgreSqlReader(typeOf, Provider, Option, Logger))
             {
@@ -42,7 +41,7 @@ namespace Objectiks.PostgreSql
 
                         if (Option.SupportDocumentParser)
                         {
-                            ParseDocumentData(ref meta, ref document, new DocumentStorage());
+                            ParseDocumentData(ref meta, ref document, new DocumentStorage(), OperationType.Load);
                         }
 
                         meta.SubmitChanges(document, OperationType.Load);

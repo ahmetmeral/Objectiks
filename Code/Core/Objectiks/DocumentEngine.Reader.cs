@@ -46,18 +46,6 @@ namespace Objectiks
                     continue;
                 }
 
-                //check schema refs
-                if (meta.HasRefs)
-                {
-                    ParseDocumentRefs(meta.GetRefs(true), ref document);
-                }
-
-                //check dynamic refs..
-                if (query.HasRefs)
-                {
-                    ParseDocumentRefs(query.Refs, ref document);
-                }
-
                 results.Add(((JObject)document.Data));
             }
 
@@ -149,21 +137,6 @@ namespace Objectiks
             if (queryResult.Keys.Count == 1)
             {
                 document = Read(query.TypeOf, queryResult.Keys[0].PrimaryOf);
-
-                if (document != null && document.Exists)
-                {
-                    if (meta.HasRefs)
-                    {
-                        //default refs
-                        ParseDocumentRefs(meta.GetRefs(true), ref document);
-                    }
-
-                    if (query.HasRefs)
-                    {
-                        //custom refs
-                        ParseDocumentRefs(query.Refs, ref document);
-                    }
-                }
             }
 
             return document;
@@ -216,18 +189,6 @@ namespace Objectiks
                 if (document == null || !document.Exists)
                 {
                     continue;
-                }
-
-                //check schema refs
-                if (meta.HasRefs)
-                {
-                    ParseDocumentRefs(meta.GetRefs(true), ref document);
-                }
-
-                //check dynamic refs..
-                if (query.HasRefs)
-                {
-                    ParseDocumentRefs(query.Refs, ref document);
                 }
 
                 results.Add(((JObject)document.Data).ToObject<T>());

@@ -13,7 +13,6 @@ namespace Objectiks.Integrations.Options
         public NoDbEngineWithManifest() : base()
         {
             Name = "NoDbEngineWithManifest";
-            SupportTypeOfRefs = false;
 
             var cacheConfig = new RedisConfiguration
             {

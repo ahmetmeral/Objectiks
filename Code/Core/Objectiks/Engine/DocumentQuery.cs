@@ -14,7 +14,6 @@ namespace Objectiks.Engine
         public QueryCacheOf CacheOf { get; internal set; }
         public QueryParameters Parameters { get; internal set; }
         public QueryOrderBy OrderBy { get; internal set; }
-        public DocumentRefs Refs { get; internal set; }
         public ResultType ResultType { get; internal set; }
         public int Skip { get; internal set; }
         public int Take { get; internal set; }
@@ -23,7 +22,6 @@ namespace Objectiks.Engine
         public bool HasPrimaryOf { get; internal set; }
         public bool HasKeyOf { get; internal set; }
         public bool HasOrderBy { get; internal set; }
-        public bool HasRefs { get; internal set; }
         public bool HasCacheOf { get; internal set; }
         public bool IsAny { get; internal set; } = false;
 
@@ -56,7 +54,6 @@ namespace Objectiks.Engine
             CacheOf = new QueryCacheOf();
             Parameters = new QueryParameters();
             OrderBy = new QueryOrderBy();
-            Refs = new DocumentRefs();
             HasPrimaryOf = primaryOf.Length > 0;
             OrderBy.Direction = OrderByDirection.Asc;
 

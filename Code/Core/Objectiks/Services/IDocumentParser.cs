@@ -6,8 +6,10 @@ using System.Text;
 
 namespace Objectiks.Services
 {
-    public interface IDocumentParser : IParser
+    public interface IDocumentParser 
     {
-        void Parse(IDocumentEngine engine, DocumentMeta meta, Document document, DocumentStorage storage);
+        string ParseOf { get; }
+
+        void Parse(IDocumentEngine engine, DocumentMeta meta, Document document, DocumentStorage storage, OperationType operation);
     }
 }
