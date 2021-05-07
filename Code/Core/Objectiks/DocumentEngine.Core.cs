@@ -150,9 +150,9 @@ namespace Objectiks
         {
             var parser = GetDocumentParser(meta.TypeOf);
 
-            if (parser != null)
+            if (parser != null && parser.IsParse(operation))
             {
-                parser.Parse(this, meta, document, file, operation);
+                parser.Parse(this, meta, document, file);
             }
         }
 

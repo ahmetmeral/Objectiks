@@ -19,8 +19,7 @@ namespace Objectiks
         public string User { get; set; } = "UserOf";
         public string WorkOf { get; set; } = "WorkOf";
         public string ParseOf { get; set; } = "Document";
-        public DocumentKeyOfNames KeyOf { get; set; } = new DocumentKeyOfNames();
-        public DocumentTypes TypeOf { get; set; } = new DocumentTypes();
+
         public string SqlProviderSchema { get; set; }
         public string SqlProviderSchemaSeperator { get; set; } = ".";
         public int SqlProviderDataReaderPageSize { get; set; } = 2;
@@ -30,10 +29,12 @@ namespace Objectiks
         public bool SupportPartialStorage { get; set; } = false;
         public bool SupportDocumentParser { get; set; } = false;
         public bool SupportDocumentWatcher { get; set; } = false;
-       
+
         public int BufferSize { get; set; } = 512;
         public string Extention { get; set; } = "*.json";
 
+        public DocumentKeyOfNames KeyOf { get; set; } = new DocumentKeyOfNames();
+        public DocumentTypes TypeOf { get; set; } = new DocumentTypes();
         public DocumentCacheInfo CacheInfo { get; set; } = new DocumentCacheInfo { Expire = 10000 };
         public DocumentSchemes Schemes { get; set; } = new DocumentSchemes();
         public DocumentVars Vars { get; set; } = new DocumentVars();
@@ -45,13 +46,6 @@ namespace Objectiks
         internal Type EngineProvider { get; set; }
         internal bool HasManifest { get; set; }
 
-        internal bool HasTypeOf
-        {
-            get
-            {
-                return TypeOf.Count > 0;
-            }
-        }
 
         public DocumentOption()
         {
@@ -60,11 +54,6 @@ namespace Objectiks
 
         public virtual void RegisterDefaultTypeOrParser()
         {
-            if (ParserOfTypes.Count == 0)
-            {
-                //AddParserTypeOf<DocumentDefaultParser>();
-            }
-
             if (CacheInstance == null)
             {
                 CacheInstance = new DocumentInMemory(Name, new DocumentBsonSerializer());
@@ -99,17 +88,12 @@ namespace Objectiks
 
         public void AddParserTypeOf<T>() where T : IDocumentParser
         {
-            ParserOfTypes.Add(GetDocumentParser(typeof(T)));
+            ParserOfTypes.Add((IDocumentParser)Activator.CreateInstance(typeof(T)));
         }
 
-        public void ClearParserOf()
+        public void ClearParserOfTypes()
         {
             ParserOfTypes?.Clear();
-        }
-
-        internal IDocumentParser GetDocumentParser(Type type)
-        {
-            return (IDocumentParser)Activator.CreateInstance(type);
         }
     }
 }

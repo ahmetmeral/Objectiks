@@ -15,7 +15,12 @@ namespace Objectiks.Parsers
 
         public DocumentDefaultParser() { }
 
-        public void Parse(IDocumentEngine engine, DocumentMeta meta, Document document, DocumentStorage file, OperationType operation)
+        public bool IsParse(OperationType operation)
+        {
+            return operation != OperationType.Delete;
+        }
+
+        public void Parse(IDocumentEngine engine, DocumentMeta meta, Document document, DocumentStorage file)
         {
 
         }
