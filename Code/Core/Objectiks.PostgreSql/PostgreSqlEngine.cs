@@ -38,20 +38,14 @@ namespace Objectiks.PostgreSql
                 {
                     foreach (var row in reader.Rows)
                     {
-                        var document = new Document
-                        {
-                            TypeOf = typeOf,
-                            Data = row,
-                            Partition = 0,
-                            CreatedAt = DateTime.UtcNow
-                        };
-
-                        UpdateDocumentMeta(ref meta, ref document, 0, OperationType.Read);
+                        var document = GetDocumentFromSource(ref meta, row, 0);
 
                         if (Option.SupportDocumentParser)
                         {
                             ParseDocumentData(ref meta, ref document, new DocumentStorage());
                         }
+
+                        meta.SubmitChanges(document, OperationType.Load);
 
                         Cache.Set(document, meta.Cache.Expire);
 

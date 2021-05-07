@@ -179,7 +179,7 @@ namespace Objectiks.Engine
                     var info = Engine.GetTypeOfDocumentInfo(doc.TypeOf, primaryValue, property.PropertyType);
 
                     doc.PrimaryOf = info.PrimaryOf.ToString();
-                    doc.CacheOf = Engine.Cache.CacheOfDocument(doc.TypeOf, doc.PrimaryOf);
+                    doc.CacheOf = Engine.Cache.CacheOfDoc(doc.TypeOf, doc.PrimaryOf);
                     doc.Partition = info.Partition;
                     doc.Exists = info.Exists;
 
@@ -305,7 +305,7 @@ namespace Objectiks.Engine
                 if (IsPartialStore)
                 {
                     temporyCount = Queue.Count(d => d.PartOf.Partition == Meta.Partitions.Current);
-                    partition = Meta.GetAvailablePartition(Meta.Partitions.Current, PartialStoreLimit, temporyCount);
+                    partition = Meta.GetPartition(Meta.Partitions.Current, PartialStoreLimit, temporyCount);
                 }
                 else
                 {

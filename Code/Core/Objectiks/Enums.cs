@@ -66,7 +66,7 @@ namespace Objectiks
         Append = 2,
         Merge = 3,
         Delete = 4,
-        Read = 5,
+        Load = 5,
         Truncate = 6
     }
 

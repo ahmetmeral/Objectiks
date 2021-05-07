@@ -259,7 +259,7 @@ namespace Objectiks
                 meta = GetTypeMeta(query.TypeOf);
             }
 
-            if (query.HasFilter)
+            if (query.HasParameters)
             {
                 result = GetCountFromQueryOf<T>(query, meta);
             }
@@ -363,7 +363,7 @@ namespace Objectiks
 
             var queryCompiler = query.Compiler();
 
-            if (query.HasFilter)
+            if (query.HasParameters)
             {
                 keys = meta.Keys.AsQueryable().Where(queryCompiler.WhereBy, queryCompiler.ValueBy.ToArray())?.ToList();
 

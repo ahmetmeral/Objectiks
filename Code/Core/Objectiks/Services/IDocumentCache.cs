@@ -34,13 +34,13 @@ namespace Objectiks.Services
 
         string CacheOf(DocumentQuery query);
         string CacheOf(Document document);
-        string CacheOfDocument(string typeOf, object primaryOf);
+        string CacheOfDoc(string typeOf, object primaryOf);
         string CacheOf(DocumentMeta meta);
         string CacheOfMeta(string typeOf);
         string CacheOf(DocumentSequence sequence);
         string CacheOfSequence(string typeOf);
         string CacheOf(DocumentInfo info);
-        string CacheOfDocumentInfo(string typeOf, object primary);
+        string CacheOfDocInfo(string typeOf, object primary);
 
         void Flush();
     }

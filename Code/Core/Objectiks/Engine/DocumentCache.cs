@@ -48,10 +48,10 @@ namespace Objectiks.Engine
 
         public virtual string CacheOf(Document doc)
         {
-            return CacheOfDocument(doc.TypeOf, doc.PrimaryOf);
+            return CacheOfDoc(doc.TypeOf, doc.PrimaryOf);
         }
 
-        public virtual string CacheOfDocument(string typeOf, object primaryOf)
+        public virtual string CacheOfDoc(string typeOf, object primaryOf)
         {
             return $"objectiks:{Bucket}:{DocumentDefaults.Documents}:{typeOf}:{primaryOf}".ToLowerInvariant();
         }
@@ -78,10 +78,10 @@ namespace Objectiks.Engine
 
         public virtual string CacheOf(DocumentInfo info)
         {
-            return CacheOfDocumentInfo(info.TypeOf, info.PrimaryOf);
+            return CacheOfDocInfo(info.TypeOf, info.PrimaryOf);
         }
 
-        public virtual string CacheOfDocumentInfo(string typeOf, object primaryOf)
+        public virtual string CacheOfDocInfo(string typeOf, object primaryOf)
         {
             return $"objectiks:{Bucket}:{DocumentDefaults.Info}:{typeOf}:{primaryOf.ToString()}".ToLowerInvariant();
         }

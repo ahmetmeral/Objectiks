@@ -149,8 +149,8 @@ namespace Objectiks
 
                 foreach (var item in meta.Keys)
                 {
-                    Cache.Remove(Cache.CacheOfDocument(typeOf, item.PrimaryOf));
-                    Cache.Remove(Cache.CacheOfDocumentInfo(typeOf, item.PrimaryOf));
+                    Cache.Remove(Cache.CacheOfDoc(typeOf, item.PrimaryOf));
+                    Cache.Remove(Cache.CacheOfDocInfo(typeOf, item.PrimaryOf));
                 }
             }
 

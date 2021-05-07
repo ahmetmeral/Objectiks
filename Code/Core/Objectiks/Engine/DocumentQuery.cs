@@ -27,11 +27,11 @@ namespace Objectiks.Engine
         public bool HasCacheOf { get; internal set; }
         public bool IsAny { get; internal set; } = false;
 
-        public bool HasFilter
+        public bool HasParameters
         {
             get
             {
-                return HasWorkOf || HasUserOf || HasPrimaryOf || HasKeyOf;
+                return Parameters.Count > 0;
             }
         }
 
@@ -64,6 +64,7 @@ namespace Objectiks.Engine
             {
                 AddParameter(new QueryParameter
                 {
+                    Type = QueryParameterType.PrimaryOf,
                     Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
                     Value = primaryOfValue
                 });
@@ -139,6 +140,13 @@ namespace Objectiks.Engine
                 {
                     keys.Add($"{item.Field}:{item.Value}");
                 }
+
+                foreach (var item in OrderBy)
+                {
+                    keys.Add(item);
+                }
+
+                keys.Add(OrderBy.Direction.ToString());
 
                 return HashHelper.CreateMD5(string.Join(":", keys));
             }

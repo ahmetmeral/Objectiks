@@ -108,41 +108,42 @@ namespace Objectiks
             return schema;
         }
 
-        protected virtual void UpdateDocumentMeta(ref DocumentMeta meta, ref Document document, int partition, OperationType operation)
+        protected virtual Document GetDocumentFromSource(ref DocumentMeta meta, JObject data, int partition)
         {
-            JObject target = document.Data;
-
-            document.PrimaryOf = target[meta.Primary].AsString();
-            document.CacheOf = Cache.CacheOfDocument(meta.TypeOf, document.PrimaryOf);
-            document.KeyOf = target.ToKeyOfValues(meta.TypeOf, meta.KeyOfNames, meta.Primary);
+            var document = new Document();
+            document.TypeOf = meta.TypeOf;
+            document.PrimaryOf = data[meta.Primary].AsString();
+            document.CacheOf = Cache.CacheOfDoc(meta.TypeOf, document.PrimaryOf);
+            document.KeyOf = data.ToKeyOfValues(meta.TypeOf, meta.KeyOfNames, meta.Primary);
             document.Partition = partition;
+            document.CreatedAt = DateTime.UtcNow;
 
-            if (!String.IsNullOrEmpty(meta.Workspace) && target.ContainsKey(meta.Workspace))
+            if (!String.IsNullOrEmpty(meta.Workspace) && data.ContainsKey(meta.Workspace))
             {
-                document.WorkOf = target[meta.Workspace].AsString();
+                document.WorkOf = data[meta.Workspace].AsString();
             }
             else
             {
                 document.WorkOf = "0";
             }
 
-            if (!String.IsNullOrEmpty(meta.User) && target.ContainsKey(meta.User))
+            if (!String.IsNullOrEmpty(meta.User) && data.ContainsKey(meta.User))
             {
-                document.UserOf = target[meta.User].AsString();
+                document.UserOf = data[meta.User].AsString();
             }
             else
             {
                 document.UserOf = "0";
             }
 
-            if (!target.ContainsKey(DocumentDefaults.DocumentTypeOf))
+            if (!data.ContainsKey(DocumentDefaults.DocumentTypeOf))
             {
-                target["Type"] = meta.TypeOf;
+                data["Type"] = meta.TypeOf;
             }
 
-            meta.SubmitChanges(document, operation);
+            document.Data = data;
 
-            document.Data = target;
+            return document;
         }
 
         protected virtual void ParseDocumentData(ref DocumentMeta meta, ref Document document, DocumentStorage file)

@@ -91,7 +91,7 @@ namespace Objectiks.Caching
 
         public override DocumentInfo GetDocumentInfo(string typeOf, object primary)
         {
-            if (Cache.TryGetValue(CacheOfDocumentInfo(typeOf, primary), out byte[] data))
+            if (Cache.TryGetValue(CacheOfDocInfo(typeOf, primary), out byte[] data))
             {
                 var info = Serializer.Deserialize<DocumentInfo>(data);
 
@@ -105,7 +105,7 @@ namespace Objectiks.Caching
 
         public override Document Get(string typeOf, object primary)
         {
-            if (Cache.TryGetValue(CacheOfDocument(typeOf, primary), out byte[] data))
+            if (Cache.TryGetValue(CacheOfDoc(typeOf, primary), out byte[] data))
             {
                 var document = Serializer.Deserialize<Document>(data);
 
@@ -183,8 +183,8 @@ namespace Objectiks.Caching
 
         public override void Remove(string typeOf, object primary)
         {
-            Cache.Remove(CacheOfDocument(typeOf, primary));
-            Cache.Remove(CacheOfDocumentInfo(typeOf, primary));
+            Cache.Remove(CacheOfDoc(typeOf, primary));
+            Cache.Remove(CacheOfDocInfo(typeOf, primary));
         }
 
         public override void Remove(string typeOf)
@@ -200,7 +200,7 @@ namespace Objectiks.Caching
         public override void Remove(Document document)
         {
             Cache.Remove(CacheOf(document));
-            Cache.Remove(CacheOfDocumentInfo(document.TypeOf, document.PrimaryOf));
+            Cache.Remove(CacheOfDocInfo(document.TypeOf, document.PrimaryOf));
         }
 
         public override void Remove(DocumentMeta meta)

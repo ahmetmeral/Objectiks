@@ -50,7 +50,7 @@ namespace Objectiks.Models
             Exist = info.Exists;
         }
 
-        public void BeginOperation()
+        internal void BeginOperation()
         {
             string name = NameWithoutExtension;
             string ticks = DateTime.Now.Ticks.ToString();

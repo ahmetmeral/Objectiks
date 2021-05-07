@@ -66,7 +66,7 @@ namespace Objectiks.Redis
 
         public override Document Get(string typeOf, object primaryOf)
         {
-            var document = Database.Get<Document>(CacheOfDocument(typeOf, primaryOf));
+            var document = Database.Get<Document>(CacheOfDoc(typeOf, primaryOf));
 
             if (document != null)
             {
@@ -94,7 +94,7 @@ namespace Objectiks.Redis
 
         public override DocumentInfo GetDocumentInfo(string typeOf, object primaryOf)
         {
-            var info = Database.Get<DocumentInfo>(CacheOfDocumentInfo(typeOf, primaryOf));
+            var info = Database.Get<DocumentInfo>(CacheOfDocInfo(typeOf, primaryOf));
 
             if (info != null)
             {
@@ -149,8 +149,8 @@ namespace Objectiks.Redis
 
         public override void Remove(string typeOf, object primaryOf)
         {
-            Database.Remove(CacheOfDocument(typeOf, primaryOf));
-            Database.Remove(CacheOfDocumentInfo(typeOf, primaryOf));
+            Database.Remove(CacheOfDoc(typeOf, primaryOf));
+            Database.Remove(CacheOfDocInfo(typeOf, primaryOf));
         }
 
         public override void Remove(string typeOf)
@@ -161,7 +161,7 @@ namespace Objectiks.Redis
         public override void Remove(Document document)
         {
             Database.Remove(CacheOf(document));
-            Database.Remove(CacheOfDocumentInfo(document.TypeOf, document.PrimaryOf));
+            Database.Remove(CacheOfDocInfo(document.TypeOf, document.PrimaryOf));
         }
 
         public override void Remove(DocumentMeta meta)

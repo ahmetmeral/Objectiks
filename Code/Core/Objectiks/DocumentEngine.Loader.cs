@@ -124,15 +124,7 @@ namespace Objectiks
                         {
                             if (reader.TokenType == JsonToken.StartObject)
                             {
-                                var document = new Document
-                                {
-                                    TypeOf = typeOf,
-                                    Data = serializer.Deserialize<JObject>(reader),
-                                    Partition = file.Partition,
-                                    CreatedAt = DateTime.UtcNow
-                                };
-
-                                UpdateDocumentMeta(ref meta, ref document, file.Partition, OperationType.Read);
+                                var document = GetDocumentFromSource(ref meta, serializer.Deserialize<JObject>(reader), file.Partition);
 
                                 if (Option.SupportDocumentParser)
                                 {
@@ -143,6 +135,8 @@ namespace Objectiks
                                 {
                                     ParseDocumentRefs(refs, ref document);
                                 }
+
+                                meta.SubmitChanges(document, OperationType.Load);
 
                                 Cache.Set(document, meta.Cache.Expire);
 

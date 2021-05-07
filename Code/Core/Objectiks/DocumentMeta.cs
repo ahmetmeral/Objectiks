@@ -120,7 +120,7 @@ namespace Objectiks
             return refs;
         }
 
-        internal DocumentPartition GetAvailablePartition(int partition, int? partialStoreLimit, int partitionTemporyCount)
+        internal DocumentPartition GetPartition(int partition, int? partialStoreLimit, int partitionTemporyCount)
         {
             if (partialStoreLimit.HasValue)
             {
@@ -155,52 +155,6 @@ namespace Objectiks
         internal void AddKeys(DocumentKey documentKey)
         {
             Keys.Add(documentKey);
-        }
-
-        internal string SubmitChanges(Document document, OperationType operation)
-        {
-            if (!Partitions.ContainsKey(document.Partition))
-            {
-                Partitions.Add(document.Partition, 0);
-            }
-
-            if (operation == OperationType.Read || operation == OperationType.Create || operation == OperationType.Append)
-            {
-                AddKeys(
-                    new DocumentKey(
-                    document.PrimaryOf,
-                    document.WorkOf,
-                    document.UserOf,
-                    document.CacheOf,
-                    document.KeyOf,
-                    document.Partition
-                    ));
-
-                TotalRecords++;
-                Partitions[document.Partition]++;
-
-                UpdateSequence(document.PrimaryOf);
-            }
-            else if (operation == OperationType.Merge)
-            {
-                UpdateKeys(
-                    new DocumentKey(
-                    document.PrimaryOf,
-                    document.WorkOf,
-                    document.UserOf,
-                    document.CacheOf,
-                    document.KeyOf,
-                    document.Partition
-                    ));
-            }
-            else if (operation == OperationType.Delete)
-            {
-                TotalRecords--;
-                Partitions[document.Partition]--;
-                RemoveKeys(document.PrimaryOf);
-            }
-
-            return document.PrimaryOf;
         }
 
         internal void UpdateKeys(DocumentKey documentKey)

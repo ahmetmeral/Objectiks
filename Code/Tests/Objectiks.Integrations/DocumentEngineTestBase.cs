@@ -90,23 +90,40 @@ namespace Objectiks.Integrations
 
             var repos = new ObjectiksOf();
 
-            var page = repos.TypeOf<Pages>()
+            repos.TruncateOf<Pages>();
+
+            var pages = TestSetup.GeneratePages(5, false, true);
+
+            using (var writer = repos.WriterOf<Pages>())
+            {
+                writer.UseFormatting();
+                writer.AddDocuments(pages);
+                writer.SubmitChanges();
+            }
+
+            var pageWriteCacheOf = repos.TypeOf<Pages>()
                 .PrimaryOf(1)
                 .CacheOf("test", callBeforeCacheOf)
                 .First();
 
-            var page_list = repos.TypeOf<Pages>()
-              .CacheOf(callBeforeCacheOf)
+            var pageReadCacheOf = repos.TypeOf<Pages>()
+                .PrimaryOf(1)
+                .CacheOf("test", callBeforeCacheOf)
+                .First();
+
+            Assert.IsTrue(pageWriteCacheOf.Id == pageReadCacheOf.Id);
+
+            var pageListWriteCacheOf = repos
+              .TypeOf<Pages>()
+              .CacheOf()
               .ToList();
 
-            var tags = repos.TypeOf<Tags>().CacheOf().ToList();
-
-            var tags_first = repos
-                .TypeOf<Tags>()
-                .PrimaryOf(1)
-                .PrimaryOf(2)
-                .CacheOf(callBeforeCacheOf)
+            var pageListReadCacheOf = repos
+                .TypeOf<Pages>()
+                .CacheOf()
                 .ToList();
+
+            Assert.IsTrue(pageListWriteCacheOf.Count == pageListReadCacheOf.Count);
         }
 
         [Test]

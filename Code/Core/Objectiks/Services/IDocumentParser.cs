@@ -8,6 +8,6 @@ namespace Objectiks.Services
 {
     public interface IDocumentParser : IParser
     {
-        void Parse(IDocumentEngine engine, DocumentMeta meta, Document document, DocumentStorage file);
+        void Parse(IDocumentEngine engine, DocumentMeta meta, Document document, DocumentStorage storage);
     }
 }
