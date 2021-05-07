@@ -25,7 +25,7 @@ namespace Objectiks.Engine
         private ConcurrentQueue<DocumentPartition> Partitions = new ConcurrentQueue<DocumentPartition>();
         private Format Formatting = Format.None;
 
-        private readonly DocumentEngine Engine;
+        private readonly IDocumentEngine Engine;
         private DocumentTransaction Transaction;
         //meta : should not be read-only 
         private DocumentMeta Meta;
@@ -35,7 +35,7 @@ namespace Objectiks.Engine
 
         public DocumentWriter() { }
 
-        internal DocumentWriter(DocumentEngine engine, string typeOf)
+        public DocumentWriter(IDocumentEngine engine, string typeOf)
         {
             Ensure.NotNullOrEmpty(typeOf, "TypeOf is empty");
 

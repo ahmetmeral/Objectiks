@@ -1,6 +1,7 @@
 ﻿using Objectiks.Caching;
 using Objectiks.Caching.Serializer;
 using Objectiks.Engine;
+using Objectiks.NoDb;
 using Objectiks.Redis;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Text;
 
 namespace Objectiks.Integrations.Options
 {
-    public class NoDbEngineWithManifest : DocumentOption
+    public class NoDbEngineWithManifest : NoDbDocumentOption
     {
         public NoDbEngineWithManifest() : base()
         {
@@ -25,8 +26,7 @@ namespace Objectiks.Integrations.Options
             UseManifestFile();
             UseCacheProvider(new RedisDocumentCache(Name, cacheConfig, new DocumentJsonSerializer(), true));
             UseDocumentWatcher<DocumentWatcher>();
-
-            RegisterDefaultTypeOrParser();
+            RegisterDefaults();
         }
     }
 }

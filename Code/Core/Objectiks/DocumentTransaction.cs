@@ -75,7 +75,7 @@ namespace Objectiks
             return storage;
         }
 
-        internal void AddOperation(DocumentContext documentContext)
+        public void AddOperation(DocumentContext documentContext)
         {
             if (!TypeOfContext.ContainsKey(documentContext.TypeOf.ToLowerInvariant()))
             {

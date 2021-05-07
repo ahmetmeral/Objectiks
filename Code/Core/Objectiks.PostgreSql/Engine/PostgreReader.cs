@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 
-namespace Objectiks.PostgreSql
+namespace Objectiks.PostgreSql.Engine
 {
-    public class PostgreSqlReader : IDisposable
+    public class PostgreReader : IDisposable
     {
         public string TypeOf { get; private set; }
         public IEnumerable<JObject> Rows { get; set; }
@@ -24,7 +24,7 @@ namespace Objectiks.PostgreSql
 
         private NpgsqlConnection Connection;
 
-        public PostgreSqlReader(string typeOf, DocumentProvider provider, DocumentOption option, IDocumentLogger logger)
+        public PostgreReader(string typeOf, DocumentProvider provider, DocumentOption option, IDocumentLogger logger)
         {
             TypeOf = typeOf;
             Provider = provider;

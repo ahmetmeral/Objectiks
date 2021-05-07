@@ -8,9 +8,6 @@ namespace Objectiks.Extentions
 {
     public static class QueryExtentions
     {
-        public static QueryCompiler Compiler(this DocumentQuery builder)
-        {
-            return new QueryCompiler(builder);
-        }
+        
     }
 }

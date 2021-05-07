@@ -47,8 +47,7 @@ namespace Objectiks
             }
         }
 
-
-        protected virtual DocumentSchema GetDocumentSchema(string typeOf)
+        public virtual DocumentSchema GetDocumentSchema(string typeOf)
         {
             DocumentSchema schema = null;
 
@@ -108,7 +107,7 @@ namespace Objectiks
             return schema;
         }
 
-        protected virtual Document GetDocumentFromSource(ref DocumentMeta meta, JObject data, int partition)
+        public virtual Document GetDocumentFromSource(ref DocumentMeta meta, JObject data, int partition)
         {
             var document = new Document();
             document.TypeOf = meta.TypeOf;
@@ -146,7 +145,7 @@ namespace Objectiks
             return document;
         }
 
-        protected virtual void ParseDocumentData(ref DocumentMeta meta, ref Document document, DocumentStorage file, OperationType operation)
+        public virtual void ParseDocumentData(ref DocumentMeta meta, ref Document document, DocumentStorage file, OperationType operation)
         {
             var parser = GetDocumentParser(meta.TypeOf);
 
@@ -156,7 +155,7 @@ namespace Objectiks
             }
         }
 
-        protected virtual IDocumentParser GetDocumentParser(string typeOf)
+        public virtual IDocumentParser GetDocumentParser(string typeOf)
         {
             var converter = ParseOf.Where(c => c.ParseOf == typeOf).FirstOrDefault();
 
@@ -173,35 +172,34 @@ namespace Objectiks
             return (IDocumentParser)converter;
         }
 
-
-        protected virtual DocumentManifest GetDocumentManifest(string baseDirectory)
+        public virtual DocumentManifest GetDocumentManifest(string baseDirectory)
         {
             var path = Path.Combine(baseDirectory, DocumentDefaults.Manifest);
 
             return DocumentManifest.Get(path);
         }
 
-        internal virtual DocumentTransaction BeginTransaction()
+        public virtual DocumentTransaction BeginTransaction()
         {
             return GetTransaction(true, false);
         }
 
-        internal virtual DocumentTransaction BeginInternalTransaction()
+        public virtual DocumentTransaction BeginInternalTransaction()
         {
             return GetTransaction(true, true);
         }
 
-        internal virtual DocumentTransaction GetThreadTransaction()
+        public virtual DocumentTransaction GetThreadTransaction()
         {
             return GetTransaction(false, false);
         }
 
-        internal virtual DocumentTransaction GetTransaction(bool create, bool isInternal)
+        public virtual DocumentTransaction GetTransaction(bool create, bool isInternal)
         {
             return Monitor.GetTransaction(this, create, isInternal);
         }
 
-        internal virtual void ReleaseTransaction(DocumentTransaction transaction)
+        public virtual void ReleaseTransaction(DocumentTransaction transaction)
         {
             Monitor.ReleaseTransaction(transaction);
         }

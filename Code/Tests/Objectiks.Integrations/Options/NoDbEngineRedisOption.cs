@@ -1,6 +1,7 @@
 ﻿using Objectiks.Caching.Serializer;
 using Objectiks.Engine;
 using Objectiks.Models;
+using Objectiks.NoDb;
 using Objectiks.Redis;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Text;
 
 namespace Objectiks.Integrations.Options
 {
-    public class NoDbEngineRedisOption : DocumentOption
+    public class NoDbEngineRedisOption : NoDbDocumentOption
     {
         public NoDbEngineRedisOption() : base()
         {
@@ -33,13 +34,9 @@ namespace Objectiks.Integrations.Options
             #endregion
 
             Name = "NoDbEngineRedisOption";
-            BufferSize = 512;
             TypeOf = new DocumentTypes("Pages", "Tags");
             Schemes = new DocumentSchemes(pages, tags);
-            SupportPartialStorage = true;
             
-
-            //var cacheConfig = new RedisConfiguration("localhost:6379");
             var cacheConfig = new RedisConfiguration
             {
                 Hosts = new RedisHost[] { new RedisHost() },
@@ -48,13 +45,16 @@ namespace Objectiks.Integrations.Options
                 AllowAdmin = true
             };
 
-            var cacheProvider = new RedisDocumentCache(Name, cacheConfig, new DocumentJsonSerializer());
-            cacheProvider.Flush();
+            UseCacheProvider(
+                new RedisDocumentCache(
+                    Name,
+                    cacheConfig, 
+                    new DocumentJsonSerializer(), 
+                    true
+                  )
+                );
 
-            UseCacheProvider(cacheProvider);
             UseDocumentWatcher<DocumentWatcher>();
-
-            RegisterDefaultTypeOrParser();
         }
     }
 }

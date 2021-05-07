@@ -21,19 +21,17 @@ namespace Objectiks
             private static DocumentEngines Engines = new DocumentEngines();
             private static DocumentOptions Options = new DocumentOptions();
 
-            internal static DocumentEngine Get()
+            internal static IDocumentEngine Get()
             {
                 return Get(Provider, null);
             }
 
-            internal static DocumentEngine Get(DocumentProvider documentProvider, DocumentOption option)
+            internal static IDocumentEngine Get(DocumentProvider documentProvider, DocumentOption option)
             {
                 if (documentProvider == null)
                 {
                     throw new Exception("DocumentProvider is null");
                 }
-
-                DocumentEngine engine;
 
                 if (option == null)
                 {
@@ -47,14 +45,10 @@ namespace Objectiks
 
                 if (option.EngineProvider == null)
                 {
-                    engine = new DocumentEngine(documentProvider, option);
-                }
-                else
-                {
-                    engine = (DocumentEngine)Activator.CreateInstance(option.EngineProvider, documentProvider, option);
+                    throw new Exception("Engine undefined..");
                 }
 
-                return engine;
+                return (DocumentEngine)Activator.CreateInstance(option.EngineProvider, documentProvider, option); 
             }
 
             public static void Map(Type type, DocumentOption option)
@@ -129,7 +123,7 @@ namespace Objectiks
                     var manifest = DocumentManifest.Get(path);
 
                     option = manifest;
-                    option.RegisterDefaultTypeOrParser();
+                    option.RegisterDefaults();
 
                     if (option.CacheInstance == null)
                     {

@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Objectiks.Helper;
+using Objectiks.Engine;
+using Objectiks.Services;
 
-namespace Objectiks.Engine.Query
+namespace Objectiks.NoDb.Engine
 {
-    public class QueryCompiler
+    public class NoDbQueryCompiler : IDocumentQueryCompiler
     {
         public string TypeOf { get; set; }
         public string WhereBy { get; set; }
@@ -16,7 +18,7 @@ namespace Objectiks.Engine.Query
         public int Take { get; set; }
         public QueryValues ValueBy { get; set; }
 
-        public QueryCompiler(DocumentQuery queryBuilder)
+        public NoDbQueryCompiler(DocumentQuery queryBuilder)
         {
             ValueBy = new QueryValues();
             Compiler(queryBuilder);

@@ -27,7 +27,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Github", ".Github", "{CE99
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Objectiks.PostgreSql", "Code\Core\Objectiks.PostgreSql\Objectiks.PostgreSql.csproj", "{D58350B7-1CA4-4FD5-99DA-34DDFD857A3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Objectiks.Redis", "Code\Core\Objectiks.Redis\Objectiks.Redis.csproj", "{20639131-7782-4A30-A50B-1E3D0A32570F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Objectiks.Redis", "Code\Core\Objectiks.Redis\Objectiks.Redis.csproj", "{20639131-7782-4A30-A50B-1E3D0A32570F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Objectiks.NoDb", "Code\Core\Objectiks.NoDb\Objectiks.NoDb.csproj", "{7C9E0A0D-F237-4A1F-98B4-B5B2A81E2050}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{20639131-7782-4A30-A50B-1E3D0A32570F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20639131-7782-4A30-A50B-1E3D0A32570F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20639131-7782-4A30-A50B-1E3D0A32570F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C9E0A0D-F237-4A1F-98B4-B5B2A81E2050}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C9E0A0D-F237-4A1F-98B4-B5B2A81E2050}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C9E0A0D-F237-4A1F-98B4-B5B2A81E2050}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C9E0A0D-F237-4A1F-98B4-B5B2A81E2050}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,6 +76,7 @@ Global
 		{FE990494-479B-4CAF-A2C1-DDB61E89BB2A} = {24C2C85A-F1BA-4AC1-BEFE-8AC8D4BAE51E}
 		{D58350B7-1CA4-4FD5-99DA-34DDFD857A3D} = {B984598E-8816-41EA-8E85-EE72E2B4A900}
 		{20639131-7782-4A30-A50B-1E3D0A32570F} = {B984598E-8816-41EA-8E85-EE72E2B4A900}
+		{7C9E0A0D-F237-4A1F-98B4-B5B2A81E2050} = {B984598E-8816-41EA-8E85-EE72E2B4A900}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4ACF303-FBE3-4D6A-A43F-00ABED5D4F99}

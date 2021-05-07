@@ -52,7 +52,7 @@ namespace Objectiks
             ParserOfTypes = new List<IDocumentParser>();
         }
 
-        public virtual void RegisterDefaultTypeOrParser()
+        public virtual void RegisterDefaults()
         {
             if (CacheInstance == null)
             {

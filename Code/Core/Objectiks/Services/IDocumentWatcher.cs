@@ -7,7 +7,7 @@ namespace Objectiks.Services
     {
         void Lock();
         void UnLock();
-        void WaitForChanged(DocumentEngine engine);
+        void WaitForChanged(IDocumentEngine engine);
         void OnChangeDocument(FileSystemEventArgs e);
     }
 }

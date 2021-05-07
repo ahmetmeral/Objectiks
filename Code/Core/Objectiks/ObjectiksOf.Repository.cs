@@ -2,6 +2,7 @@
 using Objectiks.Engine;
 using Objectiks.Engine.Query;
 using Objectiks.Extentions;
+using Objectiks.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,7 +12,7 @@ namespace Objectiks
 {
     public partial class ObjectiksOf
     {
-        private DocumentEngine Engine;
+        private IDocumentEngine Engine;
 
         public ObjectiksOf()
         {

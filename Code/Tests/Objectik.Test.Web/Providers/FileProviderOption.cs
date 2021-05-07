@@ -32,7 +32,7 @@ namespace Objectik.Test.Web.Providers
             Schemes = new DocumentSchemes(page, category);
             BufferSize = 512;
 
-            RegisterDefaultTypeOrParser();
+            RegisterDefaults();
             UseDocumentWatcher<DocumentWatcher>();
         }
     }

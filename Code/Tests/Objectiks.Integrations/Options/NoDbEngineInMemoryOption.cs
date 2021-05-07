@@ -2,13 +2,14 @@
 using Objectiks.Caching.Serializer;
 using Objectiks.Engine;
 using Objectiks.Models;
+using Objectiks.NoDb;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Objectiks.Integrations.Option
 {
-    public class NoDbEngineInMemoryOption : DocumentOption
+    public class NoDbEngineInMemoryOption : NoDbDocumentOption
     {
         public NoDbEngineInMemoryOption() : base()
         {
@@ -35,12 +36,8 @@ namespace Objectiks.Integrations.Option
             Name = "NoDbEngineProvider";
             TypeOf = new DocumentTypes("Pages", "Tags");
             Schemes = new DocumentSchemes(pages, tags);
-            SupportPartialStorage = true;
-
-            UseCacheProvider(new DocumentInMemory(Name, new DocumentBsonSerializer()));
+         
             UseDocumentWatcher<DocumentWatcher>();
-
-            RegisterDefaultTypeOrParser();
         }
     }
 }

@@ -10,23 +10,23 @@ namespace Objectiks.Engine
 {
     public class DocumentReader<T> : IDocumentReader<T>
     {
-        private readonly DocumentEngine Engine = null;
+        private readonly IDocumentEngine Engine = null;
         private readonly DocumentQuery Query = null;
 
 
-        public DocumentReader(DocumentEngine engine)
+        public DocumentReader(IDocumentEngine engine)
         {
             Engine = engine;
             Query = new DocumentQuery();
         }
 
-        public DocumentReader(DocumentEngine engine, string typeOf)
+        public DocumentReader(IDocumentEngine engine, string typeOf)
         {
             Engine = engine;
             Query = new DocumentQuery(typeOf);
         }
 
-        public DocumentReader(DocumentEngine engine, string typeOf, params object[] primaryOf)
+        public DocumentReader(IDocumentEngine engine, string typeOf, params object[] primaryOf)
         {
             Engine = engine;
             Query = new DocumentQuery(typeOf, primaryOf);

@@ -1,8 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
 using Npgsql;
 using Npgsql.Json;
+using Objectiks.Engine;
+using Objectiks.Engine.Query;
 using Objectiks.Extentions;
 using Objectiks.Models;
+using Objectiks.PostgreSql.Engine;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -10,14 +13,8 @@ using System.Text;
 
 namespace Objectiks.PostgreSql
 {
-    public class PostgreSqlEngine : DocumentEngine
+    public partial class PostgreEngine : DocumentEngine
     {
-        public PostgreSqlEngine(DocumentProvider documentProvider, DocumentOption options)
-            : base(documentProvider, options)
-        {
-
-        }
-
         public override bool LoadDocumentType(string typeOf, bool isInitialize = false)
         {
             var schema = GetDocumentSchema(typeOf);
@@ -30,8 +27,7 @@ namespace Objectiks.PostgreSql
 
             meta.Partitions.Add(0, 0);
 
-
-            using (var reader = new PostgreSqlReader(typeOf, Provider, Option, Logger))
+            using (var reader = new PostgreReader(typeOf, Provider, Option, Logger))
             {
                 while (reader.Read())
                 {
@@ -58,27 +54,11 @@ namespace Objectiks.PostgreSql
             return true;
         }
 
-        public override void BulkAppend(DocumentContext context, DocumentTransaction transaction)
+        public override void CheckTypeOfSchema(string typeOf)
         {
-
+            throw new NotImplementedException();
         }
 
-        public override void BulkCreate(DocumentContext context, DocumentTransaction transaction)
-        {
-            //using (var writer = new PostgreSqlWriter(meta.TypeOf, Provider, Option, Logger))
-            //{
-            //    writer.BulkCreate(docs);
-            //}
-        }
 
-        public override void BulkMerge(DocumentContext context, DocumentTransaction transaction)
-        {
-
-        }
-
-        public override void BulkDelete(DocumentContext context, DocumentTransaction transaction)
-        {
-
-        }
     }
 }

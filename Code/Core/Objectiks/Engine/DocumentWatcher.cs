@@ -15,7 +15,7 @@ namespace Objectiks.Engine
         private string[] Extentions;
         private string[] Prefixs;
 
-        private DocumentEngine Engine = null;
+        private IDocumentEngine Engine = null;
 
         public DocumentWatcher() { }
 
@@ -29,7 +29,7 @@ namespace Objectiks.Engine
             IsLocked = false;
         }
 
-        public virtual void WaitForChanged(DocumentEngine engine)
+        public virtual void WaitForChanged(IDocumentEngine engine)
         {
             Engine = engine;
             Prefixs = new string[] { "Backup.", "Temp." };
