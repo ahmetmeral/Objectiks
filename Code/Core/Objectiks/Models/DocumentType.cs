@@ -49,14 +49,23 @@ namespace Objectiks.Models
             TypeOf = typeOf;
         }
 
-        public static DocumentType Default()
-        {
-            return new DocumentType();
-        }
-
         public void Dispose()
         {
             GC.SuppressFinalize(this);
+        }
+
+        public static DocumentType Default()
+        {
+            var type = new DocumentType();
+            type.PrimaryOf = DocumentDefaults.DocumentPrimaryOf;
+            return type;
+        }
+
+        public static DocumentType FromClass<T>() where T : class
+        {
+            var type = new DocumentType();
+
+            throw new NotImplementedException();
         }
     }
 }

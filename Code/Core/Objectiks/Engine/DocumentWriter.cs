@@ -107,7 +107,7 @@ namespace Objectiks.Engine
         {
             var info = Engine.GetTypeOfDocumentInfo(TypeOf, primaryOf);
             var document = new Document(info);
-            document.Data = JObject.Parse("{" + $"{Meta.Primary}:{primaryOf}" + "}");
+            document.Data = JObject.Parse("{" + $"{Meta.PrimaryOf}:{primaryOf}" + "}");
 
             return document;
         }
@@ -424,7 +424,7 @@ namespace Objectiks.Engine
                     var context = new DocumentContext
                     {
                         TypeOf = Meta.TypeOf,
-                        Primary = Meta.Primary,
+                        Primary = Meta.PrimaryOf,
                         Partition = partOf.Partition,
                         Operation = partOf.Operation,
                         Storage = Transaction.GetTransactionalStorage(Meta.TypeOf, partOf.Partition, true),

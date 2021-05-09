@@ -91,7 +91,7 @@ namespace Objectiks
 
         public void RegisterTypeOf<T>() where T : class
         {
-
+            TypeOf.Add(DocumentType.FromClass<T>());
         }
     }
 }

@@ -18,9 +18,9 @@ namespace Objectiks
     {
         public string TypeOf { get; set; }
         public string ParseOf { get; set; }
-        public string Primary { get; set; }
-        public string Workspace { get; set; }
-        public string User { get; set; }
+        public string WorkOf { get; set; }
+        public string UserOf { get; set; }
+        public string PrimaryOf { get; set; }
         public object Sequence { get; set; } = 0;
         public long TotalRecords { get; set; }
         public DocumentKeyIndex Keys { get; set; }
@@ -41,8 +41,8 @@ namespace Objectiks
         {
             TypeOf = typeOf;
             ParseOf = documentType.ParseOf;
-            Primary = documentType.PrimaryOf;
-            User = documentType.UserOf;
+            PrimaryOf = documentType.PrimaryOf;
+            UserOf = documentType.UserOf;
             KeyOfNames = documentType.KeyOf;
             Cache = documentType.Cache;
             Keys = new DocumentKeyIndex();

@@ -67,24 +67,24 @@ namespace Objectiks
         {
             var document = new Document();
             document.TypeOf = meta.TypeOf;
-            document.PrimaryOf = data[meta.Primary].AsString();
+            document.PrimaryOf = data[meta.PrimaryOf].AsString();
             document.CacheOf = Cache.CacheOfDoc(meta.TypeOf, document.PrimaryOf);
-            document.KeyOf = data.ToKeyOfValues(meta.TypeOf, meta.KeyOfNames, meta.Primary);
+            document.KeyOf = data.ToKeyOfValues(meta.TypeOf, meta.KeyOfNames, meta.PrimaryOf);
             document.Partition = partition;
             document.CreatedAt = DateTime.UtcNow;
 
-            if (!String.IsNullOrEmpty(meta.Workspace) && data.ContainsKey(meta.Workspace))
+            if (!String.IsNullOrEmpty(meta.WorkOf) && data.ContainsKey(meta.WorkOf))
             {
-                document.WorkOf = data[meta.Workspace].AsString();
+                document.WorkOf = data[meta.WorkOf].AsString();
             }
             else
             {
                 document.WorkOf = "0";
             }
 
-            if (!String.IsNullOrEmpty(meta.User) && data.ContainsKey(meta.User))
+            if (!String.IsNullOrEmpty(meta.UserOf) && data.ContainsKey(meta.UserOf))
             {
-                document.UserOf = data[meta.User].AsString();
+                document.UserOf = data[meta.UserOf].AsString();
             }
             else
             {
