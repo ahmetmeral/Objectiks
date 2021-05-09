@@ -83,7 +83,7 @@ namespace Objectiks
             {
                 Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
                 Value = primaryOf,
-                Type = QueryParameterType.PrimaryOf
+                Type = ParameterType.PrimaryOf
             });
 
             return Engine.Read<T>(query);
@@ -97,7 +97,7 @@ namespace Objectiks
             {
                 Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
                 Value = primaryOf,
-                Type = QueryParameterType.PrimaryOf
+                Type = ParameterType.PrimaryOf
             });
 
             return Engine.Read<T>(query);

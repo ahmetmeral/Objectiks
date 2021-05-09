@@ -19,8 +19,8 @@ namespace Objectiks.NoDb
         {
             Logger?.Debug(ScopeType.Engine, $"Load TypeOf: {typeOf}");
 
-            var schema = GetDocumentSchema(typeOf);
-            var meta = new DocumentMeta(typeOf, schema, Provider, Option);
+            var documentType = GetDocumentType(typeOf);
+            var meta = new DocumentMeta(typeOf, documentType, Provider, Option);
 
             if (isInitialize && meta.Cache.Lazy)
             {
@@ -52,8 +52,6 @@ namespace Objectiks.NoDb
                     {
                         parts.Add(storage.Partition);
                     }
-
-                    meta.DiskSize += file.Length;
 
                     files.Add(storage);
                 }
@@ -122,7 +120,7 @@ namespace Objectiks.NoDb
             Cache.Set(meta, meta.Cache.Expire);
             Cache.Set(new DocumentSequence(typeOf, meta.Sequence));
 
-            schema.Dispose();
+            documentType.Dispose();
             meta.Dispose();
 
             return true;
@@ -130,7 +128,7 @@ namespace Objectiks.NoDb
 
         public override void CheckTypeOfSchema(string typeOf)
         {
-            Logger?.Debug(ScopeType.Engine, "Check Document Directory and Schema");
+            Logger?.Debug(ScopeType.Engine, "Check Document Directory");
 
             var documents = Path.Combine(Provider.BaseDirectory, DocumentDefaults.Documents, typeOf);
             if (!Directory.Exists(documents))
@@ -146,23 +144,6 @@ namespace Objectiks.NoDb
                 File.WriteAllText(docFile, "[]", Encoding.UTF8);
 
                 Logger?.Debug(ScopeType.Engine, $"TypeOf:{typeOf} document created.. File: {docFile}");
-            }
-
-            var docSchema = Path.Combine(Provider.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json");
-
-            if (!File.Exists(docSchema))
-            {
-                var temporySchema = DocumentSchema.Default();
-                temporySchema.TypeOf = typeOf;
-                temporySchema.ParseOf = "Document";
-                temporySchema.KeyOf = Option.KeyOf;
-                temporySchema.PrimaryOf = Option.Primary;
-
-                var schema = new JSONSerializer().Serialize(temporySchema);
-
-                File.WriteAllText(docSchema, schema, Encoding.UTF8);
-
-                Logger?.Debug(ScopeType.Engine, $"TypeOf:{typeOf} schema created.. File: {docSchema}");
             }
         }
     }

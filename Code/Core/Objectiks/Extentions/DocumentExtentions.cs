@@ -108,7 +108,7 @@ namespace Objectiks.Extentions
             {
                 query.AddParameter(new QueryParameter
                 {
-                    Type = QueryParameterType.PrimaryOf,
+                    Type = ParameterType.PrimaryOf,
                     Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
                     Value = key.PrimaryOf
                 });

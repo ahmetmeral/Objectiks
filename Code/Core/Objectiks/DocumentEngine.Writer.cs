@@ -17,7 +17,46 @@ namespace Objectiks
 {
     public abstract partial class DocumentEngine : IDocumentEngine
     {
-        public abstract void SubmitChanges(DocumentContext context, DocumentTransaction transaction);
+        public virtual void SubmitChanges(DocumentContext context, DocumentTransaction transaction)
+        {
+            if (context.HasDocuments)
+            {
+                Logger?.Debug(ScopeType.Engine, $"Document write");
+
+                try
+                {
+                    Watcher?.Lock();
+
+                    if (context.Operation == OperationType.Append)
+                    {
+                        BulkAppend(context, transaction);
+                    }
+                    else if (context.Operation == OperationType.Merge)
+                    {
+                        BulkMerge(context, transaction);
+                    }
+                    else if (context.Operation == OperationType.Create)
+                    {
+                        BulkCreate(context, transaction);
+                    }
+                    else if (context.Operation == OperationType.Delete)
+                    {
+                        BulkDelete(context, transaction);
+                    }
+
+                    transaction.AddOperation(context);
+
+                    Watcher?.UnLock();
+                }
+                catch (Exception ex)
+                {
+                    Logger?.Fatal(ex);
+
+                    throw ex;
+                }
+            }
+        }
+
         public abstract void OnChangeDocuments(DocumentMeta meta, DocumentContext context);
         public abstract void BulkCreate(DocumentContext context, DocumentTransaction transaction);
         public abstract void BulkAppend(DocumentContext context, DocumentTransaction transaction);

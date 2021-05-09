@@ -17,13 +17,26 @@ namespace Objectiks
         Count
     }
 
-    public enum QueryParameterType
+    public enum CompilerType
+    {
+        None,
+        Select,
+        Insert,
+        Update,
+        Delete
+    }
+
+    public enum ParameterType
     {
         None,
         WorkOf,
         UserOf,
         PrimaryOf,
-        KeyOf
+        KeyOf,
+        Where,
+        Insert,
+        Delete,
+        Update
     }
 
     public enum OperatorType

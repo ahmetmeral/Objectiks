@@ -14,13 +14,13 @@ namespace Objectiks.Models
         }
     }
 
-    public class DocumentSchemes : List<DocumentSchema>
+    public class DocumentTypes : List<DocumentType>
     {
-        public DocumentSchemes() : base() { }
+        public DocumentTypes() : base() { }
 
-        public DocumentSchemes(params DocumentSchema[] schemes)
+        public DocumentTypes(params DocumentType[] types)
         {
-            foreach (var item in schemes)
+            foreach (var item in types)
             {
                 if (String.IsNullOrWhiteSpace(item.ParseOf))
                 {
@@ -32,20 +32,26 @@ namespace Objectiks.Models
         }
     }
 
-    public class DocumentSchema : IDisposable
+    public class DocumentType : IDisposable
     {
         public string TypeOf { get; set; }
-        public string ParseOf { get; set; }
+        public string ParseOf { get; set; } = "Document";
         public string WorkOf { get; set; }
         public string UserOf { get; set; }
-        public string PrimaryOf { get; set; }
-        public DocumentKeyOfNames KeyOf { get; set; }
-        public DocumentCacheInfo Cache { get; set; }
-        public DocumentVars Vars { get; set; }
+        public string PrimaryOf { get; set; } = DocumentDefaults.DocumentPrimaryOf;
+        public DocumentKeyOfNames KeyOf { get; set; } = new DocumentKeyOfNames();
+        public DocumentCacheInfo Cache { get; set; } = new DocumentCacheInfo();
 
-        public static DocumentSchema Default()
+        public DocumentType() { }
+
+        public DocumentType(string typeOf)
         {
-            return new DocumentSchema();
+            TypeOf = typeOf;
+        }
+
+        public static DocumentType Default()
+        {
+            return new DocumentType();
         }
 
         public void Dispose()

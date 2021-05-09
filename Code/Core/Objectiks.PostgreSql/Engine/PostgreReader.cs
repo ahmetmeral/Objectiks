@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 using Npgsql;
+using Objectiks.Engine;
 using Objectiks.Extentions;
+using Objectiks.PostgreSql.Extentions;
 using Objectiks.Services;
 using System;
 using System.Collections.Generic;
@@ -11,6 +13,7 @@ namespace Objectiks.PostgreSql.Engine
 {
     public class PostgreReader : IDisposable
     {
+        public DocumentQuery Query { get; private set; }
         public string TypeOf { get; private set; }
         public IEnumerable<JObject> Rows { get; set; }
 
@@ -34,6 +37,15 @@ namespace Objectiks.PostgreSql.Engine
             Skip = 0;
             CurrentPage = 1;
         }
+
+        public PostgreReader(DocumentProvider provider, DocumentOption option, DocumentQuery query, IDocumentLogger logger)
+        {
+            Provider = provider;
+            Option = option;
+            Query = query;
+            Logger = logger;
+        }
+
 
         private NpgsqlConnection GetConnection()
         {
@@ -64,18 +76,26 @@ namespace Objectiks.PostgreSql.Engine
         {
             try
             {
-                var command = new NpgsqlCommand(GetSelectSqlStatement(), GetConnection());
+                var compiler = new PostgreQueryCompiler(Option, Query);
+                var selectQuery = compiler.Select();
+                var command = new NpgsqlCommand(selectQuery, GetConnection());
+
+                if (compiler.ValueBy.Count > 0)
+                {
+                    var index = -1;
+                    foreach (var item in compiler.ValueBy)
+                    {
+                        index++;
+                        command.AddNamedParameter($"@{index}", item);
+                    }
+                }
+
                 var reader = command.ExecuteReader(CommandBehavior.Default);
                 var hasRows = reader.HasRows;
 
                 if (hasRows)
                 {
                     Rows = reader.ToObjectList();
-                }
-
-                if (Option.SupportSqlDataReaderPaging)
-                {
-                    NextPage();
                 }
 
                 return hasRows;
@@ -88,7 +108,7 @@ namespace Objectiks.PostgreSql.Engine
             }
         }
 
-        private void NextPage()
+        public void NextPage()
         {
             CurrentPage = CurrentPage + 1;
             Skip = Limit * CurrentPage;

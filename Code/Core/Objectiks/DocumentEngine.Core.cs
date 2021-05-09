@@ -47,64 +47,20 @@ namespace Objectiks
             }
         }
 
-        public virtual DocumentSchema GetDocumentSchema(string typeOf)
+        public virtual DocumentType GetDocumentType(string typeOf)
         {
-            DocumentSchema schema = null;
+            DocumentType documentType = null;
 
-            if (Option.Schemes != null)
+            if (Option.TypeOf != null)
             {
-                schema = Option.Schemes.Where(s => s.TypeOf == typeOf).FirstOrDefault();
+                documentType = Option.TypeOf.Where(s => s.TypeOf == typeOf).FirstOrDefault();
             }
-
-            if (schema == null)
+            else
             {
-                var schema_file = new FileInfo(Path.Combine(Provider.BaseDirectory, DocumentDefaults.Schemes, $"{typeOf}.json"));
-                schema = new JSONSerializer().Get<DocumentSchema>(schema_file.FullName);
+                documentType = new DocumentType(typeOf);
             }
-
-            if (schema == null)
-            {
-                schema = DocumentSchema.Default();
-                schema.Cache = Option.CacheInfo;
-
-                Logger?.Debug(ScopeType.Engine, $"TypeOf: {typeOf} GetDocumentSchema Schema is null");
-            }
-
-            if (schema.Cache == null)
-            {
-                schema.Cache = Option.CacheInfo;
-            }
-
-            if (String.IsNullOrEmpty(schema.ParseOf))
-            {
-                schema.ParseOf = DocumentDefaults.DocumentParseOf;
-            }
-
-            if (String.IsNullOrWhiteSpace(schema.PrimaryOf))
-            {
-                schema.PrimaryOf = DocumentDefaults.DocumentPrimaryOf;
-            }
-
-            if (String.IsNullOrWhiteSpace(schema.WorkOf))
-            {
-                schema.WorkOf = Option.WorkOf;
-            }
-
-            if (String.IsNullOrWhiteSpace(schema.UserOf))
-            {
-                schema.UserOf = Option.User;
-            }
-
-            if (schema.KeyOf == null)
-            {
-                schema.KeyOf = Option.KeyOf != null ? Option.KeyOf : new DocumentKeyOfNames();
-            }
-            else if (schema.KeyOf.Count == 0)
-            {
-                schema.KeyOf = Option.KeyOf != null ? Option.KeyOf : new DocumentKeyOfNames();
-            }
-
-            return schema;
+           
+            return documentType;
         }
 
         public virtual Document GetDocumentFromSource(ref DocumentMeta meta, JObject data, int partition)
@@ -170,13 +126,6 @@ namespace Objectiks
             }
 
             return (IDocumentParser)converter;
-        }
-
-        public virtual DocumentManifest GetDocumentManifest(string baseDirectory)
-        {
-            var path = Path.Combine(baseDirectory, DocumentDefaults.Manifest);
-
-            return DocumentManifest.Get(path);
         }
 
         public virtual DocumentTransaction BeginTransaction()

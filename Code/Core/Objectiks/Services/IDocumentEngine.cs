@@ -17,40 +17,45 @@ namespace Objectiks.Services
         DocumentProvider Provider { get; }
         IDocumentWatcher Watcher { get; }
 
+
+        DocumentEngine Initialize();
         DocumentTransaction BeginInternalTransaction();
         DocumentTransaction BeginTransaction();
+        DocumentTransaction GetThreadTransaction();
+        DocumentTransaction GetTransaction(bool create, bool isInternal);
+        void ReleaseTransaction(DocumentTransaction transaction);
+
+        bool LoadDocumentType(string typeOf, bool isInitialize = false);
+        void ParseDocumentData(ref DocumentMeta meta, ref Document document, DocumentStorage file, OperationType operation);
+        Document GetDocumentFromSource(ref DocumentMeta meta, JObject data, int partition);
+        void CheckTypeOfSchema(string typeOf);
+
+        DocumentType GetDocumentType(string typeOf);
+        IDocumentParser GetDocumentParser(string typeOf);
+       
+        DocumentMeta GetTypeMeta(string typeOf);
+        List<DocumentMeta> GetTypeMetaAll();
+
+        DocumentInfo GetTypeOfDocumentInfo(string typeOf, object primaryOf);
+        DocumentInfo GetTypeOfDocumentInfo(string typeOf, object primaryOf, Type primaryOfDataType);
+
+        T Read<T>(DocumentQuery query, DocumentMeta meta = null);
+        List<T> ReadList<T>(DocumentQuery query);
+        T GetCount<T>(DocumentQuery query, DocumentMeta meta = null);
+
+        void RemoveAnyCacheOfFromQuery(DocumentQuery query);
+        void SetAnyCacheOfDocument<T>(DocumentQuery query, T data);
+        T ReadAnyCacheOfFromQuery<T>(DocumentQuery query);
+
+        void SubmitChanges(DocumentContext context, DocumentTransaction transaction);
         void BulkAppend(DocumentContext context, DocumentTransaction transaction);
         void BulkCreate(DocumentContext context, DocumentTransaction transaction);
         void BulkDelete(DocumentContext context, DocumentTransaction transaction);
         void BulkMerge(DocumentContext context, DocumentTransaction transaction);
-        void CheckTypeOfSchema(string typeOf);
         int Delete<T>(DocumentQuery query);
-        T GetCount<T>(DocumentQuery query, DocumentMeta meta = null);
-        T GetCountFromQueryOf<T>(DocumentQuery query, DocumentMeta meta = null);
-        Document GetDocumentFromSource(ref DocumentMeta meta, JObject data, int partition);
-        QueryResult GetDocumentKeysFromQueryOf(DocumentQuery query, DocumentMeta meta = null);
-        DocumentManifest GetDocumentManifest(string baseDirectory);
-        IDocumentParser GetDocumentParser(string typeOf);
-        DocumentSchema GetDocumentSchema(string typeOf);
-        DocumentTransaction GetThreadTransaction();
-        DocumentTransaction GetTransaction(bool create, bool isInternal);
-        DocumentMeta GetTypeMeta(string typeOf);
-        List<DocumentMeta> GetTypeMetaAll();
-        DocumentInfo GetTypeOfDocumentInfo(string typeOf, object primaryOf, Type primaryOfDataType);
-        DocumentEngine Initialize();
-        bool LoadDocumentType(string typeOf, bool isInitialize = false);
-        void OnChangeDocuments(DocumentMeta meta, DocumentContext context);
-        void ParseDocumentData(ref DocumentMeta meta, ref Document document, DocumentStorage file, OperationType operation);
-        Document Read(DocumentQuery query, DocumentMeta meta = null);
-        Document Read(string typeOf, object primaryOf);
-        T Read<T>(DocumentQuery query, DocumentMeta meta = null);
-        T ReadAnyCacheOfFromQuery<T>(DocumentQuery query);
-        List<T> ReadList<T>(DocumentQuery query);
-        void ReleaseTransaction(DocumentTransaction transaction);
-        void RemoveAnyCacheOfFromQuery(DocumentQuery query);
-        void SetAnyCacheOfDocument<T>(DocumentQuery query, T data);
-        void SubmitChanges(DocumentContext context, DocumentTransaction transaction);
         void TruncateTypeOf(DocumentMeta meta);
         void TruncateTypeOf(string typeOf);
+
+        void OnChangeDocuments(DocumentMeta meta, DocumentContext context);
     }
 }

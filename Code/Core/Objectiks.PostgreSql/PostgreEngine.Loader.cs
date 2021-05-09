@@ -17,7 +17,7 @@ namespace Objectiks.PostgreSql
     {
         public override bool LoadDocumentType(string typeOf, bool isInitialize = false)
         {
-            var schema = GetDocumentSchema(typeOf);
+            var schema = GetDocumentType(typeOf);
             var meta = new DocumentMeta(typeOf, schema, Provider, Option);
 
             if (isInitialize && meta.Cache.Lazy)
@@ -27,7 +27,11 @@ namespace Objectiks.PostgreSql
 
             meta.Partitions.Add(0, 0);
 
-            using (var reader = new PostgreReader(typeOf, Provider, Option, Logger))
+            var query = new DocumentQuery(typeOf);
+            query.Skip = 0;
+            query.Take = Option.SqlProviderDataReaderPageSize;
+
+            using (var reader = new PostgreReader(Provider, Option, query, Logger))
             {
                 while (reader.Read())
                 {
@@ -46,6 +50,8 @@ namespace Objectiks.PostgreSql
 
                         document.Dispose();
                     }
+
+                    reader.NextPage();
                 }
 
                 Cache.Set(meta, meta.Cache.Expire);
@@ -56,9 +62,7 @@ namespace Objectiks.PostgreSql
 
         public override void CheckTypeOfSchema(string typeOf)
         {
-            throw new NotImplementedException();
+            
         }
-
-
     }
 }

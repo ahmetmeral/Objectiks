@@ -1,6 +1,7 @@
 ﻿using Objectiks.Caching;
 using Objectiks.Caching.Serializer;
 using Objectiks.Engine;
+using Objectiks.Integrations.Models;
 using Objectiks.Models;
 using Objectiks.NoDb;
 using System;
@@ -13,30 +14,11 @@ namespace Objectiks.Integrations.Option
     {
         public NoDbEngineInMemoryOption() : base()
         {
-            #region TypeOf
-            var pages = new DocumentSchema
-            {
-                TypeOf = "Pages",
-                ParseOf = "Document",
-                PrimaryOf = "Id",
-                WorkOf = "AccountRef",
-                UserOf = "UserRef",
-                KeyOf = new DocumentKeyOfNames("Tag")
-            };
-
-            var tags = new DocumentSchema
-            {
-                TypeOf = "Tags",
-                ParseOf = "Document",
-                PrimaryOf = "Id",
-                KeyOf = new DocumentKeyOfNames()
-            };
-            #endregion
-
             Name = "NoDbEngineProvider";
-            TypeOf = new DocumentTypes("Pages", "Tags");
-            Schemes = new DocumentSchemes(pages, tags);
-         
+
+            RegisterTypeOf<Pages>();
+            RegisterTypeOf<Tags>();
+
             UseDocumentWatcher<DocumentWatcher>();
         }
     }

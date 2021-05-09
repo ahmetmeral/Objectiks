@@ -47,7 +47,7 @@ namespace Objectiks.Engine
             {
                 Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
                 Value = primaryOf,
-                Type = QueryParameterType.PrimaryOf
+                Type = ParameterType.PrimaryOf
             });
 
             return this;
@@ -118,7 +118,7 @@ namespace Objectiks.Engine
             Query.HasPrimaryOf = true;
             Query.AddParameter(new QueryParameter
             {
-                Type = QueryParameterType.PrimaryOf,
+                Type = ParameterType.PrimaryOf,
                 Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
                 Value = primaryOf
             });
@@ -130,7 +130,7 @@ namespace Objectiks.Engine
             Query.HasWorkOf = true;
             Query.AddParameter(new QueryParameter
             {
-                Type = QueryParameterType.WorkOf,
+                Type = ParameterType.WorkOf,
                 Field = DocumentDefaults.DocumentMetaWorkOfProperty,
                 Value = workOf
             });
@@ -143,7 +143,7 @@ namespace Objectiks.Engine
             Query.HasUserOf = true;
             Query.AddParameter(new QueryParameter
             {
-                Type = QueryParameterType.UserOf,
+                Type = ParameterType.UserOf,
                 Field = DocumentDefaults.DocumentMetaUserOfProperty,
                 Value = userOf
             });
@@ -156,7 +156,7 @@ namespace Objectiks.Engine
             Query.HasKeyOf = true;
             Query.AddParameter(new QueryParameter
             {
-                Type = QueryParameterType.KeyOf,
+                Type = ParameterType.KeyOf,
                 Field = DocumentDefaults.DocumentMetaKeyOfProperty,
                 Value = keyOf
             });

@@ -15,10 +15,16 @@ namespace Objectiks
     public class DocumentOption
     {
         public string Name { get; set; } = "Objectiks";
-        public string Primary { get; set; } = "Id";
-        public string User { get; set; } = "UserOf";
-        public string WorkOf { get; set; } = "WorkOf";
-        public string ParseOf { get; set; } = "Document";
+
+        internal IDocumentCache CacheInstance { get; set; }
+        internal IDocumentWatcher DocumentWatcher { get; set; }
+        internal IDocumentLogger DocumentLogger { get; set; }
+        internal List<IDocumentParser> ParserOfTypes { get; set; }
+        internal Type EngineProvider { get; set; }
+        internal bool HasManifest { get; set; }
+
+        public DocumentTypes TypeOf { get; set; } = new DocumentTypes();
+        public DocumentVars Vars { get; set; } = new DocumentVars();
 
         public string SqlProviderSchema { get; set; }
         public string SqlProviderSchemaSeperator { get; set; } = ".";
@@ -32,19 +38,6 @@ namespace Objectiks
 
         public int BufferSize { get; set; } = 512;
         public string Extention { get; set; } = "*.json";
-
-        public DocumentKeyOfNames KeyOf { get; set; } = new DocumentKeyOfNames();
-        public DocumentTypes TypeOf { get; set; } = new DocumentTypes();
-        public DocumentCacheInfo CacheInfo { get; set; } = new DocumentCacheInfo { Expire = 10000 };
-        public DocumentSchemes Schemes { get; set; } = new DocumentSchemes();
-        public DocumentVars Vars { get; set; } = new DocumentVars();
-
-        internal IDocumentCache CacheInstance { get; set; }
-        internal IDocumentWatcher DocumentWatcher { get; set; }
-        internal IDocumentLogger DocumentLogger { get; set; }
-        internal List<IDocumentParser> ParserOfTypes { get; set; }
-        internal Type EngineProvider { get; set; }
-        internal bool HasManifest { get; set; }
 
 
         public DocumentOption()
@@ -94,6 +87,11 @@ namespace Objectiks
         public void ClearParserOfTypes()
         {
             ParserOfTypes?.Clear();
+        }
+
+        public void RegisterTypeOf<T>() where T : class
+        {
+
         }
     }
 }

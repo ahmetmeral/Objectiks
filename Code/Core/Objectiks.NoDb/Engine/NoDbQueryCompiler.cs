@@ -24,20 +24,20 @@ namespace Objectiks.NoDb.Engine
             Compiler(queryBuilder);
         }
 
-        private void Compiler(DocumentQuery queryBuilder)
+        private void Compiler(DocumentQuery query)
         {
-            TypeOf = queryBuilder.TypeOf;
-            Skip = queryBuilder.Skip;
-            Take = queryBuilder.Take;
+            TypeOf = query.TypeOf;
+            Skip = query.Skip;
+            Take = query.Take;
 
             var builder = new List<string>();
-            var types = EnumHelper.GetEnumValues<QueryParameterType>();
+            var types = EnumHelper.GetEnumValues<ParameterType>();
 
             var index = -1;
             foreach (var type in types)
             {
                 var statement = new List<string>();
-                var parameters = queryBuilder.Parameters.Where(p => p.Type == type).ToList();
+                var parameters = query.Parameters.Where(p => p.Type == type).ToList();
 
                 if (parameters == null || parameters.Count == 0)
                 {
@@ -48,9 +48,9 @@ namespace Objectiks.NoDb.Engine
                 {
                     index++;
 
-                    if (parameter.Type == QueryParameterType.WorkOf ||
-                        parameter.Type == QueryParameterType.UserOf ||
-                        parameter.Type == QueryParameterType.PrimaryOf)
+                    if (parameter.Type == ParameterType.WorkOf ||
+                        parameter.Type == ParameterType.UserOf ||
+                        parameter.Type == ParameterType.PrimaryOf)
                     {
                         statement.Add($"{parameter.Field}=@{index}");
                     }
@@ -71,21 +71,31 @@ namespace Objectiks.NoDb.Engine
 
                 if (parameters.Count > 1)
                 {
-                    builder.Add("(" + string.Join(queryBuilder.IsAny ? " OR " : " AND ", statement) + ")");
+                    builder.Add("(" + string.Join(query.IsAny ? " OR " : " AND ", statement) + ")");
                 }
                 else
                 {
-                    builder.Add(string.Join(queryBuilder.IsAny ? " OR " : " AND ", statement));
+                    builder.Add(string.Join(query.IsAny ? " OR " : " AND ", statement));
                 }
             }
 
             WhereBy = string.Join(" AND ", builder);
 
-            if (queryBuilder.OrderBy.Count > 0)
+            if (query.OrderBy.Count > 0)
             {
-                var direction = queryBuilder.OrderBy.Direction == OrderByDirection.Asc ? "Asc" : queryBuilder.OrderBy.Direction == OrderByDirection.Desc ? "Desc" : "Asc";
-                OrderBy = string.Join(",", queryBuilder.OrderBy) + " " + direction;
+                var direction = query.OrderBy.Direction == OrderByDirection.Asc ? "Asc" : query.OrderBy.Direction == OrderByDirection.Desc ? "Desc" : "Asc";
+                OrderBy = string.Join(",", query.OrderBy) + " " + direction;
             }
         }
+
+        //public string AsWhereStatement()
+        //{
+
+        //}
+
+        //public string AsSelectStatement()
+        //{
+
+        //}
     }
 }

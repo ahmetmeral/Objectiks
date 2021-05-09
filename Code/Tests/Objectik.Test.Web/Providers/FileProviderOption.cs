@@ -11,29 +11,10 @@ namespace Objectik.Test.Web.Providers
     {
         public FileProviderOption() : base()
         {
-            var page = new DocumentSchema
-            {
-                TypeOf = "Pages",
-                ParseOf = "Document",
-                KeyOf = new DocumentKeyOfNames("Name"),
-                PrimaryOf = "Id"
-            };
-
-            var category = new DocumentSchema
-            {
-                TypeOf = "Categories",
-                ParseOf = "Document",
-                KeyOf = new DocumentKeyOfNames(),
-                PrimaryOf = "Id"
-            };
-
-            Name = "FileProvider";
-            TypeOf = new DocumentTypes("Pages", "Categories");
-            Schemes = new DocumentSchemes(page, category);
-            BufferSize = 512;
-
             RegisterDefaults();
             UseDocumentWatcher<DocumentWatcher>();
+
+            throw new Exception("RegisterTypeOf define");
         }
     }
 }

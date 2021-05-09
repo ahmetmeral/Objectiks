@@ -23,15 +23,13 @@ namespace Objectiks
         public string User { get; set; }
         public object Sequence { get; set; } = 0;
         public long TotalRecords { get; set; }
-        public long DiskSize { get; set; }
-        public long MemorySize { get; set; }
-        public bool HasData { get; set; }
         public DocumentKeyIndex Keys { get; set; }
         public DocumentKeyOfNames KeyOfNames { get; set; }
         public DocumentCacheInfo Cache { get; set; }
         public DocumentPartitions Partitions { get; set; }
         public string Extention { get; set; }
         public string Directory { get; set; }
+        public bool HasData { get; set; }
 
         [JsonIgnore]
         public bool Exists { get; set; }
@@ -39,14 +37,14 @@ namespace Objectiks
 
         public DocumentMeta() { }
 
-        public DocumentMeta(string typeOf, DocumentSchema schema, DocumentProvider fileProvider, DocumentOption option)
+        public DocumentMeta(string typeOf, DocumentType documentType, DocumentProvider fileProvider, DocumentOption option)
         {
             TypeOf = typeOf;
-            ParseOf = schema.ParseOf;
-            Primary = schema.PrimaryOf;
-            User = schema.UserOf;
-            KeyOfNames = schema.KeyOf;
-            Cache = schema.Cache;
+            ParseOf = documentType.ParseOf;
+            Primary = documentType.PrimaryOf;
+            User = documentType.UserOf;
+            KeyOfNames = documentType.KeyOf;
+            Cache = documentType.Cache;
             Keys = new DocumentKeyIndex();
             Partitions = new DocumentPartitions();
             Partitions.Current = 0;

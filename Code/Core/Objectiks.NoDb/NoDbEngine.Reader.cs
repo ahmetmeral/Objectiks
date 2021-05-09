@@ -19,16 +19,9 @@ namespace Objectiks.NoDb
 {
     public partial class NoDbEngine : DocumentEngine
     {
-        public override Document Read(string typeOf, object primaryOf)
+        public override DocumentInfo GetTypeOfDocumentInfo(string typeOf, object primary)
         {
-            var document = Cache.GetOrCreateDocument(typeOf, primaryOf, () =>
-            {
-                LoadDocumentType(typeOf);
-
-                return Cache.Get(typeOf, primaryOf);
-            });
-
-            return document;
+            return Cache.GetDocumentInfo(typeOf, primary);
         }
 
         public override DocumentInfo GetTypeOfDocumentInfo(string typeOf, object primaryOf, Type primaryOfDataType)
@@ -58,13 +51,12 @@ namespace Objectiks.NoDb
                 }
                 else
                 {
-                    var readInfo = Cache.GetDocumentInfo(typeOf, sequence.Value);
+                    var readInfo = GetTypeOfDocumentInfo(typeOf, sequence.Value);
 
                     if (readInfo.Exists)
                     {
                         info.PrimaryOf = readInfo.PrimaryOf;
                         info.Partition = readInfo.Partition;
-                        info.Exists = true;
                     }
                     else
                     {
@@ -85,7 +77,19 @@ namespace Objectiks.NoDb
             }
         }
 
-        public override Document Read(DocumentQuery query, DocumentMeta meta = null)
+        private Document Read(string typeOf, object primaryOf)
+        {
+            var document = Cache.GetOrCreateDocument(typeOf, primaryOf, () =>
+            {
+                LoadDocumentType(typeOf);
+
+                return Cache.Get(typeOf, primaryOf);
+            });
+
+            return document;
+        }
+
+        private Document Read(DocumentQuery query, DocumentMeta meta = null)
         {
             Document document = null;
 
@@ -196,74 +200,7 @@ namespace Objectiks.NoDb
             return result;
         }
 
-        public override List<DocumentMeta> GetTypeMetaAll()
-        {
-            var list = new List<DocumentMeta>();
-
-            foreach (var typeOf in Option.TypeOf)
-            {
-                var meta = GetTypeMeta(typeOf);
-
-                if (meta != null)
-                {
-                    list.Add(meta);
-                }
-            }
-
-            return list;
-        }
-
-        public override DocumentMeta GetTypeMeta(string typeOf)
-        {
-            var meta = Cache.GetOrCreateMeta(typeOf, () =>
-            {
-                LoadDocumentType(typeOf);
-
-                return Cache.Get(typeOf);
-            });
-
-            return meta;
-        }
-
-        public override T ReadAnyCacheOfFromQuery<T>(DocumentQuery query)
-        {
-            if (!query.HasCacheOf)
-            {
-                return default;
-            }
-
-            if (query.CacheOf.BeforeCallClear)
-            {
-                RemoveAnyCacheOfFromQuery(query);
-
-                return default;
-            }
-
-            return Cache.Get<T>(query);
-        }
-
-        public override void RemoveAnyCacheOfFromQuery(DocumentQuery query)
-        {
-            if (query.CacheOf.BeforeCallClear)
-            {
-                Cache.Remove(query);
-            }
-        }
-
-        public override void SetAnyCacheOfDocument<T>(DocumentQuery query, T data)
-        {
-            if (query == null)
-            {
-                return;
-            }
-
-            if (query.HasCacheOf)
-            {
-                Cache.Set(query, data);
-            }
-        }
-
-        public override T GetCountFromQueryOf<T>(DocumentQuery query, DocumentMeta meta = null)
+        private T GetCountFromQueryOf<T>(DocumentQuery query, DocumentMeta meta = null)
         {
             if (meta == null)
             {
@@ -275,7 +212,7 @@ namespace Objectiks.NoDb
                      compiler.ValueBy).ChangeType<T>();
         }
 
-        public override QueryResult GetDocumentKeysFromQueryOf(DocumentQuery query, DocumentMeta meta = null)
+        private QueryResult GetDocumentKeysFromQueryOf(DocumentQuery query, DocumentMeta meta = null)
         {
             if (meta == null)
             {

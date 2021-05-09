@@ -17,82 +17,6 @@ namespace Objectiks.NoDb
 {
     public partial class NoDbEngine : DocumentEngine
     {
-        public override void SubmitChanges(DocumentContext context, DocumentTransaction transaction)
-        {
-            if (context.HasDocuments)
-            {
-                Logger?.Debug(ScopeType.Engine, $"Document write");
-
-                try
-                {
-                    Watcher?.Lock();
-
-                    if (context.Operation == OperationType.Append)
-                    {
-                        BulkAppend(context, transaction);
-                    }
-                    else if (context.Operation == OperationType.Merge)
-                    {
-                        BulkMerge(context, transaction);
-                    }
-                    else if (context.Operation == OperationType.Create)
-                    {
-                        BulkCreate(context, transaction);
-                    }
-                    else if (context.Operation == OperationType.Delete)
-                    {
-                        BulkDelete(context, transaction);
-                    }
-
-                    transaction.AddOperation(context);
-
-                    Watcher?.UnLock();
-                }
-                catch (Exception ex)
-                {
-                    Logger?.Fatal(ex);
-
-                    throw ex;
-                }
-            }
-        }
-
-        public override void OnChangeDocuments(DocumentMeta meta, DocumentContext context)
-        {
-            int count = context.Documents.Count;
-
-            if (context.Operation == OperationType.Delete)
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    var primaryOf = meta.SubmitChanges(context.Documents[i], OperationType.Delete);
-
-                    Cache.Remove(meta.TypeOf, primaryOf);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    Document document = context.Documents[i];
-
-                    if (document.KeyOf == null)
-                    {
-                        document.KeyOf = new string[] { };
-                    }
-
-                    if (Option.SupportDocumentParser)
-                    {
-                        ParseDocumentData(ref meta, ref document, context.Storage, context.Operation);
-                    }
-
-                    meta.SubmitChanges(document, context.Operation);
-
-                    Cache.Set(document, meta.Cache.Expire);
-                }
-            }
-        }
-
         public override void BulkCreate(DocumentContext context, DocumentTransaction transaction)
         {
             var formatting = context.Formatting == Format.Indented ? Formatting.Indented : Formatting.None;
@@ -147,7 +71,6 @@ namespace Objectiks.NoDb
             meta.TotalRecords = 0;
             meta.HasData = false;
             meta.Sequence = 0;
-            meta.DiskSize = 0;
             meta.ClearPartitions();
             meta.ClearStaticFiles();
 
@@ -173,6 +96,42 @@ namespace Objectiks.NoDb
             }
 
             return numberOfRows;
+        }
+
+        public override void OnChangeDocuments(DocumentMeta meta, DocumentContext context)
+        {
+            int count = context.Documents.Count;
+
+            if (context.Operation == OperationType.Delete)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    var primaryOf = meta.SubmitChanges(context.Documents[i], OperationType.Delete);
+
+                    Cache.Remove(meta.TypeOf, primaryOf);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    Document document = context.Documents[i];
+
+                    if (document.KeyOf == null)
+                    {
+                        document.KeyOf = new string[] { };
+                    }
+
+                    if (Option.SupportDocumentParser)
+                    {
+                        ParseDocumentData(ref meta, ref document, context.Storage, context.Operation);
+                    }
+
+                    meta.SubmitChanges(document, context.Operation);
+
+                    Cache.Set(document, meta.Cache.Expire);
+                }
+            }
         }
     }
 }

@@ -16,25 +16,18 @@ namespace Objectiks.PostgreSql
     {
         public override void BulkAppend(DocumentContext context, DocumentTransaction transaction)
         {
-
         }
 
         public override void BulkCreate(DocumentContext context, DocumentTransaction transaction)
         {
-            //using (var writer = new PostgreSqlWriter(meta.TypeOf, Provider, Option, Logger))
-            //{
-            //    writer.BulkCreate(docs);
-            //}
         }
 
         public override void BulkMerge(DocumentContext context, DocumentTransaction transaction)
         {
-
         }
 
         public override void BulkDelete(DocumentContext context, DocumentTransaction transaction)
         {
-
         }
 
         public override void SubmitChanges(DocumentContext context, DocumentTransaction transaction)

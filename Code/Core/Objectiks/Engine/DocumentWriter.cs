@@ -103,6 +103,15 @@ namespace Objectiks.Engine
             return document;
         }
 
+        private Document GetDocumentFromInfo(object primaryOf)
+        {
+            var info = Engine.GetTypeOfDocumentInfo(TypeOf, primaryOf);
+            var document = new Document(info);
+            document.Data = JObject.Parse("{" + $"{Meta.Primary}:{primaryOf}" + "}");
+
+            return document;
+        }
+
         private object GetDocumentPrimaryValue(T model)
         {
             object primaryValue = null;
@@ -340,9 +349,7 @@ namespace Objectiks.Engine
                 throw new ArgumentNullException("primaryOf is null");
             }
 
-            var doc = Engine.Read(TypeOf, primaryOf);
-
-            DeleteDocument(doc);
+            DeleteDocument(GetDocumentFromInfo(primaryOf));
         }
 
         public void DeleteDocument(long primaryOf)
@@ -352,9 +359,7 @@ namespace Objectiks.Engine
                 throw new ArgumentNullException("primaryOf is null");
             }
 
-            var doc = Engine.Read(TypeOf, primaryOf);
-
-            DeleteDocument(doc);
+            DeleteDocument(GetDocumentFromInfo(primaryOf));
         }
 
         public void DeleteDocument(int primaryOf)
@@ -364,9 +369,7 @@ namespace Objectiks.Engine
                 throw new ArgumentNullException("primaryOf is null");
             }
 
-            var doc = Engine.Read(TypeOf, primaryOf);
-
-            DeleteDocument(doc);
+            DeleteDocument(GetDocumentFromInfo(primaryOf));
         }
 
         public void DeleteDocument(T document)
@@ -377,9 +380,8 @@ namespace Objectiks.Engine
             }
 
             var primaryOf = GetDocumentPrimaryValue(document);
-            var doc = Engine.Read(TypeOf, primaryOf);
 
-            DeleteDocument(doc);
+            DeleteDocument(GetDocumentFromInfo(primaryOf));
         }
 
         public void DeleteDocuments(List<T> documents)

@@ -1,5 +1,6 @@
 ﻿using Objectiks.Caching;
 using Objectiks.Caching.Serializer;
+using Objectiks.Integrations.Models;
 using Objectiks.Models;
 using Objectiks.PostgreSql;
 using Objectiks.Redis;
@@ -14,29 +15,11 @@ namespace Objectiks.Integrations.Options
     {
         public PostgreEngineRedisOption() : base()
         {
-            #region TypeOf
-            var pages = new DocumentSchema
-            {
-                TypeOf = "Pages",
-                ParseOf = "Document",
-                PrimaryOf = "Id",
-                WorkOf = "AccountRef",
-                UserOf = "UserRef",
-                KeyOf = new DocumentKeyOfNames("Tag")
-            };
+            Name = "PostgreSql";
 
-            var tags = new DocumentSchema
-            {
-                TypeOf = "Tags",
-                ParseOf = "Document",
-                PrimaryOf = "Id",
-                KeyOf = new DocumentKeyOfNames()
-            };
-            #endregion
+            RegisterTypeOf<Pages>();
+            RegisterTypeOf<Tags>();
 
-            TypeOf = new DocumentTypes("Pages", "Tags");
-            Schemes = new DocumentSchemes(pages, tags);
-       
             UseEngineProvider<PostgreEngine>();
 
             var cacheConfig = new RedisConfiguration

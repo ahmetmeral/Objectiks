@@ -10,20 +10,28 @@ namespace Objectiks.Engine
 {
     public class DocumentQuery
     {
-        public string TypeOf { get; internal set; }
-        public QueryCacheOf CacheOf { get; internal set; }
-        public QueryParameters Parameters { get; internal set; }
-        public QueryOrderBy OrderBy { get; internal set; }
-        public ResultType ResultType { get; internal set; }
-        public int Skip { get; internal set; }
-        public int Take { get; internal set; }
+        public string TypeOf { get; set; }
+        public QueryCacheOf CacheOf { get; set; }
+        public QueryParameters Parameters { get; set; }
+        public QueryOrderBy OrderBy { get; set; }
+        public ResultType ResultType { get; set; }
+        public int Skip { get; set; }
+        public int Take { get; set; }
         public bool HasWorkOf { get; internal set; }
         public bool HasUserOf { get; internal set; }
         public bool HasPrimaryOf { get; internal set; }
         public bool HasKeyOf { get; internal set; }
         public bool HasOrderBy { get; internal set; }
         public bool HasCacheOf { get; internal set; }
-        public bool IsAny { get; internal set; } = false;
+        public bool IsAny { get; set; } = false;
+
+        public bool HasPager
+        {
+            get
+            {
+                return Take > 0;
+            }
+        }
 
         public bool HasParameters
         {
@@ -61,7 +69,7 @@ namespace Objectiks.Engine
             {
                 AddParameter(new QueryParameter
                 {
-                    Type = QueryParameterType.PrimaryOf,
+                    Type = ParameterType.PrimaryOf,
                     Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
                     Value = primaryOfValue
                 });

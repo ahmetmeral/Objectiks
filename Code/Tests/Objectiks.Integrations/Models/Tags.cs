@@ -6,6 +6,7 @@ using System.Text;
 namespace Objectiks.Integrations.Models
 {
     [TypeOf("Tags"), Serializable]
+    [CacheOf(1000, true)]
     public class Tags
     {
         [Primary]

@@ -21,16 +21,16 @@ namespace Objectiks
         {
             Watcher?.Lock();
 
-            foreach (var typeOf in Option.TypeOf)
+            foreach (var type in Option.TypeOf)
             {
                 using (var trans = Monitor.GetTransaction(this, true, true))
                 {
-                    trans.EnterTypeOfLock(typeOf);
+                    trans.EnterTypeOfLock(type.TypeOf);
 
-                    CheckTypeOfSchema(typeOf);
-                    LoadDocumentType(typeOf, true);
+                    CheckTypeOfSchema(type.TypeOf);
+                    LoadDocumentType(type.TypeOf, true);
 
-                    trans.ExitTypeOfLock(typeOf);
+                    trans.ExitTypeOfLock(type.TypeOf);
 
                     Monitor.ReleaseTransaction(trans);
                 }

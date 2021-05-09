@@ -13,6 +13,7 @@ namespace Objectiks.Engine.Query
     {
         public string Field { get; set; }
         public object Value { get; set; }
-        public QueryParameterType Type { get; set; }
+        public OperationType Operator { get; set; }
+        public ParameterType Type { get; set; }
     }
 }

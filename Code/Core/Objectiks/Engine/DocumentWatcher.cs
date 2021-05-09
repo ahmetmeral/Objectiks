@@ -89,7 +89,7 @@ namespace Objectiks.Engine
                     Engine.Logger?.Debug(ScopeType.Watcher, $"TypeOf: {typeOf} Contents changes");
                 }
 
-                if (types.Contains(typeOf.ToLowerInvariant()))
+                if (types.Count(t => t.TypeOf.ToLowerInvariant() == typeOf.ToLowerInvariant()) > 0)
                 {
                     Engine.Logger?.Debug(ScopeType.Watcher, $"OnChangeDocument TypeOf: {typeOf} - File: {file.FullName}");
 

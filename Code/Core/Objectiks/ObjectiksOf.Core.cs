@@ -48,7 +48,7 @@ namespace Objectiks
                     throw new Exception("Engine undefined..");
                 }
 
-                return (DocumentEngine)Activator.CreateInstance(option.EngineProvider, documentProvider, option); 
+                return (DocumentEngine)Activator.CreateInstance(option.EngineProvider, documentProvider, option);
             }
 
             public static void Map(Type type, DocumentOption option)
@@ -80,11 +80,6 @@ namespace Objectiks
                 }
                 else
                 {
-                    if (option.HasManifest)
-                    {
-                        option = GetOptionMergeManifest(provider, option);
-                    }
-
                     Map(provider.Key, option);
                 }
 
@@ -119,10 +114,7 @@ namespace Objectiks
 
                 if (option == null)
                 {
-                    var path = Path.Combine(provider.BaseDirectory, DocumentDefaults.Manifest);
-                    var manifest = DocumentManifest.Get(path);
-
-                    option = manifest;
+                    option = new DocumentOption();
                     option.RegisterDefaults();
 
                     if (option.CacheInstance == null)
@@ -141,26 +133,6 @@ namespace Objectiks
                 }
 
                 return option;
-            }
-
-            private static DocumentOption GetOptionMergeManifest(DocumentProvider provider, DocumentOption option)
-            {
-                var path = Path.Combine(provider.BaseDirectory, DocumentDefaults.Manifest);
-                var manifest = DocumentManifest.Get(path);
-
-                if (manifest == null)
-                {
-                    throw new Exception("Manifest file not found");
-                }
-
-                manifest.CacheInstance = option.CacheInstance;
-                manifest.ParserOfTypes = option.ParserOfTypes;
-                manifest.DocumentWatcher = option.DocumentWatcher;
-                manifest.DocumentLogger = option.DocumentLogger;
-                manifest.EngineProvider = option.EngineProvider;
-                manifest.HasManifest = true;
-
-                return manifest;
             }
         }
     }

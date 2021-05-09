@@ -14,7 +14,6 @@ namespace Objectiks.NoDb
             this.Name = "NoDbDocuments";
             this.SupportPartialStorage = true;
             this.SupportPartialStorageSize = 1000;
-            this.CacheInfo = new DocumentCacheInfo { Expire = 1000, Lazy = false };
             this.UseEngineProvider<NoDbEngine>();
             this.RegisterDefaults();
         }

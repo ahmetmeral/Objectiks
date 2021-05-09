@@ -316,6 +316,81 @@ namespace Objectiks.Integrations
         }
 
         [Test]
+        public void DocumentDeleteBulk()
+        {
+            var size = 10;
+            var pages = TestSetup.GeneratePages(size, false);
+
+            var repos = new ObjectiksOf();
+
+            //removes
+            repos.TruncateOf<Pages>();
+
+            using (var create = repos.WriterOf<Pages>())
+            {
+                create.UseFormatting();
+                create.AddDocuments(pages);
+                create.SubmitChanges();
+            }
+
+            var list_before = repos.TypeOf<Pages>().ToList();
+
+            Assert.IsNotNull(list_before);
+            Assert.IsTrue(list_before.Count == size);
+
+            using (var writer = repos.WriterOf<Pages>())
+            {
+                writer.UseFormatting();
+                writer.DeleteDocuments(pages);
+                writer.SubmitChanges();
+            }
+
+            var list_after = repos.TypeOf<Pages>().ToList();
+
+            Assert.IsTrue(list_after.Count == 0);
+        }
+
+        [Test]
+        public void DocumentDeletePrimaryOf()
+        {
+            var size = 10;
+            var pages = TestSetup.GeneratePages(size, false);
+
+            var repos = new ObjectiksOf();
+
+            //removes
+            repos.TruncateOf<Pages>();
+
+            using (var create = repos.WriterOf<Pages>())
+            {
+                create.UseFormatting();
+                create.AddDocuments(pages);
+                create.SubmitChanges();
+            }
+
+            var list_before = repos.TypeOf<Pages>().ToList();
+
+            Assert.IsNotNull(list_before);
+            Assert.IsTrue(list_before.Count == size);
+
+            using (var writer = repos.WriterOf<Pages>())
+            {
+                writer.UseFormatting();
+
+                foreach (var page in pages)
+                {
+                    writer.DeleteDocument(page.Id);
+                }
+
+                writer.SubmitChanges();
+            }
+
+            var list_after = repos.TypeOf<Pages>().ToList();
+
+            Assert.IsTrue(list_after.Count == 0);
+        }
+
+        [Test]
         public void DocumentBulkWrite()
         {
             var size = 500;

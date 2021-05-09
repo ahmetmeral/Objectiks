@@ -8,5 +8,14 @@ namespace Objectiks.Models
     {
         public int Expire { get; set; }
         public bool Lazy { get; set; }
+
+        public DocumentCacheInfo() { }
+
+
+        public DocumentCacheInfo(int expire, bool lazy = false)
+        {
+            Expire = expire;
+            Lazy = lazy;
+        }
     }
 }

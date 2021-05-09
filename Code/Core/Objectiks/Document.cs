@@ -24,6 +24,17 @@ namespace Objectiks
 
         public Document() { }
 
+        public Document(DocumentInfo info)
+        {
+            if (info.Exists)
+            {
+                TypeOf = info.TypeOf;
+                PrimaryOf = info.PrimaryOf.ToString();
+                Partition = info.Partition;
+            }
+
+            Exists = info.Exists;
+        }
 
         public void Dispose()
         {
