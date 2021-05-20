@@ -18,7 +18,6 @@ namespace Objectiks
         public static class Core
         {
             private static DocumentProvider Provider;
-            private static DocumentEngines Engines = new DocumentEngines();
             private static DocumentOptions Options = new DocumentOptions();
 
             internal static IDocumentEngine Get()

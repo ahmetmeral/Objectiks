@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Objectiks.Attributes;
+using Objectiks.Extentions;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace Objectiks.Models
@@ -63,9 +66,79 @@ namespace Objectiks.Models
 
         public static DocumentType FromClass<T>() where T : class
         {
-            var type = new DocumentType();
+            var documentType = new DocumentType();
 
-            throw new NotImplementedException();
+            var type = typeof(T);
+            var properties = type.FindProperties();
+
+            var typeOf = type.GetCustomAttribute<TypeOfAttribute>();
+
+            if (typeOf == null)
+            {
+                documentType.TypeOf = type.Name;
+            }
+            else
+            {
+                documentType.TypeOf = typeOf.Name;
+
+                if (String.IsNullOrWhiteSpace(documentType.TypeOf))
+                {
+                    documentType.TypeOf = type.Name;
+                }
+            }
+
+            var cacheOf = type.GetCustomAttribute<CacheOfAttribute>();
+            if (cacheOf != null)
+            {
+                documentType.Cache = new DocumentCacheInfo
+                {
+                    Expire = cacheOf.Expire,
+                    Lazy = cacheOf.Lazy
+                };
+            }
+            else
+            {
+                documentType.Cache = new DocumentCacheInfo
+                {
+                    Expire = 1000,
+                    Lazy = false
+                };
+            }
+
+            var parseOf = type.GetCustomAttribute<ParseOfAttribute>();
+            if (parseOf != null)
+            {
+                documentType.ParseOf = parseOf.Name;
+            }
+
+            foreach (PropertyInfo property in properties)
+            {
+                var primary = property.GetAttribute<PrimaryAttribute>();
+                if (primary != null)
+                {
+                    documentType.PrimaryOf = property.Name;
+                }
+
+                var workOf = property.GetAttribute<WorkOfAttribute>();
+                if (workOf != null)
+                {
+                    documentType.WorkOf = property.Name;
+                }
+
+                var userOf = property.GetAttribute<UserOfAttribute>();
+                if (userOf != null)
+                {
+                    documentType.UserOf = property.Name;
+                }
+
+                var keyOf = property.GetAttribute<KeyOfAttribute>();
+                if (keyOf != null)
+                {
+                    documentType.KeyOf.Add(property.Name);
+                }
+            }
+
+            return documentType;
         }
     }
 }

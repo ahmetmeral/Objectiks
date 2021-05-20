@@ -36,7 +36,7 @@ namespace Objectiks.Integrations.Options
                   )
                 );
 
-            UseDocumentWatcher<DocumentWatcher>();
+            //UseDocumentWatcher<DocumentWatcher>();
         }
     }
 }

@@ -2,10 +2,39 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <Version>1.0.0-beta-01</Version>
+    <Authors>Ahmet MERAL</Authors>
+    <Title>Objectiks - NoDb json document store</Title>
+    <PackageId>Objectiks.NoDb</PackageId>
+    <Company>Apiks</Company>
+    <Product>Objectiks.NoDb</Product>
+    <Description>Objectiks is an open-source NoDb json document store, that can run over a single or multiple json files.</Description>
+    <PackageProjectUrl>https://github.com/ahmetmeral/Objectiks</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ahmetmeral/Objectiks</RepositoryUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageTags>nodb json document store</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Copyright>Copyright 2021</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Objectiks\Objectiks.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\Documents\icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

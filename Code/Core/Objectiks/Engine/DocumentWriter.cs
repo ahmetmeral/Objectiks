@@ -187,14 +187,14 @@ namespace Objectiks.Engine
 
                     var info = Engine.GetTypeOfDocumentInfo(doc.TypeOf, primaryValue, property.PropertyType);
 
-                    doc.PrimaryOf = info.PrimaryOf.ToString();
+                    doc.PrimaryOf =  info.PrimaryOf.ToString();
                     doc.CacheOf = Engine.Cache.CacheOfDoc(doc.TypeOf, doc.PrimaryOf);
                     doc.Partition = info.Partition;
                     doc.Exists = info.Exists;
 
                     if (!info.Exists)
                     {
-                        property.SetValue(model, info.PrimaryOf);
+                        property.SetValue(model, Convert.ChangeType(info.PrimaryOf, property.PropertyType));
                     }
 
                     continue;
@@ -485,7 +485,6 @@ namespace Objectiks.Engine
         public void Dispose()
         {
             GC.SuppressFinalize(this);
-            Engine.Watcher?.UnLock();
         }
     }
 }

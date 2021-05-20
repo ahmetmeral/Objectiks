@@ -41,6 +41,7 @@ namespace Objectiks
         {
             TypeOf = typeOf;
             ParseOf = documentType.ParseOf;
+            WorkOf = documentType.WorkOf;
             PrimaryOf = documentType.PrimaryOf;
             UserOf = documentType.UserOf;
             KeyOfNames = documentType.KeyOf;

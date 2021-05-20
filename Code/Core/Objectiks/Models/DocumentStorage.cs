@@ -1,4 +1,5 @@
-﻿using Objectiks.Helper;
+﻿using Objectiks.Extentions;
+using Objectiks.Helper;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -127,8 +128,10 @@ namespace Objectiks.Models
 
                 return false;
             }
-            catch
+            catch (IOException ex)
             {
+                ex.WaitIfLocked(1000);
+
                 return false;
             }
         }
@@ -150,8 +153,10 @@ namespace Objectiks.Models
             {
                 return false;
             }
-            catch (IOException)
+            catch (IOException ex)
             {
+                ex.WaitIfLocked(1000);
+
                 return false;
             }
         }
@@ -173,8 +178,10 @@ namespace Objectiks.Models
             {
                 return false;
             }
-            catch (IOException)
+            catch (IOException ex)
             {
+                ex.WaitIfLocked(1000);
+
                 return false;
             }
         }

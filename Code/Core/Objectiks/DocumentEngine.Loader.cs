@@ -19,8 +19,6 @@ namespace Objectiks
     {
         public virtual DocumentEngine Initialize()
         {
-            Watcher?.Lock();
-
             foreach (var type in Option.TypeOf)
             {
                 using (var trans = Monitor.GetTransaction(this, true, true))
@@ -35,8 +33,6 @@ namespace Objectiks
                     Monitor.ReleaseTransaction(trans);
                 }
             }
-
-            Watcher?.UnLock();
 
             return this;
         }

@@ -131,6 +131,7 @@ namespace Objectiks.NoDb
             Logger?.Debug(ScopeType.Engine, "Check Document Directory");
 
             var documents = Path.Combine(Provider.BaseDirectory, DocumentDefaults.Documents, typeOf);
+           
             if (!Directory.Exists(documents))
             {
                 Directory.CreateDirectory(documents);

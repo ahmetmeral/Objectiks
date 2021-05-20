@@ -23,6 +23,7 @@ namespace Objectiks
         internal List<DocumentStorage> Storages { get; set; }
         internal bool IsInternalTransaction { get; set; }
         internal bool IsTruncate { get; set; }
+        internal bool IsException { get; set; }
 
 
         public uint TransactionId
@@ -142,6 +143,8 @@ namespace Objectiks
         {
             try
             {
+                IsException = false;
+
                 foreach (var item in TypeOfContext)
                 {
                     var typeOf = item.Key;
@@ -180,13 +183,17 @@ namespace Objectiks
             catch (Exception ex)
             {
                 Engine.Logger?.Error(ex);
+                IsException = true;
 
                 throw ex;
             }
             finally
             {
-                ExitAllTypeOfLock();
-                Engine.ReleaseTransaction(this);
+                if (!IsException)
+                {
+                    ExitAllTypeOfLock();
+                    Engine.ReleaseTransaction(this);
+                }
             }
         }
 

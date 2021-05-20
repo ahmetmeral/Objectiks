@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.12" />
     <PackageReference Include="Npgsql" Version="5.0.4" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
@@ -22,22 +23,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Objectiks\Documents\Pages\Contents\Home.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Objectiks\Documents\Pages\Pages.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Objectiks\Documents\Tags\Tags.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Objectiks\Objectiks.json">
+    <None Update="Docs\Objectiks.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Docs\Schemes\Pages.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Objectiks\Schemes\Pages.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Objectiks\Schemes\Tags.json">
+    <None Update="Docs\Schemes\Tags.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

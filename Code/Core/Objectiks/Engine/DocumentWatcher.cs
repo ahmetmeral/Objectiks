@@ -10,7 +10,6 @@ namespace Objectiks.Engine
 {
     public class DocumentWatcher : IDocumentWatcher
     {
-        private bool IsLocked = false;
         private string DocumentExtention;
         private string[] Extentions;
         private string[] Prefixs;
@@ -19,15 +18,17 @@ namespace Objectiks.Engine
 
         public DocumentWatcher() { }
 
-        public virtual void Lock()
-        {
-            IsLocked = true;
-        }
+        //public virtual void Lock()
+        //{
+        //    IsLocked = true;
+        //    Engine?.Logger?.Debug(ScopeType.Watcher, "Locked");
+        //}
 
-        public virtual void UnLock()
-        {
-            IsLocked = false;
-        }
+        //public virtual void UnLock()
+        //{
+        //    IsLocked = false;
+        //    Engine?.Logger?.Debug(ScopeType.Watcher, "Un Locked");
+        //}
 
         public virtual void WaitForChanged(IDocumentEngine engine)
         {
@@ -57,12 +58,9 @@ namespace Objectiks.Engine
             watcher.EnableRaisingEvents = true;
             watcher.Changed += delegate (object sender, FileSystemEventArgs e)
             {
-                if (!IsLocked)
+                if (e.ChangeType == WatcherChangeTypes.Changed)
                 {
-                    if (e.ChangeType == WatcherChangeTypes.Changed)
-                    {
-                        OnChangeDocument(e);
-                    }
+                    OnChangeDocument(e);
                 }
             };
         }
@@ -89,6 +87,18 @@ namespace Objectiks.Engine
                     Engine.Logger?.Debug(ScopeType.Watcher, $"TypeOf: {typeOf} Contents changes");
                 }
 
+                var trans = Engine.GetThreadTransaction();
+
+                if (trans != null)
+                {
+                    if (trans.TypeOfLock.Contains(typeOf.ToLowerInvariant()))
+                    {
+                        Engine.Logger?.Debug(ScopeType.Watcher, $"{typeOf} is Locked");
+
+                        return;
+                    }
+                }
+
                 if (types.Count(t => t.TypeOf.ToLowerInvariant() == typeOf.ToLowerInvariant()) > 0)
                 {
                     Engine.Logger?.Debug(ScopeType.Watcher, $"OnChangeDocument TypeOf: {typeOf} - File: {file.FullName}");
@@ -98,7 +108,7 @@ namespace Objectiks.Engine
             }
             catch (Exception ex)
             {
-                Engine.Logger?.Error("Document watcher OnChangeDocument:", ex);
+                Engine.Logger?.Error("Watcher OnChangeDocument:", ex);
             }
         }
 

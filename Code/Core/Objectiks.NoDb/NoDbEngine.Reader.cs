@@ -57,6 +57,7 @@ namespace Objectiks.NoDb
                     {
                         info.PrimaryOf = readInfo.PrimaryOf;
                         info.Partition = readInfo.Partition;
+                        info.Exists = true;
                     }
                     else
                     {

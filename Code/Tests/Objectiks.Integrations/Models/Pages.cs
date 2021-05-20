@@ -6,8 +6,7 @@ using System.Text;
 
 namespace Objectiks.Integrations.Models
 {
-    [TypeOf("Pages"), Serializable]
-    [CacheOf(1000, false)]
+    [TypeOf("Pages"), Serializable, CacheOf(1000)]
     public class Pages
     {
         [Primary]

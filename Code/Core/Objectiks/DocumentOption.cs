@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace Objectiks
 {
@@ -63,6 +64,10 @@ namespace Objectiks
             EngineProvider = typeof(T);
         }
 
+        /// <summary>
+        /// Development environment must be active. Creates errors in simultaneous operations in a live environment.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
         public void UseDocumentWatcher<T>() where T : IDocumentWatcher
         {
             SupportDocumentWatcher = true;

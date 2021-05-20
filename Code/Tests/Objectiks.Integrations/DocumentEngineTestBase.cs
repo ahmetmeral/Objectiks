@@ -4,6 +4,7 @@ using System;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Diagnostics;
+using Objectiks.Integrations.Option;
 
 namespace Objectiks.Integrations
 {
@@ -129,13 +130,15 @@ namespace Objectiks.Integrations
         [Test]
         public void DocumentWriter()
         {
-            var size = 500;
+            var size = 5;
             var pages = TestSetup.GeneratePages(size, false);
             var repos = new ObjectiksOf();
 
             repos.TruncateOf<Pages>();
 
             var count_before = repos.Count<Pages>();
+
+            Assert.IsTrue(count_before == 0);
 
             using (var writer = repos.WriterOf<Pages>())
             {
@@ -151,7 +154,7 @@ namespace Objectiks.Integrations
 
             var count_after = repos.Count<Pages>();
 
-            Assert.IsTrue((count_after - count_before) == size);
+            Assert.IsTrue(count_after == size);
         }
 
         [Test]
@@ -172,7 +175,6 @@ namespace Objectiks.Integrations
 
             int pageID = pages[0].Id;
             var page_update_before = repos.TypeOf<Pages>().PrimaryOf(pageID).First();
-            var meta_before = repos.GetTypeMeta<Pages>();
 
             Assert.NotNull(page_update_before);
 
@@ -184,8 +186,6 @@ namespace Objectiks.Integrations
                 writer.UpdateDocument(page_update_before);
                 writer.SubmitChanges();
             }
-
-            var meta_after = repos.GetTypeMeta<Pages>();
 
             var page_update_after = repos.First<Pages>(pageID);
 
@@ -500,7 +500,7 @@ namespace Objectiks.Integrations
         [Test]
         public void DocumentTransactionInternalParalelTest()
         {
-            var size = 500;
+            var size = 50;
             var pages = TestSetup.GeneratePages(size, false);
             var repos = new ObjectiksOf();
 
@@ -551,6 +551,8 @@ namespace Objectiks.Integrations
                     }
                 }
             });
+            
+            var logs = DocumentLogger.Logs;
 
             Assert.IsTrue(repos.Count<Pages>() == size);
         }
