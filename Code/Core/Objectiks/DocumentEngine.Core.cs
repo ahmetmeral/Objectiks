@@ -59,7 +59,7 @@ namespace Objectiks
             {
                 documentType = new DocumentType(typeOf);
             }
-           
+
             return documentType;
         }
 
@@ -101,19 +101,9 @@ namespace Objectiks
             return document;
         }
 
-        public virtual void ParseDocumentData(ref DocumentMeta meta, ref Document document, DocumentStorage file, OperationType operation)
+        public virtual IDocumentParser GetDocumentParser(string typeOf, OperationType operation)
         {
-            var parser = GetDocumentParser(meta.TypeOf);
-
-            if (parser != null && parser.IsParse(operation))
-            {
-                parser.Parse(this, meta, document, file);
-            }
-        }
-
-        public virtual IDocumentParser GetDocumentParser(string typeOf)
-        {
-            var converter = ParseOf.Where(c => c.ParseOf == typeOf).FirstOrDefault();
+            var converter = ParseOf.Where(c => c.ParseOf == typeOf && c.IsParse(operation) == true).FirstOrDefault();
 
             if (converter == null)
             {

@@ -78,6 +78,7 @@ namespace Objectiks.NoDb
 
             int bufferSize = Option.BufferSize;
             var serializer = new JsonSerializer();
+            var parser = GetDocumentParser(meta.TypeOf, OperationType.Load);
 
             foreach (DocumentStorage file in files)
             {
@@ -97,9 +98,9 @@ namespace Objectiks.NoDb
                             {
                                 var document = GetDocumentFromSource(ref meta, serializer.Deserialize<JObject>(reader), file.Partition);
 
-                                if (Option.SupportDocumentParser)
+                                if (Option.SupportDocumentParser && parser != null)
                                 {
-                                    ParseDocumentData(ref meta, ref document, file, OperationType.Load);
+                                    parser.Parse(this, meta, document, file);
                                 }
 
                                 meta.SubmitChanges(document, OperationType.Load);
@@ -131,7 +132,7 @@ namespace Objectiks.NoDb
             Logger?.Debug(ScopeType.Engine, "Check Document Directory");
 
             var documents = Path.Combine(Provider.BaseDirectory, DocumentDefaults.Documents, typeOf);
-           
+
             if (!Directory.Exists(documents))
             {
                 Directory.CreateDirectory(documents);

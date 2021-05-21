@@ -102,6 +102,7 @@ namespace Objectiks.NoDb
         {
             int count = context.Documents.Count;
 
+
             if (context.Operation == OperationType.Delete)
             {
                 for (int i = 0; i < count; i++)
@@ -113,6 +114,8 @@ namespace Objectiks.NoDb
             }
             else
             {
+                var parser = GetDocumentParser(meta.TypeOf, context.Operation);
+
                 for (int i = 0; i < count; i++)
                 {
                     Document document = context.Documents[i];
@@ -122,9 +125,9 @@ namespace Objectiks.NoDb
                         document.KeyOf = new string[] { };
                     }
 
-                    if (Option.SupportDocumentParser)
+                    if (Option.SupportDocumentParser && parser != null)
                     {
-                        ParseDocumentData(ref meta, ref document, context.Storage, context.Operation);
+                        parser.Parse(this, meta, document, context.Storage);
                     }
 
                     meta.SubmitChanges(document, context.Operation);

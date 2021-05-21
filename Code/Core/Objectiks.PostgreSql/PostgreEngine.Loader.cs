@@ -31,6 +31,8 @@ namespace Objectiks.PostgreSql
             query.Skip = 0;
             query.Take = Option.SqlProviderDataReaderPageSize;
 
+            var parser = GetDocumentParser(meta.TypeOf, OperationType.Load);
+
             using (var reader = new PostgreReader(Provider, Option, query, Logger))
             {
                 while (reader.Read())
@@ -39,9 +41,9 @@ namespace Objectiks.PostgreSql
                     {
                         var document = GetDocumentFromSource(ref meta, row, 0);
 
-                        if (Option.SupportDocumentParser)
+                        if (Option.SupportDocumentParser && parser !=null)
                         {
-                            ParseDocumentData(ref meta, ref document, new DocumentStorage(), OperationType.Load);
+                            parser.Parse(this, meta, document, null);
                         }
 
                         meta.SubmitChanges(document, OperationType.Load);

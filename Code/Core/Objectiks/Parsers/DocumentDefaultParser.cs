@@ -13,6 +13,7 @@ namespace Objectiks.Parsers
     {
         public string ParseOf => "Document";
 
+
         public DocumentDefaultParser() { }
 
         public bool IsParse(OperationType operation)

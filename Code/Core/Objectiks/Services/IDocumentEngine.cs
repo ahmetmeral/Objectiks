@@ -26,13 +26,15 @@ namespace Objectiks.Services
         void ReleaseTransaction(DocumentTransaction transaction);
 
         bool LoadDocumentType(string typeOf, bool isInitialize = false);
-        void ParseDocumentData(ref DocumentMeta meta, ref Document document, DocumentStorage file, OperationType operation);
-        Document GetDocumentFromSource(ref DocumentMeta meta, JObject data, int partition);
         void CheckTypeOfSchema(string typeOf);
 
+        Document GetDocumentFromSource(ref DocumentMeta meta, JObject data, int partition);
+        
+
         DocumentType GetDocumentType(string typeOf);
-        IDocumentParser GetDocumentParser(string typeOf);
-       
+        IDocumentParser GetDocumentParser(string typeOf, OperationType operation);
+
+
         DocumentMeta GetTypeMeta(string typeOf);
         List<DocumentMeta> GetTypeMetaAll();
 

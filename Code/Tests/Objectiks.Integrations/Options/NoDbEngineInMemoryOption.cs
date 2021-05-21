@@ -2,6 +2,7 @@
 using Objectiks.Caching.Serializer;
 using Objectiks.Engine;
 using Objectiks.Integrations.Models;
+using Objectiks.Integrations.Parsers;
 using Objectiks.Models;
 using Objectiks.NoDb;
 using Objectiks.Services;
@@ -19,6 +20,10 @@ namespace Objectiks.Integrations.Option
 
             RegisterTypeOf<Pages>();
             RegisterTypeOf<Tags>();
+
+            RegisterParseOf<PageDocumentParser>();
+
+            SupportDocumentParser = true;
 
             //UseDocumentLogger<DocumentLogger>();
             //UseDocumentWatcher<DocumentWatcher>();
