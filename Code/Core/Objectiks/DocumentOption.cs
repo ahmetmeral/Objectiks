@@ -63,7 +63,6 @@ namespace Objectiks
         {
             EngineProvider = typeof(T);
         }
-
         /// <summary>
         /// Development environment must be active. Creates errors in simultaneous operations in a live environment.
         /// </summary>
@@ -84,19 +83,19 @@ namespace Objectiks
             HasManifest = true;
         }
 
-        public void AddParserTypeOf<T>() where T : IDocumentParser
+        public void RegisterParseOf<T>() where T : IDocumentParser
         {
             ParserOfTypes.Add((IDocumentParser)Activator.CreateInstance(typeof(T)));
-        }
-
-        public void ClearParserOfTypes()
-        {
-            ParserOfTypes?.Clear();
         }
 
         public void RegisterTypeOf<T>() where T : class
         {
             TypeOf.Add(DocumentType.FromClass<T>());
+        }
+
+        public void ClearParserOfTypes()
+        {
+            ParserOfTypes?.Clear();
         }
     }
 }
