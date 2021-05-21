@@ -78,6 +78,11 @@ public class NoDbEngineInMemoryOption : NoDbDocumentOption
     }
 }
 
+```
+
+##### Document initialize
+
+```csharp
 
 //Initialize json documents
 //default directory .\<Current Directory>\Objectiks\Documents
