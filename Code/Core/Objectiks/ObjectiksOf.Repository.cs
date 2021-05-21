@@ -179,5 +179,15 @@ namespace Objectiks
             var typeOf = GetTypeOfName<T>();
             Engine.LoadDocumentType(typeOf);
         }
+
+        public void WatcherOff()
+        {
+            Engine.Watcher?.Off();
+        }
+
+        public void WatcherOn()
+        {
+            Engine.Watcher?.On();
+        }
     }
 }

@@ -133,6 +133,7 @@ namespace Objectiks.Integrations
             var size = 5;
             var pages = TestSetup.GeneratePages(size, false);
             var repos = new ObjectiksOf();
+          
 
             repos.TruncateOf<Pages>();
 
@@ -153,6 +154,8 @@ namespace Objectiks.Integrations
             }
 
             var count_after = repos.Count<Pages>();
+
+            
 
             Assert.IsTrue(count_after == size);
         }

@@ -10,6 +10,7 @@ namespace Objectiks.Engine
 {
     public class DocumentWatcher : IDocumentWatcher
     {
+        private bool IsLocked = false;
         private string DocumentExtention;
         private string[] Extentions;
         private string[] Prefixs;
@@ -18,17 +19,17 @@ namespace Objectiks.Engine
 
         public DocumentWatcher() { }
 
-        //public virtual void Lock()
-        //{
-        //    IsLocked = true;
-        //    Engine?.Logger?.Debug(ScopeType.Watcher, "Locked");
-        //}
+        public virtual void On()
+        {
+            IsLocked = true;
+            Engine?.Logger?.Debug(ScopeType.Watcher, "Locked");
+        }
 
-        //public virtual void UnLock()
-        //{
-        //    IsLocked = false;
-        //    Engine?.Logger?.Debug(ScopeType.Watcher, "Un Locked");
-        //}
+        public virtual void Off()
+        {
+            IsLocked = false;
+            Engine?.Logger?.Debug(ScopeType.Watcher, "Un Locked");
+        }
 
         public virtual void WaitForChanged(IDocumentEngine engine)
         {
@@ -58,9 +59,12 @@ namespace Objectiks.Engine
             watcher.EnableRaisingEvents = true;
             watcher.Changed += delegate (object sender, FileSystemEventArgs e)
             {
-                if (e.ChangeType == WatcherChangeTypes.Changed)
+                if (!IsLocked)
                 {
-                    OnChangeDocument(e);
+                    if (e.ChangeType == WatcherChangeTypes.Changed)
+                    {
+                        OnChangeDocument(e);
+                    }
                 }
             };
         }
