@@ -97,14 +97,9 @@ var page = repos
     .PrimaryOf(1)
     .First();
 
-var listDynamic = repos
-    .TypeOf("Pages")
-    .OrderBy("Title")
-    .Desc()
-    .ToList();
 
-var tags = repos
-    .TypeOf("Tags")
+var pages = repos
+    .TypeOf<Pages>()
     .KeyOf("foods")
     .KeyOf("travel")
     .KeyOf("music")
