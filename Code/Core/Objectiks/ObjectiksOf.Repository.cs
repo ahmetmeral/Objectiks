@@ -81,9 +81,9 @@ namespace Objectiks
             query.HasPrimaryOf = true;
             query.AddParameter(new QueryParameter
             {
+                Type = ParameterType.PrimaryOf,
                 Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
-                Value = primaryOf,
-                Type = ParameterType.PrimaryOf
+                Value = primaryOf
             });
 
             return Engine.Read<T>(query);
@@ -95,9 +95,9 @@ namespace Objectiks
             query.HasPrimaryOf = true;
             query.AddParameter(new QueryParameter
             {
+                Type = ParameterType.PrimaryOf,
                 Field = DocumentDefaults.DocumentMetaPrimaryOfProperty,
-                Value = primaryOf,
-                Type = ParameterType.PrimaryOf
+                Value = primaryOf
             });
 
             return Engine.Read<T>(query);

@@ -23,7 +23,7 @@ namespace Objectiks.Models
         public DocumentKey(string primaryOf, string workOf, string userOf, string cacheOf,
             string[] keyOf, int partition, bool dirty = false)
         {
-            PrimaryOf = primaryOf;
+            PrimaryOf = primaryOf.ToLowerInvariant();
             WorkOf = workOf;
             UserOf = userOf;
             CacheOf = cacheOf;
