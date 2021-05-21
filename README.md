@@ -63,29 +63,48 @@ public class Tags
 > **Primary,Requried or Ignore  etc.. attributes are used for writing to a file.**
 
 
+##### Document Options
+
+```csharp
+
+public class NoDbEngineInMemoryOption : NoDbDocumentOption
+{
+    public NoDbEngineInMemoryOption() : base()
+    {
+        Name = "NoDbEngineProvider";
+
+        RegisterTypeOf<Pages>();
+        RegisterTypeOf<Tags>();
+    }
+}
+
+
+//Initialize json documents
+//default directory .\<Current Directory>\Objectiks\Documents
+ObjectiksOf.Core.Initialize(new DocumentProvider(), new NoDbEngineInMemoryOption());
+
+
+```
+
 ##### Document Reader
 
 ```csharp
-//default directory .\<Current Directory>\Objectiks
-var repos = new ObjectiksOf();
-```
 
-```csharp
+var repos = new ObjectiksOf();
+
 var page = repos
     .TypeOf<Pages>()
     .PrimaryOf(1)
     .First();
-```
 
-```csharp
 var listDynamic = repos
     .TypeOf("Pages")
     .OrderBy("Title")
     .Desc()
     .ToList();
 
-var categories = repos
-    .TypeOf("Categories")
+var tags = repos
+    .TypeOf("Tags")
     .KeyOf("foods")
     .KeyOf("travel")
     .KeyOf("music")
@@ -105,58 +124,14 @@ var pages = TestSetup.GeneratePages(10000);
 using (var writer = repos.WriterOf<Pages>())
 {
     //creates a new file for every thousand records
-    //manifest.json can also be used for all types through two parameters.
     //StoragePartial=true and StoragePartialLimit=1000
     writer.UsePartialStore(1000);
     writer.UseFormatting();
-    writer.Add(pages);
-    writer.SubmitChanges();
-}
-
-//merge
-var merge = repos
-    .TypeOf<Pages>()
-    .PrimaryOf(1)
-    .First();
-
-merge.Title = "Merge";
-
-using (var writer = repos.WriterOf<Pages>())
-{
-    writer.Add(merge);
-    writer.SubmitChanges();
-}
-
-
-//delete
-var deleted= repos.First<Pages>(2);
-using (var writer = repos.WriterOf<Pages>())
-{
-    writer.Delete(deleted);
+    writer.AddDocuments(pages);
     writer.SubmitChanges();
 }
 
 ```
-
-##### Document Meta
-
-```csharp
-var repos = new ObjectiksOf();
-var meta = repos.GetTypeMeta("pages");
-
-var typeOf = meta.TypeOf;
-var keyOf = meta.KeyOf;
-var parseOf = meta.ParseOf;
-var totalCount = meta.TotalRecords;
-var sequence = meta.Sequence;
-var directory = meta.Directory;
-var keyCount = meta.Keys.Count;
-var partition = meta.Partitions;
-
-```
-
-
-
 
 
 
