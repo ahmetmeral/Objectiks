@@ -1,11 +1,11 @@
   
 name: "Deploy to NUGET"
 
-#on: [push]
-on:
-  push:
-    tags:
-      - '*.*'
+on: [push]
+#on:
+#  push:
+#    tags:
+#      - '*.*'
 
 env:
   PROJECT_PATH: 'Code/Core/'
@@ -21,17 +21,6 @@ jobs:
       - name: 'Checkout'
         uses: actions/checkout@v2
       
-      #- name: 'Get Version'
-      #  id: vars
-      #  run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-
-      #- name: 'Version Output'
-      #  env:
-      #    RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-      #  run: | 
-      #    echo ${{ env.RELEASE_VERSION }} 
-      #    echo ${{ steps.vars.outputs.tag }} 
-
       - name: 'Install dotnet'
         uses: actions/setup-dotnet@v1
         with:
@@ -46,7 +35,7 @@ jobs:
         run: dotnet build ${{ env.PROJECT_PATH }}Objectiks/Objectiks.csproj --no-restore --configuration Release
 
       - name: 'Pack project'
-        run: dotnet pack ${{ env.PROJECT_PATH }}Objectiks/Objectiks.csproj --no-restore --no-build --configuration Release --include-symbols --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+        run: dotnet pack ${{ env.PROJECT_PATH }}Objectiks/Objectiks.csproj --no-restore --no-build --configuration Release --include-symbols --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\Objectiks
         #run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols -p:PackageVersion=${{ env.RELEASE_VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
 
       - name: 'Push github.com package'
@@ -64,14 +53,14 @@ jobs:
         run: dotnet build ${{ env.PROJECT_PATH }}Objectiks.NoDb/Objectiks.NoDb.csproj --no-restore --configuration Release
 
       - name: 'Pack project'
-        run: dotnet pack ${{ env.PROJECT_PATH }}Objectiks.NoDb/Objectiks.NoDb.csproj --no-restore --no-build --configuration Release --include-symbols --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+        run: dotnet pack ${{ env.PROJECT_PATH }}Objectiks.NoDb/Objectiks.NoDb.csproj --no-restore --no-build --configuration Release --include-symbols --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\Objectiks.NoDb
         #run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols -p:PackageVersion=${{ env.RELEASE_VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
 
       - name: 'Push github.com package'
         run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\Objectiks.NoDb\*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s ${{ env.GIT_SOURCE_URL }} --skip-duplicate
 
       #- name: 'Push nuget.org package'
-      #  run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\Objectiks\*.nupkg -k ${{ secrets.NUGET_TOKEN }} -s ${{ env.NUGET_SOURCE_URL }} --skip-duplicate
+      #  run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\Objectiks.NoDb\*.nupkg -k ${{ secrets.NUGET_TOKEN }} -s ${{ env.NUGET_SOURCE_URL }} --skip-duplicate
 
 
       #Objectiks.Redis
@@ -82,11 +71,11 @@ jobs:
         run: dotnet build ${{ env.PROJECT_PATH }}Objectiks.Redis/Objectiks.Redis.csproj --no-restore --configuration Release
 
       - name: 'Pack project'
-        run: dotnet pack ${{ env.PROJECT_PATH }}Objectiks.Redis/Objectiks.Redis.csproj --no-restore --no-build --configuration Release --include-symbols --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+        run: dotnet pack ${{ env.PROJECT_PATH }}Objectiks.Redis/Objectiks.Redis.csproj --no-restore --no-build --configuration Release --include-symbols --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\Objectiks.Redis
         #run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols -p:PackageVersion=${{ env.RELEASE_VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
 
       - name: 'Push github.com package'
         run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\Objectiks.Redis\*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s ${{ env.GIT_SOURCE_URL }} --skip-duplicate
 
       #- name: 'Push nuget.org package'
-      #  run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\Objectiks\*.nupkg -k ${{ secrets.NUGET_TOKEN }} -s ${{ env.NUGET_SOURCE_URL }} --skip-duplicate
+      #  run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\Objectiks.Redis\*.nupkg -k ${{ secrets.NUGET_TOKEN }} -s ${{ env.NUGET_SOURCE_URL }} --skip-duplicate

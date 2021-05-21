@@ -2,19 +2,11 @@
 
 Objectiks is an open-source NoDb json document store, that can run over a single or multiple **json** files.
 
-### Tasks
-
-- [x] File watcher
-- [x] Nuget Package
-- [ ] Sample Project
-- [ ] Refs Sample
-- [ ] Benchmark
-- [ ] Redis Cache
 
 
 ## Get Started
 
-> ```Install-Package Objectiks -Version 0.0.4-beta-6```
+> ```Install-Package Objectiks.NoDb -Version 1.0.0-beta-01```
 
 ##### Folder structure
 
@@ -23,172 +15,47 @@ Objectiks is an open-source NoDb json document store, that can run over a single
 - **Objectiks** [**Root**]
   - **Documents**
     - Pages
-      - Contents
       - Pages.json
-    - Categories
-      - Categories.json
     - Tags
       - Tags.json
-  - **Schemes**
-    - Pages.json
-    - Categories.json
-    - Tags.json
-  - Objectik.json [**manifest**]
-
-
-###### manifest.json (sample)
-
-```json
-{
-  "Name": "Objectiks",
-  "Version": "0.0.4",
-  "Author": "Ahmet Meral",
-  "Primary": "Id",
-  "KeyOf": [],
-  "TypeOf": [ "Pages", "Categories", "Tags" ],
-  "Documents": {
-    "Extention": "*.json",
-    "BufferSize": 512,
-    "Watcher": true,
-    "Storage": {
-      "Parital": true,
-      "Limit": 1000
-    },
-    "Parser": {
-      "PropertyOverride": true
-    },
-    "Cache": {
-      "Expire": 1000
-    }
-  },
-  "Vars": {
-    "AnyVariables": true
-  }
-}
-```
-
-###### pages.json schema (sample)
-
-```json 
-{
-  "TypeOf": "Pages",
-  "ParseOf": "Document",
-  "Primary": "Id",
-  "KeyOf": [ "Name", "Language", "CategoryRef" ],
-  "Refs": [
-    {
-      "ParseOf": "M:M",
-      "TypeOf": "Tags",
-      "KeyOf": {
-        "Source": [ "TagRefs" ],
-        "Target": [ "Id" ],
-        "Any": false
-      },
-      "MapOf": {
-        "Source": "Tags"
-      }
-    },
-    {
-      "ParseOf": "1:1",
-      "TypeOf": "Categories",
-      "KeyOf": {
-        "Source": [ "CategoryRef" ],
-        "Target": [ "Id" ]
-      },
-      "MapOf": {
-        "Source": "Category"
-      }
-    },
-    {
-      "ParseOf": "1:M",
-      "TypeOf": "Categories",
-      "MapOf": {
-        "Source": "Categories"
-      }
-    },
-    {
-      "ParseOf": "1:1F",
-      "TypeOf": "Copy",
-      "MapOf": {
-        "Source": "File",
-        "Target": "Contents"
-      }
-    }
-  ],
-  "Cache": {
-    "Expire": 100000
-  }
-}
-
-```
-
-###### categories.json schema  (sample)
-
-```json 
-{
-  "TypeOf": "Categories",
-  "ParseOf": "Default",
-  "Primary": "Id",
-  "KeyOf": [ "Name", "Language" ]
-}
-```
-
-###### tags.json schema  (sample)
-
-```json 
-{
-  "TypeOf": "Tags",
-  "ParseOf": "Document",
-  "Primary": "Id",
-  "KeyOf": [ "Name" ]
-}
-```
-
+  
 ### How to use Objectiks
 
 ##### Models (samples)
 
 ```csharp
-[TypeOf, Serializable]
+[TypeOf("Pages"), Serializable, CacheOf(1000)]
 public class Pages
 {
     [Primary]
     public int Id { get; set; }
-    public int CategoryRef { get; set; }
-    public int[] TagRefs { get; set; }
-    public string Name { get; set; }
-    public string Language { get; set; }
+
+    [WorkOf, Requried]
+    public int WorkSpaceRef { get; set; }
+
+    [UserOf, Requried]
+    public int UserRef { get; set; }
+
+    [KeyOf, Requried]
+    public string Tag { get; set; }
+
     [Requried]
     public string Title { get; set; }
+
     public string File { get; set; }
+
     [Ignore]
     public string Contents { get; set; }
-    [Ignore]
-    public Categories Category { get; set; }
-    [Ignore]
-    public Tags[] Tags { get; set; }
-    [Ignore]
-    public Categories[] Categories { get; set; }
 }
 
-[TypeOf, Serializable]
-public class Categories
-{
-    [Primary]
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Language { get; set; }
-    public string Title { get; set; }
-    public string Description { get; set; }
-}
-
-[TypeOf, Serializable]
+[TypeOf("Tags"), Serializable,CacheOf(1000)]
 public class Tags
 {
     [Primary]
     public int Id { get; set; }
+
+    [Requried]
     public string Name { get; set; }
-    public string Language { get; set; }
 }
 
 ```
