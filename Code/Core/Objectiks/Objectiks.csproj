@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>1.0.0-beta-01</Version>
+    <Version>1.0.0-beta-02</Version>
     <Authors>Ahmet MERAL</Authors>
     <Title>Objectiks - NoDb json document store</Title>
     <PackageId>Objectiks</PackageId>
