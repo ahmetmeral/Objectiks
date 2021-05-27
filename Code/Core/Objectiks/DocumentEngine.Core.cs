@@ -91,11 +91,6 @@ namespace Objectiks
                 document.UserOf = "0";
             }
 
-            if (!data.ContainsKey(DocumentDefaults.DocumentTypeOf))
-            {
-                data["Type"] = meta.TypeOf;
-            }
-
             document.Data = data;
 
             return document;
