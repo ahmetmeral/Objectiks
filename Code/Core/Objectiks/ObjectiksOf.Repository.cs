@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Objectiks
 {
-    public partial class ObjectiksOf
+    public partial class ObjectiksOf : IDisposable
     {
         private IDocumentEngine Engine;
 
@@ -188,6 +188,11 @@ namespace Objectiks
         public void WatcherOn()
         {
             Engine.Watcher?.On();
+        }
+
+        public void Dispose()
+        {
+            Engine?.Dispose();
         }
     }
 }

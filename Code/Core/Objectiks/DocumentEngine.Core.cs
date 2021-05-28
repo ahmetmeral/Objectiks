@@ -137,5 +137,10 @@ namespace Objectiks
         {
             Monitor.ReleaseTransaction(transaction);
         }
+
+        public virtual void Dispose()
+        {
+            GC.SuppressFinalize(this);
+        }
     }
 }

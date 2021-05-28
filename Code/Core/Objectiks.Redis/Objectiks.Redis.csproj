@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
 
-    <Version>1.0.0-beta-04</Version>
+    <Version>1.0.0-beta-06</Version>
     <Authors>Ahmet MERAL</Authors>
     <Title>Objectiks.Redis - Objectiks redis cache provider</Title>
     <PackageId>Objectiks.Redis</PackageId>

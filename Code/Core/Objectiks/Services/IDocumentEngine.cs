@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Objectiks.Services
 {
-    public interface IDocumentEngine
+    public interface IDocumentEngine : IDisposable
     {
         IDocumentCache Cache { get; }
         IDocumentLogger Logger { get; }
@@ -29,7 +29,7 @@ namespace Objectiks.Services
         void CheckTypeOfSchema(string typeOf);
 
         Document GetDocumentFromSource(ref DocumentMeta meta, JObject data, int partition);
-        
+
 
         DocumentType GetDocumentType(string typeOf);
         IDocumentParser GetDocumentParser(string typeOf, OperationType operation);
