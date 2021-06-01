@@ -23,6 +23,11 @@ namespace Objectiks.Redis
 
         public RedisClient(RedisConfiguration configuration, IDocumentSerializer serializer = null)
         {
+            if (configuration.PoolSize == 0)
+            {
+                configuration.PoolSize = 5;
+            }
+
             Configuration = configuration;
             Serializer = serializer ?? new DocumentBsonSerializer();
             Connection = new RedisConnection(configuration);
