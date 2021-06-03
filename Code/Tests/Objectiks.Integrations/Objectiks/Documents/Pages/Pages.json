@@ -4,6 +4,7 @@
     "AccountRef": 1,
     "UserRef": 1,
     "Tag": "Tag1",
+    "TagOfArray": [ "Tag2", "Tag3" ],
     "Name": "Home",
     "Title": "Home",
     "File": "Home.md"
@@ -13,6 +14,7 @@
     "AccountRef": 1,
     "UserRef": 2,
     "Tag": "Tag1",
+    "TagOfArray": [ "Tag2", "Tag5" ],
     "Name": "Home",
     "Title": "Ana Sayfa",
     "File": "Home.md"

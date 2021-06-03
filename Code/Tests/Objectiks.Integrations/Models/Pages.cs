@@ -22,6 +22,9 @@ namespace Objectiks.Integrations.Models
         [KeyOf, Requried]
         public string Tag { get; set; }
 
+        [KeyOf]
+        public string[] TagOfArray { get; set; }
+
         [Requried]
         public string Title { get; set; }
 

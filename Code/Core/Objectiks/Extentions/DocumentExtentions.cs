@@ -25,20 +25,27 @@ namespace Objectiks.Extentions
             var keyOfProperties = keyOfNames;
             var keyOfValues = new List<string>();
 
-            //if (!keyOfProperties.Contains(primary))
-            //{
-            //    keyOfProperties.Add(primary);
-            //}
-
             foreach (var key in keyOfProperties)
             {
                 if (target.ContainsKey(key))
                 {
-                    var keyValue = target[key].AsString().ToLowerInvariant();
-
-                    if (!String.IsNullOrEmpty(keyValue))
+                    if (target[key].Type == JTokenType.Array)
                     {
-                        keyOfValues.Add(keyValue);
+                        JArray items = target[key].ToObject<JArray>();
+
+                        foreach (var item in items)
+                        {
+                            keyOfValues.Add(item.ToString().ToLowerInvariant());
+                        }
+                    }
+                    else
+                    {
+                        var keyValue = target[key].AsString().ToLowerInvariant();
+
+                        if (!String.IsNullOrEmpty(keyValue))
+                        {
+                            keyOfValues.Add(keyValue);
+                        }
                     }
                 }
                 else

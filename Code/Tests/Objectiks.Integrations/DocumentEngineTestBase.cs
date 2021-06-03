@@ -14,6 +14,34 @@ namespace Objectiks.Integrations
         public abstract void Setup();
 
         [Test]
+        public void DocumentKeyOfArray()
+        {
+            var repos = new ObjectiksOf();
+
+            repos.TruncateOf<Pages>();
+
+            var page = new Pages
+            {
+                WorkSpaceRef = 1,
+                UserRef = 1,
+                Title = "Test Page",
+                Tag = "Tag0",
+                TagOfArray = new string[] { "Tag1", "Tag2" }
+            };
+
+            using (var writer = repos.WriterOf<Pages>())
+            {
+                writer.UseFormatting();
+                writer.AddDocument(page);
+                writer.SubmitChanges();
+            }
+
+            var read_page = repos.TypeOf<Pages>().KeyOf("Tag2").ToList();
+
+            Assert.IsTrue(read_page.Count == 1);
+        }
+
+        [Test]
         public void DocumentWorkOfUserOfKeyOfPrimaryOf()
         {
             var repos = new ObjectiksOf();
@@ -134,7 +162,7 @@ namespace Objectiks.Integrations
             var size = 5;
             var pages = TestSetup.GeneratePages(size, false);
             var repos = new ObjectiksOf();
-          
+
 
             repos.TruncateOf<Pages>();
 
@@ -156,7 +184,7 @@ namespace Objectiks.Integrations
 
             var count_after = repos.Count<Pages>();
 
-            
+
 
             Assert.IsTrue(count_after == size);
         }
@@ -555,7 +583,7 @@ namespace Objectiks.Integrations
                     }
                 }
             });
-            
+
             var logs = DocumentLogger.Logs;
 
             Assert.IsTrue(repos.Count<Pages>() == size);

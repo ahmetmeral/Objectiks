@@ -187,7 +187,7 @@ namespace Objectiks.Engine
 
                     var info = Engine.GetTypeOfDocumentInfo(doc.TypeOf, primaryValue, property.PropertyType);
 
-                    doc.PrimaryOf =  info.PrimaryOf.ToString();
+                    doc.PrimaryOf = info.PrimaryOf.ToString();
                     doc.CacheOf = Engine.Cache.CacheOfDoc(doc.TypeOf, doc.PrimaryOf);
                     doc.Partition = info.Partition;
                     doc.Exists = info.Exists;
@@ -205,10 +205,32 @@ namespace Objectiks.Engine
                 var keyOf = property.GetAttribute<KeyOfAttribute>();
                 if (keyOf != null)
                 {
-                    var value = property.GetValue(model, null);
-                    if (value != null)
+                    TypeCode typeCode = Type.GetTypeCode(property.PropertyType);
+
+                    try
                     {
-                        doc.KeyOfValues.Add(value.ToString().ToLowerInvariant());
+                        var value = property.GetValue(model, null);
+
+                        if (value != null)
+                        {
+                            if (property.PropertyType.IsArray)
+                            {
+                                var list = value as string[];
+
+                                foreach (var item in list)
+                                {
+                                    doc.KeyOfValues.Add(item.ToLowerInvariant());
+                                }
+                            }
+                            else
+                            {
+                                doc.KeyOfValues.Add(value.ToString().ToLowerInvariant());
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        throw new Exception($"Property {property.Name} KeyOf Unsupported Type {typeCode}");
                     }
                 }
                 #endregion
