@@ -38,6 +38,7 @@ namespace Objectiks
         public bool SupportDocumentWatcher { get; set; } = false;
 
         public int BufferSize { get; set; } = 512;
+        public long? MemorySize { get; set; } = null;
         public string Extention { get; set; } = "*.json";
 
 

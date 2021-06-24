@@ -20,10 +20,17 @@ namespace Objectiks.Caching
         private IMemoryCache Cache;
         private static CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
-        public DocumentInMemory(string bucket, IDocumentSerializer serializer)
+        public DocumentInMemory(string bucket, IDocumentSerializer serializer, long? memorySize = null)
             : base(bucket, serializer)
         {
-            Cache = new MemoryCache(new MemoryCacheOptions { });
+            var options = new MemoryCacheOptions();
+
+            if (memorySize.HasValue)
+            {
+                options.SizeLimit = memorySize;
+            }
+
+            Cache = new MemoryCache(options);
         }
 
         public override void Set(Document document, int expire)
