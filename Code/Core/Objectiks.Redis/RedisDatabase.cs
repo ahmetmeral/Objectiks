@@ -90,7 +90,7 @@ namespace Objectiks.Redis
             return Database.KeyDeleteAsync(key, flags);
         }
 
-        public void Flush(int databaseNumber)
+        public void Flush()
         {
             var endPoints = Database.Multiplexer.GetEndPoints();
 
@@ -101,7 +101,7 @@ namespace Objectiks.Redis
                 var server = Database.Multiplexer.GetServer(endPoints[i]);
 
                 if (!server.IsReplica)
-                    tasks.Add(server.FlushDatabaseAsync(databaseNumber));
+                    tasks.Add(server.FlushDatabaseAsync(Number));
             }
 
             Task.WhenAll(tasks);

@@ -176,7 +176,7 @@ namespace Objectiks.Redis
 
         public override void Flush()
         {
-            Database.Flush(Database.Number);
+            Database.Flush();
         }
     }
 }
