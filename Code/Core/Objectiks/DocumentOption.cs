@@ -51,7 +51,7 @@ namespace Objectiks
         {
             if (CacheInstance == null)
             {
-                CacheInstance = new DocumentInMemory(Name, new DocumentBsonSerializer());
+                CacheInstance = new DocumentInMemory(Name, new DocumentBsonSerializer(), MemorySize);
             }
         }
 
