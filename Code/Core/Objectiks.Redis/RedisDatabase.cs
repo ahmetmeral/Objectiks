@@ -90,6 +90,16 @@ namespace Objectiks.Redis
             return Database.KeyDeleteAsync(key, flags);
         }
 
+        public bool Exists(string key, CommandFlags flags = CommandFlags.None)
+        {
+            return Database.KeyExists(key, flags);
+        }
+
+        public Task<bool> ExistsAsync(string key, CommandFlags flags = CommandFlags.None)
+        {
+            return Database.KeyExistsAsync(key, flags);
+        }
+
         public void Flush()
         {
             var endPoints = Database.Multiplexer.GetEndPoints();
