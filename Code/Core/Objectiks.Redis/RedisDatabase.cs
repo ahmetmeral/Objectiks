@@ -89,5 +89,22 @@ namespace Objectiks.Redis
         {
             return Database.KeyDeleteAsync(key, flags);
         }
+
+        public void Flush(int databaseNumber)
+        {
+            var endPoints = Database.Multiplexer.GetEndPoints();
+
+            var tasks = new List<Task>(endPoints.Length);
+
+            for (var i = 0; i < endPoints.Length; i++)
+            {
+                var server = Database.Multiplexer.GetServer(endPoints[i]);
+
+                if (!server.IsReplica)
+                    tasks.Add(server.FlushDatabaseAsync(databaseNumber));
+            }
+
+            Task.WhenAll(tasks);
+        }
     }
 }

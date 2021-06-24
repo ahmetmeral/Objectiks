@@ -176,21 +176,7 @@ namespace Objectiks.Redis
 
         public override void Flush()
         {
-            var endPoints = Database.Database.Multiplexer.GetEndPoints();
-
-            var tasks = new List<Task>(endPoints.Length);
-
-            for (var i = 0; i < endPoints.Length; i++)
-            {
-                var server = Database.Database.Multiplexer.GetServer(endPoints[i]);
-
-                if (!server.IsReplica)
-                    tasks.Add(server.FlushDatabaseAsync(Database.Number));
-            }
-
-            Task.WhenAll(tasks);
+            Database.Flush(Database.Number);
         }
-
-
     }
 }
