@@ -32,7 +32,7 @@ namespace Objectiks.Caching.Serializer
                 using (BsonDataWriter writer = new BsonDataWriter(ms))
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    serializer.Serialize(writer, item, item.GetType());
+                    serializer.Serialize(writer, item, item?.GetType());
 
                     return ms.ToArray();
                 }

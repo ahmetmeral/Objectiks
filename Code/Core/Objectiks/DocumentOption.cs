@@ -20,10 +20,11 @@ namespace Objectiks
         internal IDocumentCache CacheInstance { get; set; }
         internal IDocumentWatcher DocumentWatcher { get; set; }
         internal IDocumentLogger DocumentLogger { get; set; }
-        internal List<IDocumentParser> ParserOfTypes { get; set; }
+        
         internal Type EngineProvider { get; set; }
         internal bool HasManifest { get; set; }
 
+        public List<IDocumentParser> ParserOfTypes { get; set; }
         public DocumentTypes TypeOf { get; set; } = new DocumentTypes();
         public DocumentVars Vars { get; set; } = new DocumentVars();
 
