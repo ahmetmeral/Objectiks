@@ -42,6 +42,18 @@ namespace Objectiks.Redis
             return Database.StringSetAsync(key, bytes, null, when, flag);
         }
 
+
+        public bool Set(RedisKey key, byte[] bytes, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSet(key, bytes, null, when, flag);
+        }
+
+        public Task<bool> SetAsync(RedisKey key, byte[] bytes, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSetAsync(key, bytes, null, when, flag);
+        }
+
+
         public bool Set<T>(RedisKey key, T value, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
         {
             var bytes = Serializer.Serialize(value);
@@ -55,6 +67,18 @@ namespace Objectiks.Redis
 
             return Database.StringSetAsync(key, bytes, TimeSpan.FromMinutes(expiry), when, flag);
         }
+
+
+        public bool Set(RedisKey key, byte[] bytes, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSet(key, bytes, TimeSpan.FromMinutes(expiry), when, flag);
+        }
+
+        public Task<bool> SetAsync(RedisKey key, byte[] bytes, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSetAsync(key, bytes, TimeSpan.FromMinutes(expiry), when, flag);
+        }
+
 
         public T Get<T>(RedisKey key, CommandFlags flags = CommandFlags.None)
         {
@@ -79,6 +103,31 @@ namespace Objectiks.Redis
 
             return Serializer.Deserialize<T>(bytes);
         }
+
+        public byte[] Get(RedisKey key, CommandFlags flags = CommandFlags.None)
+        {
+            var bytes = Database.StringGet(key, flags);
+
+            if (!bytes.HasValue)
+            {
+                return default;
+            }
+
+            return bytes;
+        }
+
+        public async Task<byte[]> GetAsync(RedisKey key, CommandFlags flags = CommandFlags.None)
+        {
+            var bytes = await Database.StringGetAsync(key, flags).ConfigureAwait(false);
+
+            if (!bytes.HasValue)
+            {
+                return default;
+            }
+
+            return bytes;
+        }
+
 
         public bool Remove(string key, CommandFlags flags = CommandFlags.None)
         {
