@@ -28,16 +28,6 @@ namespace Objectiks.Redis
             Number = databaseNumber;
         }
 
-        public bool Set(RedisKey key, RedisValue value, When when = When.Always, CommandFlags flag = CommandFlags.None)
-        {
-            return Database.StringSet(key, value, null, when, flag);
-        }
-
-        public Task<bool> SetAsync(RedisKey key, RedisValue value, When when = When.Always, CommandFlags flag = CommandFlags.None)
-        {
-            return Database.StringSetAsync(key, value, null, when, flag);
-        }
-
 
         public bool Set<T>(RedisKey key, T value, When when = When.Always, CommandFlags flag = CommandFlags.None)
         {
@@ -65,17 +55,6 @@ namespace Objectiks.Redis
         }
 
 
-        public bool Set(RedisKey key, RedisValue value, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
-        {
-            return Database.StringSet(key, value, TimeSpan.FromMinutes(expiry), when, flag);
-        }
-
-        public Task<bool> SetAsync(RedisKey key, RedisValue value, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
-        {
-            return Database.StringSetAsync(key, value, TimeSpan.FromMinutes(expiry), when, flag);
-        }
-
-
         public bool Set<T>(RedisKey key, T value, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
         {
             var bytes = Serializer.Serialize(value);
@@ -100,7 +79,6 @@ namespace Objectiks.Redis
         {
             return Database.StringSetAsync(key, bytes, TimeSpan.FromMinutes(expiry), when, flag);
         }
-
 
         public T Get<T>(RedisKey key, CommandFlags flags = CommandFlags.None)
         {
@@ -148,6 +126,51 @@ namespace Objectiks.Redis
             }
 
             return bytes;
+        }
+
+
+        public bool StringSet(RedisKey key, RedisValue value, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSet(key, value, TimeSpan.FromMinutes(expiry), when, flag);
+        }
+
+        public Task<bool> StringSetAsync(RedisKey key, RedisValue value, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSetAsync(key, value, TimeSpan.FromMinutes(expiry), when, flag);
+        }
+
+        public bool StringSet(RedisKey key, RedisValue value, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSet(key, value, null, when, flag);
+        }
+
+        public Task<bool> StringSetAsync(RedisKey key, RedisValue value, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSetAsync(key, value, null, when, flag);
+        }
+
+        public string StringGet(RedisKey key, CommandFlags flags = CommandFlags.None)
+        {
+            var value = Database.StringGet(key, flags);
+
+            if (!value.HasValue)
+            {
+                return default;
+            }
+
+            return value;
+        }
+
+        public async Task<string> StringGetAsync(RedisKey key, CommandFlags flags = CommandFlags.None)
+        {
+            var value = await Database.StringGetAsync(key, flags).ConfigureAwait(false);
+
+            if (!value.HasValue)
+            {
+                return default;
+            }
+
+            return value;
         }
 
 
