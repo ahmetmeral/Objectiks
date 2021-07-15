@@ -28,6 +28,17 @@ namespace Objectiks.Redis
             Number = databaseNumber;
         }
 
+        public bool Set(RedisKey key, RedisValue value, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSet(key, value, null, when, flag);
+        }
+
+        public Task<bool> SetAsync(RedisKey key, RedisValue value, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSetAsync(key, value, null, when, flag);
+        }
+
+
         public bool Set<T>(RedisKey key, T value, When when = When.Always, CommandFlags flag = CommandFlags.None)
         {
             var bytes = Serializer.Serialize(value);
@@ -51,6 +62,17 @@ namespace Objectiks.Redis
         public Task<bool> SetAsync(RedisKey key, byte[] bytes, When when = When.Always, CommandFlags flag = CommandFlags.None)
         {
             return Database.StringSetAsync(key, bytes, null, when, flag);
+        }
+
+
+        public bool Set(RedisKey key, RedisValue value, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSet(key, value, TimeSpan.FromMinutes(expiry), when, flag);
+        }
+
+        public Task<bool> SetAsync(RedisKey key, RedisValue value, int expiry, When when = When.Always, CommandFlags flag = CommandFlags.None)
+        {
+            return Database.StringSetAsync(key, value, TimeSpan.FromMinutes(expiry), when, flag);
         }
 
 
