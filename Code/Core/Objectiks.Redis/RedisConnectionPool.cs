@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Objectiks.Redis
 {
+    //references: https://github.com/imperugo/StackExchange.Redis.Extensions
     public class RedisConnectionPool : IDisposable
     {
         public IConnectionMultiplexer Connection { get; set; }
@@ -23,7 +24,7 @@ namespace Objectiks.Redis
 
         private void ConnectionFailed(object sender, ConnectionFailedEventArgs e)
         {
-
+            
         }
 
         private void ConnectionRestored(object sender, ConnectionFailedEventArgs e)

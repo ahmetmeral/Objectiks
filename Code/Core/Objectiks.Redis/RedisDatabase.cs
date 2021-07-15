@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace Objectiks.Redis
 {
+
+    //references: https://github.com/imperugo/StackExchange.Redis.Extensions
     public class RedisDatabase
     {
         public int Number { get; private set; }
@@ -17,9 +19,11 @@ namespace Objectiks.Redis
         {
             get
             {
-                return Connection.GetConnection().GetDatabase(Number);
+                return Connection.GetConnection()?.GetDatabase(Number);
             }
         }
+
+        internal RedisDatabase() { }
 
         public RedisDatabase(RedisConnection connection, IDocumentSerializer serializer, int databaseNumber)
         {

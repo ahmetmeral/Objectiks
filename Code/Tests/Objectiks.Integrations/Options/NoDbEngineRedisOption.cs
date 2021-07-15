@@ -21,7 +21,7 @@ namespace Objectiks.Integrations.Options
 
             var cacheConfig = new RedisConfiguration
             {
-                Database = 15,
+                Database = 0,
                 Hosts = new RedisHost[] { new RedisHost() },
                 ConnectionTimeout = 20000,
                 SyncTimeout = 20000,

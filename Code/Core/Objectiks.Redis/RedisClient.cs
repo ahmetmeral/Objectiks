@@ -8,17 +8,29 @@ using System.Text;
 
 namespace Objectiks.Redis
 {
-    public class RedisClient
+    //references: https://github.com/imperugo/StackExchange.Redis.Extensions
+    public class RedisClient : IDisposable
     {
-        private readonly RedisConnection Connection;
         private readonly IDocumentSerializer Serializer;
-
         private RedisConfiguration Configuration;
+        private RedisConnection Connection;
+
+        public bool IsConnected
+        {
+            get
+            {
+                if (!Connection.IsConnected)
+                {
+                    Reset();
+                }
+
+                return Connection.IsConnected;
+            }
+        }
 
         public RedisClient(string connectionString, IDocumentSerializer serializer = null)
             : this(new RedisConfiguration(connectionString), serializer)
         {
-
         }
 
         public RedisClient(RedisConfiguration configuration, IDocumentSerializer serializer = null)
@@ -33,9 +45,39 @@ namespace Objectiks.Redis
             Connection = new RedisConnection(configuration);
         }
 
+        public RedisConnectionInformation GetInformation()
+        {
+            return Connection.GetInformations();
+        }
+
+        public void Reset()
+        {
+            Connection.Reset();
+            Connection = new RedisConnection(Configuration);
+        }
+
         public RedisDatabase GetDatabase(int databaseNumber)
         {
-            return new RedisDatabase(Connection, Serializer, databaseNumber);
+            try
+            {
+                if (!IsConnected)
+                {
+                    throw new Exception("Redis connection failed..");
+                }
+
+                return new RedisDatabase(Connection, Serializer, databaseNumber);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public void Dispose()
+        {
+            Connection.Reset();
+            Connection?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }
