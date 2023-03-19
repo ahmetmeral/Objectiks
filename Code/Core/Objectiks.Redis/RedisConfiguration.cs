@@ -14,6 +14,9 @@ namespace Objectiks.Redis
         public int ConnectionTimeout { get; set; } = 5000;
         public int SyncTimeout { get; set; } = 5000;
         public bool AllowAdmin { get; set; } = false;
+        public bool AbortOnConnectFail { get; set; } = false;
+        public string User { get; set; }
+        public string Password { get; set; }
         public RedisHost[] Hosts { get; set; }
 
 
@@ -36,7 +39,10 @@ namespace Objectiks.Redis
                 {
                     ConnectTimeout = ConnectionTimeout,
                     SyncTimeout = SyncTimeout,
-                    AllowAdmin = AllowAdmin
+                    AllowAdmin = AllowAdmin,
+                    User = User,
+                    Password = Password,
+                    AbortOnConnectFail = AbortOnConnectFail
                 };
 
                 foreach (var redis in Hosts)
